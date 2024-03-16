@@ -8,7 +8,7 @@
 
 #### Target users
 
-- SUSTech students and faculty
+- SUSTech students and faculty members
 
 #### Functionalities
 
@@ -62,3 +62,7 @@ We need the list of students' id number and their names. They are stored in comp
 The root services is running in macOS Sonoma 14.4.
 
 ## 3. AI Usage
+
+![image-chatgpt-Q](image-chatgpt-Q.png)
+
+![image-chatgpt-A](image-chatgpt-A.png)
