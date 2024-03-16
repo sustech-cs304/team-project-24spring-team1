@@ -24,6 +24,12 @@ We aim to construct a huge online platform which serves mainly for students. Stu
 
 #### Functional requirements
 
+- Event Listings:
+
+  - Browse through a comprehensive list of upcoming events including performances, lectures, competitions, and more.
+  - Filter events by category, date, popularity, and relevance to easily find what interests you.
+  - View detailed event descriptions, including date, time, venue, organizer, and ticket availability.
+
 - Enter an activity easily 
 
   Take part in an activity shown in your homepage, or search a specific event using its name or id.
