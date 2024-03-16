@@ -26,6 +26,26 @@ We aim to construct a huge online platform which serves mainly for students. Stu
 
 #### Functional requirements
 
+- Enter an activity easily 
+
+  Take part in an activity shown in your homepage, or search a specific event using its name or id.
+
+- Sign up with verified identity 
+
+  When signing up, please give your name and student ID number, aiming to ensure that you are a student in our university.
+
+- Share enterred activities in different ways 
+
+  After enjoying an activity, you can share it in your moments, using words, pictures, even videos.
+
+- Make comments to others sharings and chat with others 
+
+  Noticing an attractive activity, you can chat with other students to acquire more details, or answer others' questions.
+
+- Hilarious and cute stickers 
+
+  Send a sticker to make your chats more fun. They are totally free with a huge amount.
+
 **Account**
 
 1. Sign up page
@@ -64,7 +84,7 @@ We aim to construct a huge online platform which serves mainly for students. Stu
 
 5. ask for assistance
 
-**Comminity**
+**Community**
 
 1. Share enterred activities in different ways
    After enjoying an activity, you can share it in your moments, using words, pictures, even videos.
@@ -106,11 +126,3 @@ The root services is running in macOS Sonoma 14.4.
 
 
 ## 3. AI Usage
-
-1. activity recommendation: recommend activities on the main page to the user according to view history.
-
-2. friend recommendation
-
-3. facial recognition
-
-   

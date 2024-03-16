@@ -2,7 +2,9 @@
 
 ## 1. Project Overview
 
-On the SUSTech campus, there is a wide variety of channels for releasing information about events, covering a wide range of methods such as emails, public numbers, QQ groups, and so on. However, this diversity also brings some inconvenience to students and faculty. For example, students who want to participate in an event need to search for the availability of relevant information on various channels, which causes a certain degree of inconvenience. In addition, organizers who hold events also need to release information about the event on different channels, while there may be many different forms of registration, such as using questionnaire stars, WeChat groups, or filling out Tencent documents. To address these issues and make life easier for SUSTech students and faculty, we plan to develop a comprehensive campus event service website. The site will allow SUSTech students and faculty to browse information about various performances, lectures, competitions and other events on campus, and provide functions such as booking, purchasing tickets and writing reviews.
+​	On the SUSTech campus, there is a wide variety of channels for releasing information about events, covering a wide range of methods such as emails, public numbers, QQ groups, and so on. However, this diversity also brings some inconvenience to students and faculty. For example, students who want to participate in an event need to search for the availability of relevant information on various channels, which causes a certain degree of inconvenience. In addition, organizers who hold events also need to release information about the event on different channels, while there may be many different forms of registration, such as using questionnaire stars, WeChat groups, or filling out Tencent documents. 
+
+​	To address these issues and make life easier for SUSTech students and faculty, we plan to develop a comprehensive campus event service website. The site will allow SUSTech students and faculty to *browse information about various performances (e.g., musical concerts), lectures, competitions and other events on campus*, and provide functions such as *booking, purchasing tickets and writing reviews*.
 
 #### Target users
 
@@ -22,34 +24,25 @@ We aim to construct a huge online platform which serves mainly for students. Stu
 
 #### Functional requirements
 
-**Account**
+- Enter an activity easily 
 
-1. Sign up with verified identity
-   When signing up, please give your name and student ID number, aiming to ensure that you are a student in our university.
+  Take part in an activity shown in your homepage, or search a specific event using its name or id.
 
-2. Account Interface
+- Sign up with verified identity 
 
-   - User can see profile photo, username，activities attended，posted activities/published posts
+  When signing up, please give your name and student ID number, aiming to ensure that you are a student in our university.
 
-   - User can change profile photo, username
+- Share enterred activities in different ways 
 
-**Activity Center**
+  After enjoying an activity, you can share it in your moments, using words, pictures, even videos.
 
-1. Enter an activity easily
-   Take part in an activity shown in your homepage, or search a specific event using its name, id or keywords.
+- Make comments to others sharings and chat with others 
 
-2. Book a seat
+  Noticing an attractive activity, you can chat with other students to acquire more details, or answer others' questions.
 
-   Users see the activity they want to participate in, they can book seats on the website, note that user cannot book seats for more than one activity at the same time
+- Hilarious and cute stickers 
 
-**Comminity**
-
-1. Share enterred activities in different ways
-   After enjoying an activity, you can share it in your moments, using words, pictures, even videos.
-2. Make comments to others sharings and chat with others
-   Noticing an attractive activity, you can chat with other students to acquire more details, or answer others' questions.
-3. Hilarious and cute stickers
-   Send a sticker to make your chats more fun. They are totally free with a huge amount.
+  Send a sticker to make your chats more fun. They are totally free with a huge amount.
 
 #### Non-functional requirements
 
@@ -67,7 +60,5 @@ We need the list of students' id number and their names. They are stored in comp
 #### Technical requirements
 
 The root services is running in macOS Sonoma 14.4.
-
-
 
 ## 3. AI Usage
