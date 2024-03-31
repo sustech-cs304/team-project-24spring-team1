@@ -124,8 +124,8 @@ struct RegisterForm {
 
 #[derive(Debug, Deserialize, Validate)]
 struct LoginForm {
-    #[validate(length(min = 1, max = 30))]
-    name: String,
+    #[validate(range(min = 10000000, max = 99999999))]
+    student_id: i32,
 
     #[validate(length(min = 8, max = 64))]
     password: String,
@@ -145,7 +145,7 @@ struct CheckResponse {
 #[post("/register")]
 async fn register(
     state: web::Data<AppState>,
-    form: web::Form<RegisterForm>,
+    form: web::Json<RegisterForm>,
 ) -> Result<impl Responder> {
     let form = form.into_inner();
     form.validate()?;
@@ -171,11 +171,11 @@ async fn register(
 }
 
 #[post("/login")]
-async fn login(state: web::Data<AppState>, form: web::Form<LoginForm>) -> Result<impl Responder> {
+async fn login(state: web::Data<AppState>, form: web::Json<LoginForm>) -> Result<impl Responder> {
     let form = form.into_inner();
     form.validate()?;
 
-    let AccountCredential { id, password } = Account::by_name(&form.name)
+    let AccountCredential { id, password } = Account::by_student_id(form.student_id)
         .select(AccountCredential::as_select())
         .first(&mut state.pool.get().await?)
         .await?;

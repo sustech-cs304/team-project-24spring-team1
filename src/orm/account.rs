@@ -38,6 +38,8 @@ trait Selectable = diesel::expression::Selectable<Pg>;
 type All = Select<Table, AsSelect<Account, Pg>>;
 type WithName<'a> = Eq<accounts::name, &'a str>;
 type ByName<'a> = Filter<All, WithName<'a>>;
+type WithStudentId = Eq<accounts::student_id, i32>;
+type ByStudentId = Filter<All, WithStudentId>;
 type FindId = Find<All, i32>;
 
 impl Account {
@@ -47,6 +49,10 @@ impl Account {
 
     pub fn by_name(name: &str) -> ByName<'_> {
         Self::all().filter(accounts::name.eq(name))
+    }
+
+    pub fn by_student_id(student_id: i32) -> ByStudentId {
+        Self::all().filter(accounts::student_id.eq(student_id))
     }
 
     pub fn find(id: i32) -> FindId {
