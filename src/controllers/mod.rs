@@ -12,7 +12,8 @@ pub struct AppState {
 }
 
 pub async fn run() -> std::io::Result<()> {
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let database_url = env::var("DATABASE_URL")
+        .expect("DATABASE_URL must be set, e.g. DATABASE_URL=postgres://<user>:<passwd>@127.0.0.1:5432/<db>");
     let pool_config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(database_url);
     let pool = Pool::builder(pool_config).build().unwrap();
 
