@@ -23,6 +23,7 @@ struct NewEventForm {
     pub venue_id: i32,
     pub description: String,
     pub tickets: Option<i32>,
+    pub registeration_deadline: Option<NaiveDateTime>,
 }
 
 #[derive(Debug, Deserialize, Validate)]
@@ -63,6 +64,7 @@ async fn new_event(
         description: &form.description,
         organizer_id: auth.user_id,
         tickets: form.tickets,
+        registeration_deadline: form.registeration_deadline,
     };
 
     let id = new_event

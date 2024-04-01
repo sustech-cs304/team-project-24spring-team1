@@ -31,6 +31,7 @@ pub struct NewEvent<'a> {
     pub description: &'a str,
     pub organizer_id: i32,
     pub tickets: Option<i32>,
+    pub registeration_deadline: Option<NaiveDateTime>,
 }
 
 #[derive(Debug, Selectable, Identifiable, Queryable)]
@@ -47,6 +48,7 @@ pub struct Event {
     pub description: String,
     pub organizer_id: i32,
     pub tickets: Option<i32>,
+    pub registeration_deadline: Option<NaiveDateTime>,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
@@ -65,6 +67,7 @@ pub struct EventDisplay {
     #[diesel(embed)]
     pub organizer: AccountProfile,
     pub tickets: Option<i32>,
+    pub registeration_deadline: Option<NaiveDateTime>,
 }
 
 #[derive(Debug, Serialize, Selectable, Queryable)]
@@ -81,6 +84,7 @@ pub struct EventSummary {
     #[diesel(embed)]
     pub organizer: AccountProfile,
     pub tickets: Option<i32>,
+    pub registeration_deadline: Option<NaiveDateTime>,
 }
 
 type Table = events::table;

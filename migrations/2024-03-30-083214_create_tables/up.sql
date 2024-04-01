@@ -32,6 +32,7 @@ CREATE TABLE events (
     description TEXT NOT NULL,
     organizer_id INT NOT NULL REFERENCES accounts(id),
     tickets INT,
+    registeration_deadline TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

@@ -42,6 +42,7 @@ diesel::table! {
         description -> Text,
         organizer_id -> Int4,
         tickets -> Nullable<Int4>,
+        registeration_deadline -> Nullable<Timestamp>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
