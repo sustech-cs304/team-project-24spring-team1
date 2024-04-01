@@ -11,10 +11,11 @@ mod orm;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenvy::dotenv().unwrap();
     if std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "info");
     }
-    dotenvy::dotenv().unwrap();
+
     pretty_env_logger::init();
 
     controllers::run().await
