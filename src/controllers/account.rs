@@ -163,6 +163,10 @@ async fn register(
         .get_result(&mut state.pool.get().await?)
         .await?;
 
+    debug!(
+        "New account created: {}, sid={}, id={user_id}",
+        form.name, form.sustech_id
+    );
     let resp = AuthResponse {
         user_id,
         token: generate_token(user_id),
@@ -181,6 +185,7 @@ async fn login(state: web::Data<AppState>, form: web::Json<LoginForm>) -> Result
         .await?;
     verify_password(&form.password, &password)?;
 
+    debug!("Account logged in: sid={}, id={id}", form.sustech_id);
     let resp = AuthResponse {
         user_id: id,
         token: generate_token(id),
