@@ -53,6 +53,7 @@ struct EventIdResponse {
 #[derive(Debug, Serialize)]
 struct ListEventsResponse {
     pub page: Page,
+    pub event_by_id: Option<EventSummary>,
     pub events: Vec<EventSummary>,
 }
 
@@ -125,6 +126,15 @@ async fn list_events(
         sql
     };
 
+    let event_by_id = if let Some(id) = query.name.as_ref().and_then(|name| name.parse().ok()) {
+        let event = Event::find_as_summary(id)
+            .get_result(&mut state.pool.get().await?)
+            .await?;
+        Some(event)
+    } else {
+        None
+    };
+
     let total_item = as_query()
         .count()
         .get_result(&mut state.pool.get().await?)
@@ -141,7 +151,11 @@ async fn list_events(
         .get_results(&mut state.pool.get().await?)
         .await?;
 
-    Ok(web::Json(ListEventsResponse { page, events }))
+    Ok(web::Json(ListEventsResponse {
+        page,
+        event_by_id,
+        events,
+    }))
 }
 
 #[get("/{id}")]
