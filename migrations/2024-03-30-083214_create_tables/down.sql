@@ -1,1 +1,2 @@
-DROP TABLE accounts;
+DROP TABLE IF EXISTS accounts;
+DROP TYPE IF EXISTS Role;

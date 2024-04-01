@@ -3,8 +3,17 @@ use diesel::dsl::{AsSelect, Eq, Filter, Find, Select};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::query_builder::InsertStatement;
+use diesel_derive_enum::DbEnum;
 
 use super::schema::*;
+
+#[derive(Debug, DbEnum)]
+#[ExistingTypePath = "crate::orm::schema::sql_types::Role"]
+pub enum Role {
+    Admin,
+    Staff,
+    Student,
+}
 
 #[derive(Debug, Insertable)]
 #[diesel(table_name = accounts)]
@@ -21,6 +30,7 @@ pub struct Account {
     pub sustech_id: i32,
     pub name: String,
     pub password: String,
+    pub role: Role,
     pub registered_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
