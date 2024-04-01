@@ -26,12 +26,22 @@ struct NewEventForm {
     pub registeration_deadline: Option<NaiveDateTime>,
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum EventStatus {
+    Applicable,
+    NotStarted,
+    Ongoing,
+    Ended,
+}
+
 #[derive(Debug, Deserialize, Validate)]
 struct EventFilterQuery {
     pub name: Option<String>,
     pub kind: Option<EventType>,
     pub venue_id: Option<i32>,
     pub organizer_id: Option<i32>,
+    pub status: Option<EventStatus>,
     pub page: Option<i64>,
 }
 
@@ -85,6 +95,8 @@ async fn list_events(
     let query = query.into_inner();
     query.validate()?;
 
+    let now = Utc::now().naive_utc();
+
     let as_query = || {
         let mut sql = Event::all().into_boxed();
         if let Some(name) = &query.name {
@@ -99,6 +111,17 @@ async fn list_events(
         if let Some(organizer_id) = &query.organizer_id {
             sql = sql.filter(events::organizer_id.eq(organizer_id));
         }
+
+        sql = match query.status {
+            Some(EventStatus::Applicable) => sql.filter(events::registeration_deadline.gt(now)),
+            Some(EventStatus::NotStarted) => sql.filter(events::start_at.gt(now)),
+            Some(EventStatus::Ongoing) => sql
+                .filter(events::start_at.le(now))
+                .filter(events::end_at.gt(now)),
+            Some(EventStatus::Ended) => sql.filter(events::end_at.le(now)),
+            None => sql,
+        };
+
         sql
     };
 
