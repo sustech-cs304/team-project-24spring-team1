@@ -108,7 +108,7 @@ impl FromRequest for JwtAuth {
     }
 }
 
-/// Handlers
+// ===== Handlers =====
 
 #[derive(Debug, Deserialize, Validate)]
 struct RegisterForm {
@@ -164,7 +164,7 @@ async fn register(
         .await?;
 
     debug!(
-        "New account created: {}, sid={}, id={user_id}",
+        "New account created: {:?}, sid={}, id={user_id}",
         form.name, form.sustech_id
     );
     let resp = AuthResponse {

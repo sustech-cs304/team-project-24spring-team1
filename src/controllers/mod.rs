@@ -6,6 +6,8 @@ use diesel_async::AsyncPgConnection;
 use std::env;
 
 mod account;
+mod event;
+mod metadata;
 
 pub struct AppState {
     pool: Pool<AsyncPgConnection>,
@@ -30,5 +32,7 @@ pub async fn run() -> std::io::Result<()> {
 }
 
 fn configure(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/account").configure(account::configure));
+    cfg.service(web::scope("/account").configure(account::configure))
+        .service(web::scope("/metadata").configure(metadata::configure))
+        .service(web::scope("/event").configure(event::configure));
 }

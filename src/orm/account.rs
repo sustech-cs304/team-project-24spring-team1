@@ -43,7 +43,6 @@ pub struct AccountCredential {
 }
 
 type Table = accounts::table;
-trait Selectable = diesel::expression::Selectable<Pg>;
 
 type All = Select<Table, AsSelect<Account, Pg>>;
 type WithName<'a> = Eq<accounts::name, &'a str>;
