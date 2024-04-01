@@ -21,7 +21,7 @@ pub async fn run() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(AppState { pool: pool.clone() }))
             .wrap(Logger::default())
-            .service(web::scope("/api").configure(config))
+            .service(web::scope("/api").configure(configure))
     })
     .bind(("127.0.0.1", 8080))?
     .workers(2)
@@ -29,6 +29,6 @@ pub async fn run() -> std::io::Result<()> {
     .await
 }
 
-fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/account").configure(account::config));
+fn configure(cfg: &mut web::ServiceConfig) {
+    cfg.service(web::scope("/account").configure(account::configure));
 }

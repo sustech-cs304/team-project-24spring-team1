@@ -195,6 +195,6 @@ async fn check(_auth: JwtAuth) -> Result<impl Responder> {
     }))
 }
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(register).service(login).service(check);
 }
