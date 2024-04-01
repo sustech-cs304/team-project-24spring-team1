@@ -9,7 +9,7 @@ use super::schema::*;
 #[derive(Debug, Insertable)]
 #[diesel(table_name = accounts)]
 pub struct NewAccount<'a> {
-    pub student_id: i32,
+    pub sustech_id: i32,
     pub name: &'a str,
     pub password: &'a str,
 }
@@ -18,7 +18,7 @@ pub struct NewAccount<'a> {
 #[diesel(table_name = accounts)]
 pub struct Account {
     pub id: i32,
-    pub student_id: i32,
+    pub sustech_id: i32,
     pub name: String,
     pub password: String,
     pub registered_at: Option<NaiveDateTime>,
@@ -38,7 +38,7 @@ trait Selectable = diesel::expression::Selectable<Pg>;
 type All = Select<Table, AsSelect<Account, Pg>>;
 type WithName<'a> = Eq<accounts::name, &'a str>;
 type ByName<'a> = Filter<All, WithName<'a>>;
-type WithStudentId = Eq<accounts::student_id, i32>;
+type WithStudentId = Eq<accounts::sustech_id, i32>;
 type ByStudentId = Filter<All, WithStudentId>;
 type FindId = Find<All, i32>;
 
@@ -51,8 +51,8 @@ impl Account {
         Self::all().filter(accounts::name.eq(name))
     }
 
-    pub fn by_student_id(student_id: i32) -> ByStudentId {
-        Self::all().filter(accounts::student_id.eq(student_id))
+    pub fn by_sustech_id(sustech_id: i32) -> ByStudentId {
+        Self::all().filter(accounts::sustech_id.eq(sustech_id))
     }
 
     pub fn find(id: i32) -> FindId {

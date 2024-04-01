@@ -113,7 +113,7 @@ impl FromRequest for JwtAuth {
 #[derive(Debug, Deserialize, Validate)]
 struct RegisterForm {
     #[validate(range(min = 10000000, max = 99999999))]
-    student_id: i32,
+    sustech_id: i32,
 
     #[validate(length(min = 1, max = 30))]
     name: String,
@@ -125,7 +125,7 @@ struct RegisterForm {
 #[derive(Debug, Deserialize, Validate)]
 struct LoginForm {
     #[validate(range(min = 10000000, max = 99999999))]
-    student_id: i32,
+    sustech_id: i32,
 
     #[validate(length(min = 8, max = 64))]
     password: String,
@@ -152,7 +152,7 @@ async fn register(
 
     let password_hash = hash_password(&form.password)?;
     let new_account = NewAccount {
-        student_id: form.student_id,
+        sustech_id: form.sustech_id,
         name: &form.name,
         password: &password_hash,
     };
@@ -175,7 +175,7 @@ async fn login(state: web::Data<AppState>, form: web::Json<LoginForm>) -> Result
     let form = form.into_inner();
     form.validate()?;
 
-    let AccountCredential { id, password } = Account::by_student_id(form.student_id)
+    let AccountCredential { id, password } = Account::by_sustech_id(form.sustech_id)
         .select(AccountCredential::as_select())
         .first(&mut state.pool.get().await?)
         .await?;
