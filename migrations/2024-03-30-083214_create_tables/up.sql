@@ -1,3 +1,9 @@
+CREATE FUNCTION head(text) RETURNS text AS $$
+BEGIN
+    RETURN left($1, 256);
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TYPE Role AS ENUM ('admin', 'staff', 'student');
 CREATE TYPE EventType AS ENUM ('show', 'lecture', 'competition', 'other');
 

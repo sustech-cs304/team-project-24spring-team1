@@ -1,4 +1,4 @@
-use actix_web::middleware::Logger;
+use actix_web::middleware::{Logger, NormalizePath};
 use actix_web::{web, App, HttpServer};
 use diesel_async::pooled_connection::deadpool::Pool;
 use diesel_async::pooled_connection::AsyncDieselConnectionManager;
@@ -22,6 +22,7 @@ pub async fn run() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(AppState { pool: pool.clone() }))
+            .wrap(NormalizePath::trim())
             .wrap(Logger::default())
             .service(web::scope("/api").configure(configure))
     })

@@ -4,10 +4,12 @@ use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::query_builder::InsertStatement;
 use diesel_derive_enum::DbEnum;
+use serde::Serialize;
 
 use super::schema::*;
 
-#[derive(Debug, DbEnum)]
+#[derive(Debug, Serialize, DbEnum)]
+#[serde(rename_all = "snake_case")]
 #[ExistingTypePath = "crate::orm::schema::sql_types::Role"]
 pub enum Role {
     Admin,
@@ -40,6 +42,15 @@ pub struct Account {
 pub struct AccountCredential {
     pub id: i32,
     pub password: String,
+}
+
+#[derive(Debug, Serialize, Selectable, Queryable)]
+#[diesel(table_name = accounts)]
+pub struct AccountProfile {
+    pub id: i32,
+    pub sustech_id: i32,
+    pub name: String,
+    pub role: Role,
 }
 
 type Table = accounts::table;

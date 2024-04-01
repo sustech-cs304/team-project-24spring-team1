@@ -1,4 +1,5 @@
 #![feature(trait_alias)]
+#![feature(int_roundings)]
 
 #[macro_use]
 extern crate log;
@@ -8,6 +9,7 @@ extern crate lazy_static;
 mod controllers;
 mod error;
 mod orm;
+mod utils;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

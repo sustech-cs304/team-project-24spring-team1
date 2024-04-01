@@ -1,16 +1,16 @@
 use chrono::prelude::*;
-use diesel::dsl::{AsSelect, Eq, Filter, Find, Select};
+use diesel::dsl::{self, AsSelect, InnerJoin, Select};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::query_builder::InsertStatement;
 use diesel_derive_enum::DbEnum;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-use super::account::Account;
+use super::account::AccountProfile;
 use super::misc::Place;
 use super::schema::*;
 
-#[derive(Debug, Deserialize, DbEnum)]
+#[derive(Debug, Serialize, Deserialize, DbEnum)]
 #[serde(rename_all = "snake_case")]
 #[ExistingTypePath = "crate::orm::schema::sql_types::Eventtype"]
 pub enum EventType {
@@ -51,16 +51,71 @@ pub struct Event {
     pub updated_at: Option<NaiveDateTime>,
 }
 
+#[derive(Debug, Serialize, Selectable, Queryable)]
+#[diesel(table_name = events)]
+pub struct EventDisplay {
+    pub id: i32,
+    pub name: String,
+    pub kind: EventType,
+    pub start_at: NaiveDateTime,
+    pub end_at: NaiveDateTime,
+    #[diesel(embed)]
+    pub venue: Place,
+    pub description: String,
+    #[diesel(embed)]
+    pub organizer: AccountProfile,
+    pub tickets: Option<i32>,
+}
+
+#[derive(Debug, Serialize, Selectable, Queryable)]
+#[diesel(table_name = events)]
+pub struct EventSummary {
+    pub id: i32,
+    pub name: String,
+    pub kind: EventType,
+    pub start_at: NaiveDateTime,
+    pub end_at: NaiveDateTime,
+    #[diesel(embed)]
+    pub venue: Place,
+    pub description: String,
+    #[diesel(embed)]
+    pub organizer: AccountProfile,
+    pub tickets: Option<i32>,
+}
+
 type Table = events::table;
 
 type All = Select<Table, AsSelect<Event, Pg>>;
+type Find = dsl::Find<All, i32>;
+type FindAsDisplay =
+    Select<InnerJoin<InnerJoin<Find, accounts::table>, places::table>, AsSelect<EventDisplay, Pg>>;
+type FindAsSummary =
+    Select<InnerJoin<InnerJoin<Find, accounts::table>, places::table>, AsSelect<EventSummary, Pg>>;
 
 impl Event {
     pub fn all() -> All {
         events::table.select(Event::as_select())
     }
 
-    pub fn venus(&self) -> super::misc::PlaceFindName {
+    pub fn find(id: i32) -> Find {
+        Self::all().find(id)
+    }
+
+    pub fn find_as_display(id: i32) -> FindAsDisplay {
+        Self::find(id)
+            .inner_join(accounts::table)
+            .inner_join(places::table)
+            .select(EventDisplay::as_select())
+    }
+
+    pub fn find_as_summary(id: i32) -> FindAsSummary {
+        Self::find(id)
+            .inner_join(accounts::table)
+            .inner_join(places::table)
+            .select(EventSummary::as_select())
+    }
+
+    pub fn venue(&self) -> super::misc::PlaceFindName {
         Place::find(self.venue_id)
     }
 }

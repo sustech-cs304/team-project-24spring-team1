@@ -5,7 +5,7 @@ use serde::Serialize;
 
 use super::schema::*;
 
-#[derive(Serialize, Selectable, Identifiable, Queryable)]
+#[derive(Debug, Serialize, Selectable, Identifiable, Queryable)]
 #[diesel(table_name = places)]
 pub struct Place {
     pub id: i32,
