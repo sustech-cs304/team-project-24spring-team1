@@ -1,5 +1,6 @@
 #![feature(trait_alias)]
 #![feature(int_roundings)]
+#![feature(let_chains)]
 
 #[macro_use]
 extern crate log;

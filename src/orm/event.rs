@@ -49,8 +49,8 @@ pub struct Event {
     pub organizer_id: i32,
     pub tickets: Option<i32>,
     pub registeration_deadline: Option<NaiveDateTime>,
-    pub created_at: Option<NaiveDateTime>,
-    pub updated_at: Option<NaiveDateTime>,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Serialize, Selectable, Queryable)]

@@ -49,9 +49,9 @@ diesel::table! {
 }
 
 diesel::table! {
-    participation (account, event) {
-        account -> Int4,
-        event -> Int4,
+    participation (account_id, event_id) {
+        account_id -> Int4,
+        event_id -> Int4,
     }
 }
 
@@ -65,7 +65,7 @@ diesel::table! {
 
 diesel::joinable!(events -> accounts (organizer_id));
 diesel::joinable!(events -> places (venue_id));
-diesel::joinable!(participation -> accounts (account));
-diesel::joinable!(participation -> events (event));
+diesel::joinable!(participation -> accounts (account_id));
+diesel::joinable!(participation -> events (event_id));
 
 diesel::allow_tables_to_appear_in_same_query!(accounts, events, participation, places,);

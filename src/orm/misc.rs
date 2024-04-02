@@ -1,6 +1,7 @@
 use diesel::dsl::{AsSelect, Eq, Filter, Find, Select};
 use diesel::pg::Pg;
 use diesel::prelude::*;
+use diesel::query_builder::InsertStatement;
 use serde::Serialize;
 
 use super::schema::*;
@@ -10,6 +11,14 @@ use super::schema::*;
 pub struct Place {
     pub id: i32,
     pub name: String,
+}
+
+#[derive(Debug, Serialize, Selectable, Identifiable, Insertable, Queryable)]
+#[diesel(table_name = participation)]
+#[diesel(primary_key(event_id, account_id))]
+pub struct Participation {
+    pub event_id: i32,
+    pub account_id: i32,
 }
 
 type PlaceAll = Select<places::table, AsSelect<Place, Pg>>;
@@ -30,5 +39,21 @@ impl Place {
 
     pub fn find(id: i32) -> PlaceFindName {
         Self::all().find(id).select(places::name)
+    }
+}
+
+impl Participation {
+    pub fn new(event_id: i32, account_id: i32) -> Self {
+        Self {
+            event_id,
+            account_id,
+        }
+    }
+
+    pub fn as_insert(
+        &self,
+    ) -> InsertStatement<participation::table, <&Self as Insertable<participation::table>>::Values>
+    {
+        diesel::insert_into(participation::table).values(self)
     }
 }

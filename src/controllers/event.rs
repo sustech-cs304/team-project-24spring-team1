@@ -7,8 +7,9 @@ use validator::Validate;
 
 use super::account::JwtAuth;
 use super::AppState;
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::orm::event::{Event, EventDisplay, EventSummary, EventType, NewEvent};
+use crate::orm::misc::Participation;
 use crate::orm::schema::{accounts, events, places};
 use crate::utils::page::Page;
 
@@ -167,8 +168,36 @@ async fn get_event(state: web::Data<AppState>, path: web::Path<i32>) -> Result<i
     Ok(web::Json(event))
 }
 
+#[post("/{id}/register")]
+async fn register_event(
+    state: web::Data<AppState>,
+    path: web::Path<i32>,
+    auth: JwtAuth,
+) -> Result<impl Responder> {
+    let id = path.into_inner();
+    let event: Event = Event::find(id)
+        .get_result(&mut state.pool.get().await?)
+        .await?;
+
+    if let Some(deadline) = &event.registeration_deadline
+        && deadline < &Utc::now().naive_utc()
+    {
+        return Err(Error::BadRequest(
+            "Registeration deadline has passed".into(),
+        ));
+    }
+
+    Participation::new(id, auth.account_id)
+        .as_insert()
+        .execute(&mut state.pool.get().await?)
+        .await?;
+
+    Ok(web::Json(serde_json::Value::Object(Default::default())))
+}
+
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(new_event)
         .service(list_events)
-        .service(get_event);
+        .service(get_event)
+        .service(register_event);
 }

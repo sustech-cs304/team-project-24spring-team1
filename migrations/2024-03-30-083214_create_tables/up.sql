@@ -38,9 +38,9 @@ CREATE TABLE events (
 );
 
 CREATE TABLE participation (
-    account INT NOT NULL REFERENCES accounts(id),
-    event INT NOT NULL REFERENCES events(id),
-    PRIMARY KEY (account, event)
+    account_id INT NOT NULL REFERENCES accounts(id),
+    event_id INT NOT NULL REFERENCES events(id),
+    PRIMARY KEY (account_id, event_id)
 );
 
 SELECT diesel_manage_updated_at('accounts');
