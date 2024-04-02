@@ -73,7 +73,7 @@ async fn new_event(
         end_at: form.end_at,
         venue_id: form.venue_id,
         description: &form.description,
-        organizer_id: auth.user_id,
+        organizer_id: auth.account_id,
         tickets: form.tickets,
         registeration_deadline: form.registeration_deadline,
     };

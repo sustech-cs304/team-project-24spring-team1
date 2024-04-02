@@ -30,7 +30,7 @@ lazy_static! {
 const ALGORITHM: Algorithm = Algorithm::HS256;
 
 pub struct JwtAuth {
-    pub user_id: i32,
+    pub account_id: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -59,10 +59,10 @@ fn verify_password(password: &str, password_hash: &str) -> Result<()> {
     }
 }
 
-fn generate_token(user_id: i32) -> String {
+fn generate_token(account_id: i32) -> String {
     let now = Utc::now();
     let claims: TokenClaims = TokenClaims {
-        sub: user_id,
+        sub: account_id,
         exp: (now + Duration::hours(24)).timestamp() as usize,
         iat: now.timestamp() as usize,
     };
@@ -95,8 +95,8 @@ fn request_to_jwt_middleware(req: &HttpRequest) -> Result<JwtAuth> {
     )
     .map_err(|_| Error::Unauthorized(String::from("Invalid token")))?;
 
-    let user_id = claims.claims.sub;
-    Ok(JwtAuth { user_id })
+    let account_id = claims.claims.sub;
+    Ok(JwtAuth { account_id })
 }
 
 impl FromRequest for JwtAuth {
@@ -133,7 +133,7 @@ struct LoginForm {
 
 #[derive(Debug, Serialize)]
 struct AuthResponse {
-    pub user_id: i32,
+    pub account_id: i32,
     pub token: String,
 }
 
@@ -157,19 +157,19 @@ async fn register(
         password: &password_hash,
     };
 
-    let user_id = new_account
+    let account_id = new_account
         .as_insert()
         .returning(accounts::id)
         .get_result(&mut state.pool.get().await?)
         .await?;
 
     debug!(
-        "New account created: {:?}, sid={}, id={user_id}",
+        "New account created: {:?}, sid={}, id={account_id}",
         form.name, form.sustech_id
     );
     let resp = AuthResponse {
-        user_id,
-        token: generate_token(user_id),
+        account_id,
+        token: generate_token(account_id),
     };
     Ok(web::Json(resp))
 }
@@ -187,7 +187,7 @@ async fn login(state: web::Data<AppState>, form: web::Json<LoginForm>) -> Result
 
     debug!("Account logged in: sid={}, id={id}", form.sustech_id);
     let resp = AuthResponse {
-        user_id: id,
+        account_id: id,
         token: generate_token(id),
     };
     Ok(web::Json(resp))
