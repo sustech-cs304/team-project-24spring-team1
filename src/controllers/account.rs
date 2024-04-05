@@ -76,12 +76,17 @@ fn generate_token(account_id: i32) -> String {
 }
 
 fn request_to_jwt_middleware(req: &HttpRequest) -> Result<JwtAuth> {
+    const SCHEMA: &str = "Bearer ";
     let token = req
         .headers()
         .get(header::AUTHORIZATION)
         .map(|value| value.to_str())
         .transpose()?
-        .and_then(|value| value.starts_with("Basic ").then_some(value.split_at(6).1))
+        .and_then(|value| {
+            value
+                .starts_with(SCHEMA)
+                .then_some(value.split_at(SCHEMA.len()).1)
+        })
         .ok_or_else(|| {
             Error::Unauthorized(String::from(
                 "A valid header \"Authorization\" must be provided for authorization",
