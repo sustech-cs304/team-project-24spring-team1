@@ -48,7 +48,6 @@ pub struct AccountCredential {
 #[diesel(table_name = accounts)]
 pub struct AccountProfile {
     pub id: i32,
-    pub sustech_id: i32,
     pub name: String,
     pub role: Role,
 }
