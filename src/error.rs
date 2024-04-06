@@ -65,9 +65,8 @@ impl ResponseError for Error {
             message: &message,
         };
 
-        match self {
-            Error::Internal(e) => error!("Internal server error: {e}"),
-            _ => warn!("API error: {message}"),
+        if let Error::Internal(e) = self {
+            error!("Internal server error: {e}");
         }
 
         HttpResponse::build(self.status_code())
