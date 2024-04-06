@@ -91,10 +91,9 @@ type Table = events::table;
 
 type All = Select<Table, AsSelect<Event, Pg>>;
 type Find = dsl::Find<All, i32>;
-type FindAsDisplay =
-    Select<InnerJoin<InnerJoin<Find, accounts::table>, places::table>, AsSelect<EventDisplay, Pg>>;
-type FindAsSummary =
-    Select<InnerJoin<InnerJoin<Find, accounts::table>, places::table>, AsSelect<EventSummary, Pg>>;
+type Join = InnerJoin<InnerJoin<Find, accounts::table>, places::table>;
+type FindAsDisplay = Select<Join, AsSelect<EventDisplay, Pg>>;
+type FindAsSummary = Select<Join, AsSelect<EventSummary, Pg>>;
 
 impl Event {
     pub fn all() -> All {
@@ -105,18 +104,18 @@ impl Event {
         Self::all().find(id)
     }
 
-    pub fn find_as_display(id: i32) -> FindAsDisplay {
+    pub fn find_joined(id: i32) -> Join {
         Self::find(id)
             .inner_join(accounts::table)
             .inner_join(places::table)
-            .select(EventDisplay::as_select())
+    }
+
+    pub fn find_as_display(id: i32) -> FindAsDisplay {
+        Self::find_joined(id).select(EventDisplay::as_select())
     }
 
     pub fn find_as_summary(id: i32) -> FindAsSummary {
-        Self::find(id)
-            .inner_join(accounts::table)
-            .inner_join(places::table)
-            .select(EventSummary::as_select())
+        Self::find_joined(id).select(EventSummary::as_select())
     }
 
     pub fn venue(&self) -> super::misc::PlaceFindName {
