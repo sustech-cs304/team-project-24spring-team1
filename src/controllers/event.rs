@@ -8,9 +8,11 @@ use validator::Validate;
 use super::account::JwtAuth;
 use super::AppState;
 use crate::error::{Error, Result};
-use crate::orm::event::{Event, EventDisplay, EventSummary, EventType, NewEvent};
+use crate::orm::event::{
+    Event, EventDisplay, EventSummary, EventType, EventWithParticipation, NewEvent,
+};
 use crate::orm::misc::Participation;
-use crate::orm::schema::{accounts, events, places};
+use crate::orm::schema::events;
 use crate::utils::page::Page;
 
 // ===== Handlers =====
@@ -54,8 +56,8 @@ struct EventIdResponse {
 #[derive(Debug, Serialize)]
 struct ListEventsResponse {
     pub page: Page,
-    pub event_by_id: Option<EventSummary>,
-    pub events: Vec<EventSummary>,
+    pub event_by_id: Option<EventWithParticipation<EventSummary>>,
+    pub events: Vec<EventWithParticipation<EventSummary>>,
 }
 
 #[post("")]
@@ -100,7 +102,7 @@ async fn list_events(
     let now = Utc::now().naive_utc();
 
     let as_query = || {
-        let mut sql = Event::all().into_boxed();
+        let mut sql = Event::all_summary_with_participation().into_boxed();
         if let Some(name) = &query.name {
             sql = sql.filter(events::name.like(format!("%{name}%")));
         }
@@ -128,7 +130,7 @@ async fn list_events(
     };
 
     let event_by_id = if let Some(id) = query.name.as_ref().and_then(|name| name.parse().ok()) {
-        let event = Event::find_as_summary(id)
+        let event = Event::find_as_summary_with_participation(id)
             .get_result(&mut state.pool.get().await?)
             .await?;
         Some(event)
@@ -143,9 +145,6 @@ async fn list_events(
     let page = Page::builder(total_item, query.page.unwrap_or(1)).build();
 
     let events = as_query()
-        .inner_join(accounts::table)
-        .inner_join(places::table)
-        .select(EventSummary::as_select())
         .order(events::start_at.asc())
         .limit(page.page_size)
         .offset(page.offset)
@@ -162,7 +161,7 @@ async fn list_events(
 #[get("/{id}")]
 async fn get_event(state: web::Data<AppState>, path: web::Path<i32>) -> Result<impl Responder> {
     let id = path.into_inner();
-    let event: EventDisplay = Event::find_as_display(id)
+    let event: EventWithParticipation<EventDisplay> = Event::find_as_display_with_participation(id)
         .get_result(&mut state.pool.get().await?)
         .await?;
     Ok(web::Json(event))

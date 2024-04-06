@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use super::account::AccountProfile;
 use super::misc::Place;
 use super::schema::*;
+use super::utils::{Bracket, BracketDsl, CountReferencesDsl, CountReferencesIn};
 
 #[derive(Debug, Serialize, Deserialize, DbEnum)]
 #[serde(rename_all = "snake_case")]
@@ -87,35 +88,69 @@ pub struct EventSummary {
     pub registeration_deadline: Option<NaiveDateTime>,
 }
 
+#[derive(Debug, Serialize, Queryable)]
+pub struct EventWithParticipation<T: Serialize> {
+    pub participation_count: i64,
+    #[serde(flatten)]
+    pub inner: T,
+}
+
 type Table = events::table;
 
 type All = Select<Table, AsSelect<Event, Pg>>;
 type Find = dsl::Find<All, i32>;
-type Join = InnerJoin<InnerJoin<Find, accounts::table>, places::table>;
-type FindAsDisplay = Select<Join, AsSelect<EventDisplay, Pg>>;
-type FindAsSummary = Select<Join, AsSelect<EventSummary, Pg>>;
+type FindJoin = InnerJoin<InnerJoin<Find, accounts::table>, places::table>;
+type ParticipationCount = Bracket<CountReferencesIn<accounts::id, participation::account_id>>;
+type FindWithParticipationAs<T> = Select<FindJoin, (ParticipationCount, AsSelect<T, Pg>)>;
+type Join = InnerJoin<InnerJoin<All, accounts::table>, places::table>;
+type JoinWithParticipation<T> = Select<Join, (ParticipationCount, AsSelect<T, Pg>)>;
 
 impl Event {
     pub fn all() -> All {
         events::table.select(Event::as_select())
     }
 
+    pub fn joined() -> Join {
+        Self::all()
+            .inner_join(accounts::table)
+            .inner_join(places::table)
+    }
+
+    pub fn all_summary_with_participation() -> JoinWithParticipation<EventSummary> {
+        Self::joined().select((
+            accounts::id
+                .count_references_in(participation::account_id)
+                .bracket(),
+            EventSummary::as_select(),
+        ))
+    }
+
     pub fn find(id: i32) -> Find {
         Self::all().find(id)
     }
 
-    pub fn find_joined(id: i32) -> Join {
+    pub fn find_joined(id: i32) -> FindJoin {
         Self::find(id)
             .inner_join(accounts::table)
             .inner_join(places::table)
     }
 
-    pub fn find_as_display(id: i32) -> FindAsDisplay {
-        Self::find_joined(id).select(EventDisplay::as_select())
+    pub fn find_as_display_with_participation(id: i32) -> FindWithParticipationAs<EventDisplay> {
+        Self::find_joined(id).select((
+            accounts::id
+                .count_references_in(participation::account_id)
+                .bracket(),
+            EventDisplay::as_select(),
+        ))
     }
 
-    pub fn find_as_summary(id: i32) -> FindAsSummary {
-        Self::find_joined(id).select(EventSummary::as_select())
+    pub fn find_as_summary_with_participation(id: i32) -> FindWithParticipationAs<EventSummary> {
+        Self::find_joined(id).select((
+            accounts::id
+                .count_references_in(participation::account_id)
+                .bracket(),
+            EventSummary::as_select(),
+        ))
     }
 
     pub fn venue(&self) -> super::misc::PlaceFindName {
