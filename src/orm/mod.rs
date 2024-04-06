@@ -5,5 +5,6 @@ pub mod account;
 pub mod event;
 pub mod misc;
 pub mod schema;
+pub mod utils;
 
 pub type Conn = deadpool::managed::Object<AsyncDieselConnectionManager<AsyncPgConnection>>;
