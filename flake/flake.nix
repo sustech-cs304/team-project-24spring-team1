@@ -19,6 +19,7 @@
       overlay = final: prev: {
         rustToolchain = prev.rust-bin.nightly."2024-02-19".minimal.override {
           extensions = [ "clippy" "rustfmt" "rust-analyzer" "rustc-codegen-cranelift-preview" ];
+          targets = [ "x86_64-unknown-linux-musl" ];
         };
         rustPlatform = final.makeRustPlatform {
           cargo = final.rustToolchain;
