@@ -14,7 +14,10 @@ mod utils;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    dotenvy::dotenv().unwrap();
+    if let Err(e) = dotenvy::dotenv() {
+        eprintln!("Warning: failed to load .env file: {e}");
+    }
+
     if std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "info");
     }
