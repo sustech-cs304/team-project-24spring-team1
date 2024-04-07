@@ -1,7 +1,6 @@
 use actix_web::{get, post, web, Responder};
 use chrono::prelude::*;
 use diesel::prelude::*;
-use diesel_async::RunQueryDsl;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -13,7 +12,7 @@ use crate::orm::event::{
 };
 use crate::orm::misc::Participation;
 use crate::orm::schema::events;
-use crate::orm::utils::coalesce;
+use crate::orm::utils::{coalesce, RunQueryDsl};
 use crate::utils::page::Page;
 
 // ===== Handlers =====

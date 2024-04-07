@@ -10,7 +10,6 @@ use argon2::{
 };
 use chrono::{prelude::*, Duration};
 use diesel::prelude::*;
-use diesel_async::RunQueryDsl;
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use std::future::{ready, Ready};
@@ -20,6 +19,7 @@ use super::AppState;
 use crate::error::{Error, Result};
 use crate::orm::account::{Account, AccountCredential, NewAccount};
 use crate::orm::schema::accounts;
+use crate::orm::utils::RunQueryDsl;
 
 lazy_static! {
     static ref JWT_SECRET: String = std::env::var("JWT_SECRET").unwrap_or_else(|_| {

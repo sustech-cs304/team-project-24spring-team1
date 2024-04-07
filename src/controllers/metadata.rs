@@ -1,9 +1,9 @@
 use actix_web::{get, web, Responder};
-use diesel_async::RunQueryDsl;
 
 use super::AppState;
 use crate::error::Result;
 use crate::orm::misc::Place;
+use crate::orm::utils::RunQueryDsl;
 
 // ===== Handlers =====
 
