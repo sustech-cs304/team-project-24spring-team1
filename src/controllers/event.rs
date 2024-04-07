@@ -13,6 +13,7 @@ use crate::orm::event::{
 };
 use crate::orm::misc::Participation;
 use crate::orm::schema::events;
+use crate::orm::utils::coalesce;
 use crate::utils::page::Page;
 
 // ===== Handlers =====
@@ -117,7 +118,9 @@ async fn list_events(
         }
 
         sql = match query.status {
-            Some(EventStatus::Applicable) => sql.filter(events::registeration_deadline.gt(now)),
+            Some(EventStatus::Applicable) => {
+                sql.filter(coalesce(events::registeration_deadline, events::end_at).gt(now))
+            }
             Some(EventStatus::NotStarted) => sql.filter(events::start_at.gt(now)),
             Some(EventStatus::Ongoing) => sql
                 .filter(events::start_at.le(now))

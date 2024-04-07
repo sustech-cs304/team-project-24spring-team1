@@ -4,7 +4,9 @@ use diesel::expression::{AsExpression, TypedExpressionType, ValidGrouping};
 use diesel::prelude::*;
 use diesel::query_builder::{AstPass, QueryFragment, QueryId, SelectQuery};
 use diesel::query_dsl::methods::{FilterDsl, LimitDsl, SelectDsl};
-use diesel::sql_types::{SingleValue, SqlType};
+use diesel::sql_types::{Nullable, SingleValue, SqlType};
+
+sql_function! { fn coalesce<T: SingleValue>(x: Nullable<T>, y: T) -> T; }
 
 /// CountReferencesDsl: a DSL for counting references in a table
 /// `one.count_references_in(many)` is equivalent to `SELECT COUNT(*) FROM many_table WHERE many = one`
