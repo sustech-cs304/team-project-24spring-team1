@@ -176,13 +176,12 @@ async fn register_event(
     auth: JwtAuth,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    let event: Event = Event::find(id)
+    let deadline: NaiveDateTime = Event::find(id)
+        .select(coalesce(events::registeration_deadline, events::end_at))
         .get_result(&mut state.pool.get().await?)
         .await?;
 
-    if let Some(deadline) = &event.registeration_deadline
-        && deadline < &Utc::now().naive_utc()
-    {
+    if deadline < Utc::now().naive_utc() {
         return Err(Error::NotAcceptable(
             "Registeration deadline has passed".into(),
         ));
