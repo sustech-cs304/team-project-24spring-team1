@@ -19,6 +19,12 @@ pub enum Error {
     #[error("Not Acceptable: {0}")]
     NotAcceptable(String),
 
+    #[error("Record Not Found")]
+    RecordNotFound,
+
+    #[error("Record Already Exists")]
+    RecordAlreadyExists,
+
     #[error("Bad request: {0}")]
     BadRequest(String),
 
@@ -35,7 +41,7 @@ pub enum InternalError {
     Deadpool(#[from] PoolError),
 
     #[error("Diesel: {0}")]
-    Diesel(#[from] DieselError),
+    Diesel(DieselError),
 
     #[error("PasswordHash: {0}")]
     PasswordHash(#[from] PasswordHashError),
@@ -48,6 +54,8 @@ impl Error {
         match self {
             Error::InvalidArgument(_) => "invalid_argument",
             Error::NotAcceptable(_) => "not_acceptable",
+            Error::RecordNotFound => "record_not_found",
+            Error::RecordAlreadyExists => "record_already_exists",
             Error::BadRequest(_) => "bad_request",
             Error::Unauthorized(_) => "unauthorized",
             Error::Internal(_) => "internal_server_error",
@@ -82,6 +90,8 @@ impl ResponseError for Error {
         match self {
             Error::InvalidArgument(_) => StatusCode::BAD_REQUEST,
             Error::NotAcceptable(_) => StatusCode::NOT_ACCEPTABLE,
+            Error::RecordNotFound => StatusCode::NOT_ACCEPTABLE,
+            Error::RecordAlreadyExists => StatusCode::NOT_ACCEPTABLE,
             Error::BadRequest(_) => StatusCode::BAD_REQUEST,
             Error::Unauthorized(_) => StatusCode::UNAUTHORIZED,
             Error::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -92,6 +102,17 @@ impl ResponseError for Error {
 impl From<ToStrError> for Error {
     fn from(error: ToStrError) -> Self {
         Error::BadRequest(error.to_string())
+    }
+}
+
+impl From<DieselError> for Error {
+    fn from(error: DieselError) -> Self {
+        use diesel::result::{Error::*, DatabaseErrorKind::*};
+        match error {
+            NotFound => Error::RecordNotFound,
+            DatabaseError(UniqueViolation, _) => Error::RecordAlreadyExists,
+            _ => Error::Internal(InternalError::Diesel(error)),
+        }
     }
 }
 
