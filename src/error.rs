@@ -16,6 +16,9 @@ pub enum Error {
     #[error("invalid argument: {0}")]
     InvalidArgument(#[from] ValidationErrors),
 
+    #[error("Not Acceptable: {0}")]
+    NotAcceptable(String),
+
     #[error("Bad request: {0}")]
     BadRequest(String),
 
@@ -44,6 +47,7 @@ impl Error {
     pub fn kind(&self) -> &'static str {
         match self {
             Error::InvalidArgument(_) => "invalid_argument",
+            Error::NotAcceptable(_) => "not_acceptable",
             Error::BadRequest(_) => "bad_request",
             Error::Unauthorized(_) => "unauthorized",
             Error::Internal(_) => "internal_server_error",
@@ -77,6 +81,7 @@ impl ResponseError for Error {
     fn status_code(&self) -> StatusCode {
         match self {
             Error::InvalidArgument(_) => StatusCode::BAD_REQUEST,
+            Error::NotAcceptable(_) => StatusCode::NOT_ACCEPTABLE,
             Error::BadRequest(_) => StatusCode::BAD_REQUEST,
             Error::Unauthorized(_) => StatusCode::UNAUTHORIZED,
             Error::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,

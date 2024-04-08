@@ -183,7 +183,7 @@ async fn register_event(
     if let Some(deadline) = &event.registeration_deadline
         && deadline < &Utc::now().naive_utc()
     {
-        return Err(Error::BadRequest(
+        return Err(Error::NotAcceptable(
             "Registeration deadline has passed".into(),
         ));
     }
