@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, Responder};
+use actix_web::{delete, get, post, web, Responder};
 use chrono::prelude::*;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -195,9 +195,24 @@ async fn register_event(
     Ok(web::Json(serde_json::Value::Object(Default::default())))
 }
 
+#[delete("/{id}/register")]
+async fn unregister_event(
+    state: web::Data<AppState>,
+    path: web::Path<i32>,
+    auth: JwtAuth,
+) -> Result<impl Responder> {
+    let id = path.into_inner();
+    Participation::new(id, auth.account_id)
+        .as_delete()
+        .get_result::<Participation>(&mut state.pool.get().await?)
+        .await?;
+    Ok(web::Json(serde_json::Value::Object(Default::default())))
+}
+
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(new_event)
         .service(list_events)
         .service(get_event)
-        .service(register_event);
+        .service(register_event)
+        .service(unregister_event);
 }

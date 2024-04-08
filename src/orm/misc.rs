@@ -1,7 +1,7 @@
 use diesel::dsl::{AsSelect, Eq, Filter, Find, Select};
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use diesel::query_builder::InsertStatement;
+use diesel::query_builder::{DeleteStatement, InsertStatement, IntoUpdateTarget};
 use serde::Serialize;
 
 use super::schema::*;
@@ -16,6 +16,8 @@ pub struct Place {
 #[derive(Debug, Serialize, Selectable, Identifiable, Insertable, Queryable)]
 #[diesel(table_name = participation)]
 #[diesel(primary_key(event_id, account_id))]
+#[diesel(belongs_to(Event))]
+#[diesel(belongs_to(Account))]
 pub struct Participation {
     pub event_id: i32,
     pub account_id: i32,
@@ -27,6 +29,8 @@ type PlaceByName<'a> = Filter<PlaceAll, PlaceWithName<'a>>;
 type PlaceIdByName<'a> = Select<PlaceByName<'a>, places::id>;
 type PlaceFind = Find<PlaceAll, i32>;
 pub type PlaceFindName = Select<PlaceFind, places::name>;
+
+type ParticipationFind = Find<participation::table, (i32, i32)>;
 
 impl Place {
     pub fn all() -> PlaceAll {
@@ -55,5 +59,12 @@ impl Participation {
     ) -> InsertStatement<participation::table, <&Self as Insertable<participation::table>>::Values>
     {
         diesel::insert_into(participation::table).values(self)
+    }
+
+    pub fn as_delete(
+        &self,
+    ) -> DeleteStatement<participation::table, <ParticipationFind as IntoUpdateTarget>::WhereClause>
+    {
+        diesel::delete(participation::table.find((self.event_id, self.account_id)))
     }
 }
