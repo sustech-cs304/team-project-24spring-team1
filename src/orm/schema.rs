@@ -36,11 +36,11 @@ diesel::table! {
         #[max_length = 50]
         name -> Varchar,
         kind -> Eventtype,
+        description -> Text,
+        organizer_id -> Int4,
         start_at -> Timestamp,
         end_at -> Timestamp,
         venue_id -> Int4,
-        description -> Text,
-        organizer_id -> Int4,
         tickets -> Nullable<Int4>,
         registeration_deadline -> Nullable<Timestamp>,
         created_at -> Timestamp,

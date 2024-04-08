@@ -9,7 +9,7 @@ CREATE TYPE EventType AS ENUM ('show', 'lecture', 'competition', 'other');
 
 CREATE TABLE accounts (
     id SERIAL PRIMARY KEY NOT NULL,
-    sustech_id INT NOT NULL CHECK (1000000 <= sustech_id AND sustech_id <= 99999999),
+    sustech_id INT NOT NULL UNIQUE CHECK (1000000 <= sustech_id AND sustech_id <= 99999999),
     name VARCHAR(30) NOT NULL UNIQUE,
     password VARCHAR(128) NOT NULL,
     role Role NOT NULL DEFAULT 'student',
@@ -26,11 +26,11 @@ CREATE TABLE events (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(50) NOT NULL,
     kind EventType NOT NULL,
+    description TEXT NOT NULL,
+    organizer_id INT NOT NULL REFERENCES accounts(id),
     start_at TIMESTAMP NOT NULL,
     end_at TIMESTAMP NOT NULL,
     venue_id INT NOT NULL REFERENCES places(id),
-    description TEXT NOT NULL,
-    organizer_id INT NOT NULL REFERENCES accounts(id),
     tickets INT,
     registeration_deadline TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),

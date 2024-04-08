@@ -11,28 +11,35 @@ use serde::Serialize;
 use thiserror::Error;
 use validator::ValidationErrors;
 
-#[derive(Debug, Error)]
+use crate::orm::CONSTRAINTS_MAP;
+
+#[derive(Debug, Error, Serialize)]
+#[serde(untagged)]
 pub enum Error {
     #[error("invalid argument: {0}")]
-    InvalidArgument(#[from] ValidationErrors),
+    InvalidArgument(
+        #[from]
+        #[serde(skip)]
+        ValidationErrors,
+    ),
 
-    #[error("Not Acceptable: {0}")]
-    NotAcceptable(String),
+    #[error("Not acceptable: {0}")]
+    NotAcceptable(#[serde(skip)] String),
 
-    #[error("Record Not Found")]
-    RecordNotFound,
+    #[error("Record not found")]
+    RecordNotFound { key: Option<String> },
 
-    #[error("Record Already Exists")]
-    RecordAlreadyExists,
+    #[error("Record already exists")]
+    RecordAlreadyExists { key: Option<String> },
 
     #[error("Bad request: {0}")]
-    BadRequest(String),
+    BadRequest(#[serde(skip)] String),
 
     #[error("Unauthorized: {0}")]
-    Unauthorized(String),
+    Unauthorized(#[serde(skip)] String),
 
     #[error("Internal server error")]
-    Internal(InternalError),
+    Internal(#[serde(skip)] InternalError),
 }
 
 #[derive(Debug, Error)]
@@ -54,8 +61,8 @@ impl Error {
         match self {
             Error::InvalidArgument(_) => "invalid_argument",
             Error::NotAcceptable(_) => "not_acceptable",
-            Error::RecordNotFound => "record_not_found",
-            Error::RecordAlreadyExists => "record_already_exists",
+            Error::RecordNotFound { .. } => "record_not_found",
+            Error::RecordAlreadyExists { .. } => "record_already_exists",
             Error::BadRequest(_) => "bad_request",
             Error::Unauthorized(_) => "unauthorized",
             Error::Internal(_) => "internal_server_error",
@@ -67,6 +74,8 @@ impl Error {
 struct ErrorResponseBody<'a> {
     kind: &'a str,
     message: &'a str,
+    #[serde(flatten)]
+    inner: &'a Error,
 }
 
 impl ResponseError for Error {
@@ -75,6 +84,7 @@ impl ResponseError for Error {
         let body = ErrorResponseBody {
             kind: self.kind(),
             message: &message,
+            inner: self,
         };
 
         if let Error::Internal(e) = self {
@@ -90,8 +100,8 @@ impl ResponseError for Error {
         match self {
             Error::InvalidArgument(_) => StatusCode::BAD_REQUEST,
             Error::NotAcceptable(_) => StatusCode::NOT_ACCEPTABLE,
-            Error::RecordNotFound => StatusCode::NOT_ACCEPTABLE,
-            Error::RecordAlreadyExists => StatusCode::NOT_ACCEPTABLE,
+            Error::RecordNotFound { .. } => StatusCode::NOT_FOUND,
+            Error::RecordAlreadyExists { .. } => StatusCode::NOT_ACCEPTABLE,
             Error::BadRequest(_) => StatusCode::BAD_REQUEST,
             Error::Unauthorized(_) => StatusCode::UNAUTHORIZED,
             Error::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -107,10 +117,23 @@ impl From<ToStrError> for Error {
 
 impl From<DieselError> for Error {
     fn from(error: DieselError) -> Self {
-        use diesel::result::{Error::*, DatabaseErrorKind::*};
+        use diesel::result::{DatabaseErrorKind::*, Error::*};
+        trace!("DieselError: {:?}", error);
+
+        fn get_key(constraint_name: Option<&str>) -> Option<String> {
+            constraint_name
+                .and_then(|s| CONSTRAINTS_MAP.get(s))
+                .map(ToString::to_string)
+        }
+
         match error {
-            NotFound => Error::RecordNotFound,
-            DatabaseError(UniqueViolation, _) => Error::RecordAlreadyExists,
+            NotFound => Error::RecordNotFound { key: None },
+            DatabaseError(UniqueViolation, info) => Error::RecordAlreadyExists {
+                key: get_key(info.constraint_name()),
+            },
+            DatabaseError(ForeignKeyViolation, info) => Error::RecordNotFound {
+                key: get_key(info.constraint_name()),
+            },
             _ => Error::Internal(InternalError::Diesel(error)),
         }
     }
