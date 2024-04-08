@@ -98,7 +98,10 @@ fn request_to_jwt_middleware(req: &HttpRequest) -> Result<JwtAuth> {
         &DecodingKey::from_secret(JWT_SECRET.as_bytes()),
         &Validation::new(ALGORITHM),
     )
-    .map_err(|_| Error::Unauthorized(String::from("Invalid token")))?;
+    .map_err(|err| {
+        trace!("JWT decode error: {:?}", err);
+        Error::Unauthorized(String::from("Invalid token"))
+    })?;
 
     let account_id = claims.claims.sub;
     Ok(JwtAuth { account_id })
