@@ -9,6 +9,8 @@ mod account;
 mod event;
 mod metadata;
 
+use crate::error::Error;
+
 pub struct AppState {
     pool: Pool<AsyncPgConnection>,
 }
@@ -27,8 +29,21 @@ pub async fn run() -> std::io::Result<()> {
     info!("Starting server on {}:{}", bind_address, bind_port);
 
     HttpServer::new(move || {
+        let json_cfg = web::JsonConfig::default()
+            .limit(1024 * 32)
+            .content_type_required(true)
+            .content_type(|mime| mime == mime::APPLICATION_JSON)
+            .error_handler(|err, _req| Error::BadRequest(err.to_string()).into());
+        let path_cfg = web::PathConfig::default()
+            .error_handler(|err, _req| Error::BadRequest(err.to_string()).into());
+        let query_cfg = web::QueryConfig::default()
+            .error_handler(|err, _req| Error::BadRequest(err.to_string()).into());
+
         App::new()
             .app_data(web::Data::new(AppState { pool: pool.clone() }))
+            .app_data(json_cfg)
+            .app_data(path_cfg)
+            .app_data(query_cfg)
             .wrap(NormalizePath::trim())
             .wrap(Logger::new(
                 r#"%t "%r" %s %b "%{Referer}i" "%{User-Agent}i" %T"#,
