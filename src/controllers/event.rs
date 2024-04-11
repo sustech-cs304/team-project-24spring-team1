@@ -4,7 +4,7 @@ use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use super::account::JwtAuth;
+use super::auth::JwtAuth;
 use super::AppState;
 use crate::error::{Error, Result};
 use crate::orm::event::{
