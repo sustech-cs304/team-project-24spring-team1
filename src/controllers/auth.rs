@@ -145,11 +145,6 @@ struct AuthResponse {
     pub token: String,
 }
 
-#[derive(Debug, Serialize)]
-struct CheckResponse {
-    pub message: String,
-}
-
 #[post("/register")]
 async fn register(
     state: web::Data<AppState>,
@@ -203,9 +198,7 @@ async fn login(state: web::Data<AppState>, form: web::Json<LoginForm>) -> Result
 
 #[get("/check")]
 async fn check(_auth: JwtAuth) -> Result<impl Responder> {
-    Ok(web::Json(CheckResponse {
-        message: String::from("ok"),
-    }))
+    Ok(web::Json(serde_json::Value::Object(Default::default())))
 }
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
