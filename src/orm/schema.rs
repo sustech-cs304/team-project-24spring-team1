@@ -22,6 +22,7 @@ diesel::table! {
         #[max_length = 128]
         password -> Varchar,
         role -> Role,
+        bio -> Text,
         registered_at -> Timestamp,
         updated_at -> Timestamp,
     }

@@ -7,6 +7,7 @@ use diesel_derive_enum::DbEnum;
 use serde::Serialize;
 
 use super::schema::*;
+use super::utils::Update;
 
 #[derive(Debug, Serialize, DbEnum)]
 #[serde(rename_all = "snake_case")]
@@ -33,6 +34,7 @@ pub struct Account {
     pub name: String,
     pub password: String,
     pub role: Role,
+    pub bio: String,
     pub registered_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
@@ -52,14 +54,27 @@ pub struct AccountCard {
     pub role: Role,
 }
 
+#[derive(Debug, Serialize, Selectable, Queryable)]
+#[diesel(table_name = accounts)]
+pub struct AccountProfile {
+    pub id: i32,
+    pub name: String,
+    pub role: Role,
+    pub bio: String,
+}
+
 type Table = accounts::table;
 
 type All = Select<Table, AsSelect<Account, Pg>>;
+type UpdateAll = Update<Table>;
+type WithId = Eq<accounts::id, i32>;
 type WithName<'a> = Eq<accounts::name, &'a str>;
-type ByName<'a> = Filter<All, WithName<'a>>;
 type WithStudentId = Eq<accounts::sustech_id, i32>;
-type ByStudentId = Filter<All, WithStudentId>;
 type FindId = Find<All, i32>;
+
+type ByName<'a> = Filter<All, WithName<'a>>;
+type ByStudentId = Filter<All, WithStudentId>;
+type UpdateId = Filter<UpdateAll, WithId>;
 
 impl Account {
     pub fn all() -> All {
@@ -76,6 +91,10 @@ impl Account {
 
     pub fn find(id: i32) -> FindId {
         Self::all().find(id)
+    }
+
+    pub fn update(id: i32) -> UpdateId {
+        diesel::update(accounts::table).filter(accounts::id.eq(id))
     }
 }
 

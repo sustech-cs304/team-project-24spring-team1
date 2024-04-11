@@ -13,6 +13,7 @@ CREATE TABLE accounts (
     name VARCHAR(30) NOT NULL UNIQUE,
     password VARCHAR(128) NOT NULL,
     role Role NOT NULL DEFAULT 'student',
+    bio TEXT NOT NULL DEFAULT '',
     registered_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

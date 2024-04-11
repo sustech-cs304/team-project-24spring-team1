@@ -5,6 +5,7 @@ use diesel_async::pooled_connection::AsyncDieselConnectionManager;
 use diesel_async::AsyncPgConnection;
 use std::env;
 
+mod account;
 mod auth;
 mod event;
 mod metadata;
@@ -58,6 +59,7 @@ pub async fn run() -> std::io::Result<()> {
 
 fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/auth").configure(auth::configure))
+        .service(web::scope("/account").configure(account::configure))
         .service(web::scope("/metadata").configure(metadata::configure))
         .service(web::scope("/event").configure(event::configure));
 }
