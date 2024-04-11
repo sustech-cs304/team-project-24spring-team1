@@ -46,7 +46,7 @@ pub struct AccountCredential {
 
 #[derive(Debug, Serialize, Selectable, Queryable)]
 #[diesel(table_name = accounts)]
-pub struct AccountProfile {
+pub struct AccountCard {
     pub id: i32,
     pub name: String,
     pub role: Role,

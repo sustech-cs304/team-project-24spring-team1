@@ -6,7 +6,7 @@ use diesel::query_builder::InsertStatement;
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
-use super::account::AccountProfile;
+use super::account::AccountCard;
 use super::misc::Place;
 use super::schema::*;
 use super::utils::{Bracket, BracketDsl, CountReferencesDsl, CountReferencesIn};
@@ -66,7 +66,7 @@ pub struct EventDisplay {
     pub venue: Place,
     pub description: String,
     #[diesel(embed)]
-    pub organizer: AccountProfile,
+    pub organizer: AccountCard,
     pub tickets: Option<i32>,
     pub registeration_deadline: Option<NaiveDateTime>,
 }
@@ -83,7 +83,7 @@ pub struct EventSummary {
     pub venue: Place,
     pub description: String,
     #[diesel(embed)]
-    pub organizer: AccountProfile,
+    pub organizer: AccountCard,
     pub tickets: Option<i32>,
     pub registeration_deadline: Option<NaiveDateTime>,
 }
