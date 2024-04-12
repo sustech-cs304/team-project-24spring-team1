@@ -40,28 +40,28 @@
         <div class="collapse navbar-collapse show" v-show="showMenu">
           <ul class="navbar-nav" :class="$rtl.isRTL ? 'mr-auto' : 'ml-auto'">
             <div>
-              <base-button class="animation-on-hover" type="primary">My Moment</base-button>
+              <base-button round type="primary"><i class="tim-icons icon-heart-2"></i>  My Moment</base-button>
             </div>
             <div>
               <base-button class="animation-on-hover" type="primary">My Event</base-button>
-             </div>
+            </div>
             <div
               class="search-bar input-group"
               @click="searchModalVisible = true"
             >
-              <!-- <input type="text" class="form-control" placeholder="Search...">
-              <div class="input-group-addon"><i class="tim-icons icon-zoom-split"></i></div> -->
-              <button
+              <input type="text" class="form-control" placeholder="Search...">
+              <div class="input-group-addon"><i class="tim-icons icon-zoom-split"></i></div>
+              <!-- <button
                 class="btn btn-link"
                 id="search-button"
                 data-toggle="modal"
                 data-target="#searchModal"
               >
                 <i class="tim-icons icon-zoom-split"></i>
-              </button>
+              </button> -->
               <!-- You can choose types of search input -->
             </div>
-            <modal
+            <!-- <modal
               :show.sync="searchModalVisible"
               class="modal-search"
               id="searchModal"
@@ -76,7 +76,7 @@
                 id="inlineFormInputGroup"
                 placeholder="SEARCH"
               />
-            </modal>
+            </modal> -->
             <base-dropdown
               tag="li"
               :menu-on-right="!$rtl.isRTL"
@@ -91,12 +91,17 @@
                 aria-expanded="true"
               >
                 <div class="notification d-none d-lg-block d-xl-block"></div>
-                <i class="tim-icons icon-sound-wave"></i>
+                <i class="tim-icons icon-bell-55"></i>
                 <p class="d-lg-none">New Notifications</p>
               </a>
               <li class="nav-link">
                 <a href="#" class="nav-item dropdown-item"
-                  >Mike John responded to your email</a
+                  >Notifications</a
+                >
+              </li>
+              <li class="nav-link">
+                <a href="#" class="nav-item dropdown-item"
+                  >Message</a
                 >
               </li>
             </base-dropdown>
