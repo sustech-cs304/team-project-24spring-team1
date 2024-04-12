@@ -20,6 +20,17 @@ Created using IcoMoon - icomoon.io
 /*------------------------
 	base class definition
 -------------------------*/
+.custom-input {
+  border: 1px solid #000; /* Solid border */
+  border-radius: 4px; /* Optional: Adding border-radius */
+  transition: border-color 0.3s ease; /* Adding transition effect */
+  color: white; /* Text color */
+}
+
+.custom-input:hover {
+  border-color: purple; /* Border color on hover */
+}
+
 
 .tim-icons {
   display: inline-block;
