@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <!-- <div class="wrapper">
     <side-bar>
       <template slot="links">
         <sidebar-link
@@ -43,7 +43,7 @@
           icon="tim-icons icon-world"
         />
       </template>
-    </side-bar>
+    </side-bar> -->
     <div class="main-panel">
       <top-navbar></top-navbar>
 

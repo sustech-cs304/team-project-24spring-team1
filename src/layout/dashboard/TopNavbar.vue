@@ -39,6 +39,12 @@
       <collapse-transition>
         <div class="collapse navbar-collapse show" v-show="showMenu">
           <ul class="navbar-nav" :class="$rtl.isRTL ? 'mr-auto' : 'ml-auto'">
+            <div>
+              <base-button class="animation-on-hover" type="primary">My Moment</base-button>
+            </div>
+            <div>
+              <base-button class="animation-on-hover" type="primary">My Event</base-button>
+             </div>
             <div
               class="search-bar input-group"
               @click="searchModalVisible = true"
@@ -92,24 +98,6 @@
                 <a href="#" class="nav-item dropdown-item"
                   >Mike John responded to your email</a
                 >
-              </li>
-              <li class="nav-link">
-                <a href="#" class="nav-item dropdown-item"
-                  >You have 5 more tasks</a
-                >
-              </li>
-              <li class="nav-link">
-                <a href="#" class="nav-item dropdown-item"
-                  >Your friend Michael is in town</a
-                >
-              </li>
-              <li class="nav-link">
-                <a href="#" class="nav-item dropdown-item"
-                  >Another notification</a
-                >
-              </li>
-              <li class="nav-link">
-                <a href="#" class="nav-item dropdown-item">Another one</a>
               </li>
             </base-dropdown>
             <base-dropdown
