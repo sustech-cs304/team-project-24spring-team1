@@ -79,7 +79,7 @@
                 <p class="d-lg-none">New Notifications</p>
               </a>
               <li class="nav-link">
-                <a href="#" class="nav-item dropdown-item"
+                <a href="#/notifications" class="nav-item dropdown-item"
                   >Notifications</a
                 >
               </li>

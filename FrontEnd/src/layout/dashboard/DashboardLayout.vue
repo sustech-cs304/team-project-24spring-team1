@@ -17,11 +17,11 @@
           :name="$t('sidebar.maps')"
           icon="tim-icons icon-pin"
         />
-        <sidebar-link
+        <!-- <sidebar-link
           to="/notifications"
           :name="$t('sidebar.notifications')"
           icon="tim-icons icon-bell-55"
-        />
+        /> -->
         <sidebar-link
           to="/profile"
           :name="$t('sidebar.userProfile')"
@@ -32,25 +32,32 @@
           :name="$t('sidebar.tableList')"
           icon="tim-icons icon-puzzle-10"
         />
-        <sidebar-link
+        <!-- <sidebar-link
           to="/typography"
           :name="$t('sidebar.typography')"
           icon="tim-icons icon-align-center"
-        />
-        <sidebar-link
+        /> -->
+        <!-- <sidebar-link
           to="/dashboard?enableRTL=true"
           :name="$t('sidebar.rtlSupport')"
           icon="tim-icons icon-world"
-        />
+        /> -->
       </template>
     </side-bar>
     <div class="main-panel">
       <top-navbar></top-navbar>
-
       <dashboard-content @click.native="toggleSidebar"> </dashboard-content>
-
       <content-footer></content-footer>
     </div>
+    <right-sidebar>
+      <template slot="links">
+        <right-sidebar-link
+          to="/dashboard"
+          :name="$t('sidebar.dashboard')"
+          icon="tim-icons icon-chart-pie-36"
+        />
+      </template>
+    </right-sidebar>
   </div>
 </template>
 <style lang="scss"></style>
