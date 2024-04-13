@@ -1,76 +1,62 @@
 <template>
   <div class="wrapper">
     <side-bar>
-      <template slot="links">
-        <sidebar-link
-          to="/dashboard"
-          :name="$t('sidebar.dashboard')"
-          icon="tim-icons icon-chart-pie-36"
-        />
-        <sidebar-link
-          to="/icons"
-          :name="$t('sidebar.icons')"
-          icon="tim-icons icon-atom"
-        />
-        <sidebar-link
-          to="/maps"
-          :name="$t('sidebar.maps')"
-          icon="tim-icons icon-pin"
-        />
-        <!-- <sidebar-link
-          to="/notifications"
-          :name="$t('sidebar.notifications')"
-          icon="tim-icons icon-bell-55"
-        /> -->
-        <sidebar-link
-          to="/profile"
-          :name="$t('sidebar.userProfile')"
-          icon="tim-icons icon-single-02"
-        />
-        <sidebar-link
-          to="/table-list"
-          :name="$t('sidebar.tableList')"
-          icon="tim-icons icon-puzzle-10"
-        />
-        <!-- <sidebar-link
-          to="/typography"
-          :name="$t('sidebar.typography')"
-          icon="tim-icons icon-align-center"
-        /> -->
-        <!-- <sidebar-link
-          to="/dashboard?enableRTL=true"
-          :name="$t('sidebar.rtlSupport')"
-          icon="tim-icons icon-world"
-        /> -->
+      <template>
+        <div class="filter-container-custom">
+          <div
+              class="filter-item"
+              v-for="(filter, index) in filters"
+              :key="index"
+              :style="filterStyles(index)"
+          >
+            <input type="checkbox" v-model="filter.checked" :id="'filter' + index">
+            <label :for="'filter' + index">{{ filter.label }}</label>
+          </div>
+        </div>
       </template>
+
     </side-bar>
     <div class="main-panel">
       <top-navbar></top-navbar>
+
       <dashboard-content @click.native="toggleSidebar"> </dashboard-content>
+
       <content-footer></content-footer>
     </div>
-    <right-sidebar>
-      <template slot="links">
-        <right-sidebar-link
-          to="/dashboard"
-          :name="$t('sidebar.dashboard')"
-          icon="tim-icons icon-chart-pie-36"
-        />
-      </template>
-    </right-sidebar>
   </div>
 </template>
-<style lang="scss"></style>
+
+<style lang="scss">
+.filter-container-custom { /* 添加样式 */
+  display: flex;
+  flex-direction: column;
+}
+</style>
+
 <script>
 import TopNavbar from "./TopNavbar.vue";
 import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
 import MobileMenu from "./MobileMenu";
+import {BaseTable} from "@/components";
+
 export default {
   components: {
+    BaseTable,
     TopNavbar,
     ContentFooter,
     DashboardContent,
+  },
+  data() {
+    return {
+      filters: [
+        { label: "Lecture", checked: false },
+        { label: "Concert", checked: false },
+        { label: "Competition", checked: false },
+        { label: "Social", checked: false },
+        { label: "Volunteering", checked: false },
+      ],
+    };
   },
   methods: {
     toggleSidebar() {
@@ -78,6 +64,16 @@ export default {
         this.$sidebar.displaySidebar(false);
       }
     },
+    filterStyles(index) { // 定义动态样式方法
+      return {
+        marginTop: '10px',
+        marginHeight: '10px',
+        marginLeft: '20px', // 左边距
+        marginBlock: '0px', // 垂直方向上边距
+      };
+    },
   },
+
 };
+
 </script>
