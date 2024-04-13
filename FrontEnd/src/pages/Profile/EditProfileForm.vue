@@ -92,6 +92,7 @@
     <base-button slot="footer" type="primary" fill>Save</base-button>
   </card>
 </template>
+
 <script>
 export default {
   props: {
