@@ -40,7 +40,8 @@
         <div class="collapse navbar-collapse show" v-show="showMenu">
           <ul class="navbar-nav" :class="$rtl.isRTL ? 'mr-auto' : 'ml-auto'">
             <div>
-              <base-button round type="primary"><i class="tim-icons icon-heart-2"></i>  My Moment</base-button>
+              <base-button tag="a" round type="primary" href="#/mymoment" role="button" aria-pressed="true">
+                <i class="tim-icons icon-heart-2"></i>  My Moment</base-button>
             </div>
             <div>
               <base-button round type="primary"><i class="tim-icons icon-bullet-list-67"></i>  My Event</base-button>
