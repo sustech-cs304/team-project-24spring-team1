@@ -44,7 +44,8 @@
                 <i class="tim-icons icon-heart-2"></i>  My Moment</base-button>
             </div>
             <div>
-              <base-button round type="primary"><i class="tim-icons icon-bullet-list-67"></i>  My Event</base-button>
+              <base-button tag="a" round type="primary" href="#/myevent" role="button" aria-pressed="true">
+                <i class="tim-icons icon-bullet-list-67"></i>  My Event</base-button>
             </div>
             <div
               class="search-bar input-group"
