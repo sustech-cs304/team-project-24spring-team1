@@ -9,18 +9,16 @@
               :key="index"
               :style="filterStyles(index)"
           >
-            <input type="checkbox" v-model="filter.checked" :id="'filter' + index">
-            <label :for="'filter' + index">{{ filter.label }}</label>
+            <BaseCheckbox v-model="filter.checked" :id="'filter' + index">
+              {{ filter.label }}
+            </BaseCheckbox>
           </div>
         </div>
       </template>
-
     </side-bar>
     <div class="main-panel">
       <top-navbar></top-navbar>
-
       <dashboard-content @click.native="toggleSidebar"> </dashboard-content>
-
       <content-footer></content-footer>
     </div>
   </div>
@@ -31,6 +29,10 @@
   display: flex;
   flex-direction: column;
 }
+.filter-item label {
+  color: white; // 将字体颜色设置为白色
+}
+
 </style>
 
 <script>
@@ -38,7 +40,7 @@ import TopNavbar from "./TopNavbar.vue";
 import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
 import MobileMenu from "./MobileMenu";
-import {BaseTable} from "@/components";
+import { BaseTable, BaseCheckbox } from "@/components"; // 导入 BaseCheckbox
 
 export default {
   components: {
@@ -46,6 +48,7 @@ export default {
     TopNavbar,
     ContentFooter,
     DashboardContent,
+    BaseCheckbox,
   },
   data() {
     return {
@@ -64,7 +67,7 @@ export default {
         this.$sidebar.displaySidebar(false);
       }
     },
-    filterStyles(index) { // 定义动态样式方法
+    filterStyles(index) {
       return {
         marginTop: '10px',
         marginHeight: '10px',
@@ -73,7 +76,5 @@ export default {
       };
     },
   },
-
 };
-
 </script>
