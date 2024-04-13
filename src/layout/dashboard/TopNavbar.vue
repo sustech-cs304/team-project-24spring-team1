@@ -8,6 +8,7 @@
         <div
           class="navbar-toggle d-inline"
           :class="{ toggled: $sidebar.showSidebar }"
+
         >
           <button
             type="button"
@@ -20,7 +21,8 @@
             <span class="navbar-toggler-bar bar3"></span>
           </button>
         </div>
-        <a class="navbar-brand" href="#pablo">{{ routeName }}</a>
+<!--        <a class="navbar-brand" href="#pablo">{{ routeName }}</a>-->
+        <a class="navbar-brand" href="#/dashboard">SUSTech Event</a>
       </div>
       <button
         class="navbar-toggler"
@@ -40,17 +42,19 @@
         <div class="collapse navbar-collapse show" v-show="showMenu">
           <ul class="navbar-nav" :class="$rtl.isRTL ? 'mr-auto' : 'ml-auto'">
             <div>
-              <base-button class="animation-on-hover" type="primary">My Moment</base-button>
+              <base-button tag="a" round type="primary" href="#/mymoment" role="button" aria-pressed="true">
+                <i class="tim-icons icon-heart-2"></i>  My Moment</base-button>
             </div>
             <div>
-              <base-button class="animation-on-hover" type="primary">My Event</base-button>
-             </div>
+              <base-button tag="a" round type="primary" href="#/myevent" role="button" aria-pressed="true">
+                <i class="tim-icons icon-bullet-list-67"></i>  My Event</base-button>
+            </div>
             <div
               class="search-bar input-group"
               @click="searchModalVisible = true"
             >
-              <!-- <input type="text" class="form-control" placeholder="Search...">
-              <div class="input-group-addon"><i class="tim-icons icon-zoom-split"></i></div> -->
+              <input type="text" class="custom-input" placeholder="Search...">
+              <!-- <div class="input-group-addon"><i class="tim-icons icon-zoom-split"></i></div> -->
               <button
                 class="btn btn-link"
                 id="search-button"
@@ -61,22 +65,6 @@
               </button>
               <!-- You can choose types of search input -->
             </div>
-            <modal
-              :show.sync="searchModalVisible"
-              class="modal-search"
-              id="searchModal"
-              :centered="false"
-              :show-close="true"
-            >
-              <input
-                slot="header"
-                v-model="searchQuery"
-                type="text"
-                class="form-control"
-                id="inlineFormInputGroup"
-                placeholder="SEARCH"
-              />
-            </modal>
             <base-dropdown
               tag="li"
               :menu-on-right="!$rtl.isRTL"
@@ -91,12 +79,17 @@
                 aria-expanded="true"
               >
                 <div class="notification d-none d-lg-block d-xl-block"></div>
-                <i class="tim-icons icon-sound-wave"></i>
+                <i class="tim-icons icon-bell-55"></i>
                 <p class="d-lg-none">New Notifications</p>
               </a>
               <li class="nav-link">
+                <a href="#/notifications" class="nav-item dropdown-item"
+                  >Notifications</a
+                >
+              </li>
+              <li class="nav-link">
                 <a href="#" class="nav-item dropdown-item"
-                  >Mike John responded to your email</a
+                  >Message</a
                 >
               </li>
             </base-dropdown>
@@ -121,10 +114,10 @@
                 <p class="d-lg-none">Log out</p>
               </a>
               <li class="nav-link">
-                <a href="#" class="nav-item dropdown-item">Profile</a>
+                <a href="#/profile" class="nav-item dropdown-item">Profile</a>
               </li>
               <li class="nav-link">
-                <a href="#" class="nav-item dropdown-item">Settings</a>
+                <a href="#/profile" class="nav-item dropdown-item">Settings</a>
               </li>
               <div class="dropdown-divider"></div>
               <li class="nav-link">
@@ -148,8 +141,9 @@ export default {
   },
   computed: {
     routeName() {
-      const { name } = this.$route;
-      return this.capitalizeFirstLetter(name);
+      return "SUSTech Event";
+      // const { name } = this.$route;
+      // return this.capitalizeFirstLetter(name);
     },
     isRTL() {
       return this.$rtl.isRTL;
@@ -179,8 +173,13 @@ export default {
     hideSidebar() {
       this.$sidebar.displaySidebar(false);
     },
+    // toggleMenu() {
+    //   this.showMenu = !this.showMenu;
+    // },
     toggleMenu() {
       this.showMenu = !this.showMenu;
+      // Navigate to Dashboard page
+      this.$router.push('/Dashboard');
     },
   },
 };
