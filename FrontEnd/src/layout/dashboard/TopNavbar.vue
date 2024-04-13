@@ -8,6 +8,7 @@
         <div
           class="navbar-toggle d-inline"
           :class="{ toggled: $sidebar.showSidebar }"
+
         >
           <button
             type="button"
@@ -20,7 +21,8 @@
             <span class="navbar-toggler-bar bar3"></span>
           </button>
         </div>
-        <a class="navbar-brand" href="#pablo">{{ routeName }}</a>
+<!--        <a class="navbar-brand" href="#pablo">{{ routeName }}</a>-->
+        <a class="navbar-brand" href="#/dashboard">SUSTech Event</a>
       </div>
       <button
         class="navbar-toggler"
@@ -40,10 +42,12 @@
         <div class="collapse navbar-collapse show" v-show="showMenu">
           <ul class="navbar-nav" :class="$rtl.isRTL ? 'mr-auto' : 'ml-auto'">
             <div>
-              <base-button round type="primary"><i class="tim-icons icon-heart-2"></i>  My Moment</base-button>
+              <base-button tag="a" round type="primary" href="#/mymoment" role="button" aria-pressed="true">
+                <i class="tim-icons icon-heart-2"></i>  My Moment</base-button>
             </div>
             <div>
-              <base-button round type="primary"><i class="tim-icons icon-bullet-list-67"></i>  My Event</base-button>
+              <base-button tag="a" round type="primary" href="#/myevent" role="button" aria-pressed="true">
+                <i class="tim-icons icon-bullet-list-67"></i>  My Event</base-button>
             </div>
             <div
               class="search-bar input-group"
@@ -137,8 +141,9 @@ export default {
   },
   computed: {
     routeName() {
-      const { name } = this.$route;
-      return this.capitalizeFirstLetter(name);
+      return "SUSTech Event";
+      // const { name } = this.$route;
+      // return this.capitalizeFirstLetter(name);
     },
     isRTL() {
       return this.$rtl.isRTL;
@@ -168,8 +173,13 @@ export default {
     hideSidebar() {
       this.$sidebar.displaySidebar(false);
     },
+    // toggleMenu() {
+    //   this.showMenu = !this.showMenu;
+    // },
     toggleMenu() {
       this.showMenu = !this.showMenu;
+      // Navigate to Dashboard page
+      this.$router.push('/Dashboard');
     },
   },
 };

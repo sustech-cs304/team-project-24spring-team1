@@ -1,6 +1,7 @@
 import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue";
 // GeneralViews
 import NotFound from "@/pages/NotFoundPage.vue";
+// import { component } from "vue/types/umd.js";
 
 // Admin pages
 const Dashboard = () =>
@@ -16,6 +17,10 @@ const Typography = () =>
   import(/* webpackChunkName: "common" */ "@/pages/Typography.vue");
 const TableList = () =>
   import(/* webpackChunkName: "common" */ "@/pages/TableList.vue");
+const MyMoment = () =>
+  import("@/pages/MyMoment.vue");
+const MyEvent = () =>
+  import("@/pages/MyEvent.vue");
 
 const routes = [
   {
@@ -57,6 +62,16 @@ const routes = [
         path: "table-list",
         name: "table-list",
         component: TableList,
+      },
+      {
+        path: "mymoment",
+        name: "mymoment",
+        component: MyMoment,
+      },
+      {
+        path: "myevent",
+        name: "myevent",
+        component: MyEvent,
       },
     ],
   },
