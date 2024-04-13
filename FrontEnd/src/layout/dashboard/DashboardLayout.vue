@@ -15,10 +15,13 @@
           </div>
         </div>
       </template>
+
     </side-bar>
     <div class="main-panel">
       <top-navbar></top-navbar>
+
       <dashboard-content @click.native="toggleSidebar"> </dashboard-content>
+
       <content-footer></content-footer>
     </div>
   </div>
@@ -32,7 +35,6 @@
 .filter-item label {
   color: white; // 将字体颜色设置为白色
 }
-
 </style>
 
 <script>
@@ -40,7 +42,7 @@ import TopNavbar from "./TopNavbar.vue";
 import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
 import MobileMenu from "./MobileMenu";
-import { BaseTable, BaseCheckbox } from "@/components"; // 导入 BaseCheckbox
+import {BaseTable, BaseCheckbox} from "@/components";
 
 export default {
   components: {
@@ -53,11 +55,11 @@ export default {
   data() {
     return {
       filters: [
-        { label: "Lecture", checked: false },
-        { label: "Concert", checked: false },
-        { label: "Competition", checked: false },
-        { label: "Social", checked: false },
-        { label: "Volunteering", checked: false },
+        {label: "Lecture", checked: false},
+        {label: "Concert", checked: false},
+        {label: "Competition", checked: false},
+        {label: "Social", checked: false},
+        {label: "Volunteering", checked: false},
       ],
     };
   },
@@ -67,7 +69,7 @@ export default {
         this.$sidebar.displaySidebar(false);
       }
     },
-    filterStyles(index) {
+    filterStyles(index) { // 定义动态样式方法
       return {
         marginTop: '10px',
         marginHeight: '10px',
@@ -76,5 +78,7 @@ export default {
       };
     },
   },
+
 };
+
 </script>
