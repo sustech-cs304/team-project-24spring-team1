@@ -3,7 +3,9 @@
         <div class="row">
             <div class="col-lg-4" :class="{ 'text-right': isRTL }">
                 <card v-for="(card, index) in moment" :key="index" style="width: 50rem;">
-                    <img slot="image" class="card-img-top" :src="getMomentImagePath(card.id)" alt="Card image cap"/>
+                    <template v-for="(imageNumber, i) in [1]">
+                        <img slot="image" class="card-img-top" :key="i" :src="getMomentImagePath(card.id, imageNumber)" alt="Card image cap"/>
+                    </template>
                     <p class="card-text">{{ card.content }}</p>
                     <div class="d-flex justify-content-around">
                         <base-button v-for="(button, bIndex) in card.buttons" :key="bIndex" round icon type="primary">
@@ -24,8 +26,10 @@
     </div>
 </template>
 
+
 <script>
 export default {
+    props: ['username'],
     data() {
         return {
             moment: [
@@ -59,8 +63,8 @@ export default {
         }
     },
     methods: {
-        getMomentImagePath(momentId) {
-            return `Data/user/moment/${momentId}/pictures/image.jpg`;
+        getMomentImagePath(momentId, imageNumber) {
+            return `users/testuser/moment/${momentId}-${imageNumber}.jpg`;
         }
     }
 }
