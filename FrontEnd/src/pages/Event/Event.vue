@@ -1,12 +1,21 @@
 <template>
   <div>
-    <h1>Event ID: {{ eventId }}</h1>
-    <div v-if="error" class="error">{{ error }}</div>
-    <div v-else>
-      <h2>{{ event.holder }}</h2>
-      <p>{{ event.time }}</p>
-      <p>{{ event.classification }}</p>
-      <p>{{ event.introduction }}</p>
+    <div class="row">
+      <div class="col-lg-4" :class="{ 'text-right': isRTL }">
+
+        <card style="width: 75rem; height: 30rem">
+          <h1> {{ event.title }}</h1>
+          <div v-if="error" class="error">{{ error }}</div>
+          <div v-else>
+            <p>{{ event.holder }}</p>
+            <p>{{ event.time }}</p>
+            <p>{{ event.classification }}</p>
+            <p>{{ event.introduction }}</p>
+          </div>
+          <base-button type="info" @click="reserveActivity" style="padding: 10px 20px; font-size: 16px;  border-radius: 5px; cursor: pointer;">Reserve</base-button>
+        </card>
+
+      </div>
     </div>
   </div>
 </template>

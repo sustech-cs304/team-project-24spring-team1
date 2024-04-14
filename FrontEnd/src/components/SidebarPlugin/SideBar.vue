@@ -7,13 +7,7 @@
     <!-- -->
     <div class="sidebar-wrapper" id="style-3">
       <div class="logo">
-        <a
-          aria-label="sidebar mini logo"
-          class="simple-text logo-mini"
-
-        >
-        </a>
-        <a class="simple-text logo-normal" style="margin-right: -1000px;">
+        <a class="simple-text logo-normal">
           <i class="fas fa-filter"></i>
           {{ title }}
         </a>

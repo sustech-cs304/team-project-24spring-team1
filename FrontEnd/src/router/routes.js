@@ -20,7 +20,6 @@ const MyMoment = () =>
   import("@/pages/MyMoment.vue");
 const MyEvent = () =>
   import("@/pages/MyEvent.vue");
-
 const Login = () => import('@/pages/login');
 
 

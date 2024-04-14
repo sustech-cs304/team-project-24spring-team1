@@ -1,6 +1,25 @@
 <template>
   <div>
     <div class="row">
+      <side-bar>
+        <template>
+          <div class="filter-container-custom">
+            <div
+                class="filter-item"
+                v-for="(filter, index) in filters"
+                :key="index"
+                :style="filterStyles(index)"
+            >
+              <BaseCheckbox v-model="filter.checked" :id="'filter' + index">
+                {{ filter.label }}
+              </BaseCheckbox>
+            </div>
+          </div>
+        </template>
+      </side-bar>
+    </div>
+
+    <div class="row">
       <div class="col-12">
         <card type="chart">
           <template slot="header">
@@ -60,118 +79,26 @@
             <h4 class="card-title">{{ card.title }}</h4>
             <p class="card-text">{{ card.description }}</p>
             <base-button tag="a" type="primary" :href="getEventUrlPath(index)" role="button" aria-pressed="true"
-              class="animation-on-hover btn-center"> Check Event
+              class="animation-on-hover btn-center"> Event Detail
             </base-button>
           </card>
         </div>
-      </div>
-      <!-- <div class="col-lg-4" :class="{ 'text-right': isRTL }">
-        <card type="chart">
-          <template slot="header">
-            <h5 class="card-category">{{ $t("dashboard.totalShipments") }}</h5>
-            <h3 class="card-title">
-              <i class="tim-icons icon-bell-55 text-primary"></i> 763,215
-            </h3>
-          </template>
-          <div class="chart-area">
-            <line-chart
-              style="height: 100%"
-              chart-id="purple-line-chart"
-              :chart-data="purpleLineChart.chartData"
-              :gradient-colors="purpleLineChart.gradientColors"
-              :gradient-stops="purpleLineChart.gradientStops"
-              :extra-options="purpleLineChart.extraOptions"
-            >
-            </line-chart>
-          </div>
-        </card>
-      </div>
-      <div class="col-lg-4" :class="{ 'text-right': isRTL }">
-        <card type="chart">
-          <template slot="header">
-            <h5 class="card-category">{{ $t("dashboard.dailySales") }}</h5>
-            <h3 class="card-title">
-              <i class="tim-icons icon-delivery-fast text-info"></i> 3,500€
-            </h3>
-          </template>
-          <div class="chart-area">
-            <bar-chart
-              style="height: 100%"
-              chart-id="blue-bar-chart"
-              :chart-data="blueBarChart.chartData"
-              :gradient-stops="blueBarChart.gradientStops"
-              :extra-options="blueBarChart.extraOptions"
-            >
-            </bar-chart>
-          </div>
-        </card>
-      </div>
-      <div class="col-lg-4" :class="{ 'text-right': isRTL }">
-        <card type="chart">
-          <template slot="header">
-            <h5 class="card-category">{{ $t("dashboard.completedTasks") }}</h5>
-            <h3 class="card-title">
-              <i class="tim-icons icon-send text-success"></i> 12,100K
-            </h3>
-          </template>
-          <div class="chart-area">
-            <line-chart
-              style="height: 100%"
-              chart-id="green-line-chart"
-              :chart-data="greenLineChart.chartData"
-              :gradient-stops="greenLineChart.gradientStops"
-              :extra-options="greenLineChart.extraOptions"
-            >
-            </line-chart>
-          </div>
-        </card>
-      </div> -->
-    </div>
-    <div class="row">
-      <div class="col-lg-6 col-md-12">
-        <card type="tasks" :header-classes="{ 'text-right': false }">
-          <template slot="header">
-            <h6 class="title d-inline">
-              {{ $t("dashboard.tasks", { count: 5 }) }}
-            </h6>
-            <p class="card-category d-inline">{{ $t("dashboard.today") }}</p>
-            <base-dropdown
-              menu-on-right=""
-              tag="div"
-              title-classes="btn btn-link btn-icon"
-              aria-label="Settings menu"
-              :class="{ 'float-left': isRTL }"
-            >
-              <i slot="title" class="tim-icons icon-settings-gear-63"></i>
-              <a class="dropdown-item" href="#pablo">{{
-                $t("dashboard.dropdown.action")
-              }}</a>
-              <a class="dropdown-item" href="#pablo">{{
-                $t("dashboard.dropdown.anotherAction")
-              }}</a>
-              <a class="dropdown-item" href="#pablo">{{
-                $t("dashboard.dropdown.somethingElse")
-              }}</a>
-            </base-dropdown>
-          </template>
-          <div class="table-full-width table-responsive">
-            <task-list></task-list>
-          </div>
-        </card>
-      </div>
-      <div class="col-lg-6 col-md-12">
-        <card class="card" :header-classes="{ 'text-right': isRTL }">
-          <h4 slot="header" class="card-title">
-            {{ $t("dashboard.simpleTable") }}
-          </h4>
-          <div class="table-responsive">
-            <user-table></user-table>
-          </div>
-        </card>
-      </div>
     </div>
   </div>
+  </div>
 </template>
+
+<style lang="scss">
+.filter-container-custom { /* 添加样式 */
+  display: flex;
+  flex-direction: column;
+}
+.filter-item label {
+  color: white; // 将字体颜色设置为白色
+}
+</style>
+
+
 <script>
 import LineChart from "@/components/Charts/LineChart";
 import BarChart from "@/components/Charts/BarChart";
@@ -179,6 +106,7 @@ import * as chartConfigs from "@/components/Charts/config";
 import TaskList from "./Dashboard/TaskList";
 import UserTable from "./Dashboard/UserTable";
 import config from "@/config";
+import {BaseCheckbox} from "@/components";
 
 export default {
   components: {
@@ -186,9 +114,17 @@ export default {
     BarChart,
     TaskList,
     UserTable,
+    BaseCheckbox,
   },
   data() {
     return {
+      filters: [
+        {label: "Lecture", checked: false},
+        {label: "Concert", checked: false},
+        {label: "Competition", checked: false},
+        {label: "Social", checked: false},
+        {label: "Volunteering", checked: false},
+      ],
       events: [
         {
           title: 'Card 1',
@@ -324,11 +260,20 @@ export default {
     },
   },
   methods: {
+    filterStyles(index) { // 定义动态样式方法
+      return {
+        marginTop: '10px',
+        marginHeight: '10px',
+        marginLeft: '20px', // 左边距
+        marginBlock: '0px', // 垂直方向上边距
+      };
+    },
     getEventImagePath(index) {
       return `events/${index + 1}/1.jpg`;
     },
     getEventUrlPath(index) {
       return `#/event/${index + 1}`;
+      // return '#/dashboard/activity'
     },
     initBigChart(index) {
       let chartData = {
@@ -390,4 +335,5 @@ export default {
   display: block;
   margin: 0 auto;
 }
+
 </style>
