@@ -44,6 +44,9 @@
               SUSTech
             </div>
           </div>
+          <card>
+            <base-input class="has-success" value="Comment here..."></base-input>
+          </card>
           <div>
             <div v-for="(comment, cIndex) in event.comments" :key="cIndex">
               <card class="mb-3">
