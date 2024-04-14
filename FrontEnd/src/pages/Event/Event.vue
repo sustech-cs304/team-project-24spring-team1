@@ -1,7 +1,7 @@
 <template>
   <div>
     <top-navbar class="fixed-top"></top-navbar>
-    <div class="content"style="margin-top: 70px;">
+    <div class="content"style="margin-top: 80px;">
       <fade-transition :duration="100" mode="out-in">
         <div class="col-lg-4" :class="{ 'text-right': false }">
           <card type="nav-tabs" class="text-left" style="width: 60rem;">
