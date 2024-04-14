@@ -22,7 +22,7 @@
           </button>
         </div>
 <!--        <a class="navbar-brand" href="#pablo">{{ routeName }}</a>-->
-        <a class="navbar-brand" href="#/dashboard">SUSTech Event</a>
+        <a class="navbar-brand" href="#/dashboard/dashboard">SUSTech Event</a>
       </div>
       <button
         class="navbar-toggler"
@@ -42,11 +42,11 @@
         <div class="collapse navbar-collapse show" v-show="showMenu">
           <ul class="navbar-nav" :class="$rtl.isRTL ? 'mr-auto' : 'ml-auto'">
             <div>
-              <base-button tag="a" round type="primary" href="#/mymoment" role="button" aria-pressed="true">
+              <base-button tag="a" round type="primary" href="#/dashboard/mymoment" role="button" aria-pressed="true">
                 <i class="tim-icons icon-heart-2"></i>  My Moment</base-button>
             </div>
             <div>
-              <base-button tag="a" round type="primary" href="#/myevent" role="button" aria-pressed="true">
+              <base-button tag="a" round type="primary" href="#/dashboard/myevent" role="button" aria-pressed="true">
                 <i class="tim-icons icon-bullet-list-67"></i>  My Event</base-button>
             </div>
             <div
@@ -73,7 +73,7 @@
             >
               <a
                 slot="title"
-                href="#"
+                href="#/dashboard"
                 class="dropdown-toggle nav-link"
                 data-toggle="dropdown"
                 aria-expanded="true"
@@ -83,16 +83,17 @@
                 <p class="d-lg-none">New Notifications</p>
               </a>
               <li class="nav-link">
-                <a href="#/notifications" class="nav-item dropdown-item"
+                <a href="#/dashboard/notifications" class="nav-item dropdown-item"
                   >Notifications</a
                 >
               </li>
               <li class="nav-link">
-                <a href="#" class="nav-item dropdown-item"
+                <a href="#/dashboard" class="nav-item dropdown-item"
                   >Message</a
                 >
               </li>
             </base-dropdown>
+
             <base-dropdown
               tag="li"
               :menu-on-right="!$rtl.isRTL"
@@ -114,14 +115,14 @@
                 <p class="d-lg-none">Log out</p>
               </a>
               <li class="nav-link">
-                <a href="#/profile" class="nav-item dropdown-item">Profile</a>
+                <a href="#/dashboard/profile" class="nav-item dropdown-item">Profile</a>
               </li>
               <li class="nav-link">
-                <a href="#/profile" class="nav-item dropdown-item">Settings</a>
+                <a href="#/dashboard/profile" class="nav-item dropdown-item">Settings</a>
               </li>
               <div class="dropdown-divider"></div>
               <li class="nav-link">
-                <a href="#" class="nav-item dropdown-item">Log out</a>
+                <a href="#/dashboard" class="nav-item dropdown-item">Log out</a>
               </li>
             </base-dropdown>
           </ul>
@@ -179,7 +180,7 @@ export default {
     toggleMenu() {
       this.showMenu = !this.showMenu;
       // Navigate to Dashboard page
-      this.$router.push('/Dashboard');
+      this.$router.push('/dashboard/dashboard'); //'Dashboard'
     },
   },
 };

@@ -1,5 +1,4 @@
 import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue";
-// GeneralViews
 import NotFound from "@/pages/NotFoundPage.vue";
 // import { component } from "vue/types/umd.js";
 
@@ -22,11 +21,28 @@ const MyMoment = () =>
 const MyEvent = () =>
   import("@/pages/MyEvent.vue");
 
+
 const routes = [
   {
-    path: "/",
+    path: '/login',
+    component: () => import('@/pages/login'),
+    hidden: true
+  },
+  {
+    path: '/register',
+    component: () => import('@/pages/register'),
+    hidden: true
+  },
+  {
+    path: '/',
+    // component: () => import('@/pages/register'),
+    redirect: '/login'// '/dashboard/dashboard',
+  },
+
+  {
+    path: "/dashboard",
     component: DashboardLayout,
-    redirect: "/dashboard",
+    // redirect: "/dashboard",
     children: [
       {
         path: "dashboard",
@@ -76,6 +92,7 @@ const routes = [
     ],
   },
   { path: "*", component: NotFound },
+
 ];
 
 /**

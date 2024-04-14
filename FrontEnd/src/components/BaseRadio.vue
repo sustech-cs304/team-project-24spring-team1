@@ -17,6 +17,7 @@
     </label>
   </div>
 </template>
+
 <script>
 export default {
   name: "base-radio",
