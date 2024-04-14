@@ -4,9 +4,9 @@
       <header>
         <el-avatar icon="el-icon-user-solid" shape="circle" />
         <span class="login">
-          <em class="bold">已有账号？</em>
+          <em class="bold">already have an account?</em>
           <a href="/login">
-            <el-button type="primary" size="mini">登录</el-button>
+            <el-button type="primary" size="mini">LOGIN</el-button>
           </a>
         </span>
       </header>
@@ -22,11 +22,11 @@
         size="medium"
       >
         <div style="padding-top: 10px">
-          <el-form-item label="邮箱" prop="email">
+          <el-form-item label="email" prop="email">
             <el-col :span="10">
               <el-input
                 v-model="ruleForm.email"
-                placeholder="输入邮箱并点击发送验证码"
+                placeholder="enter your email address and click to do verification"
               />
             </el-col>
             <el-button
@@ -39,12 +39,12 @@
 
             <span class="status">{{ statusMsg }}</span>
           </el-form-item>
-          <el-form-item label="verification-code" prop="code">
+          <el-form-item label="verification" prop="code">
             <el-col :span="10">
               <el-input
                 v-model="ruleForm.code"
                 maxlength="6"
-                placeholder="请登录邮箱接收验证码"
+                placeholder="verification code sent to your email please check"
               />
             </el-col>
           </el-form-item>
@@ -108,7 +108,7 @@ export default {
           required: true,
           message: 'set password',
           trigger: 'blur'
-        }, { pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, message: '密码必须同时包含数字与字母,且长度为 8-20位' }],
+        }, { pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, message: 'contain both letters and digits, length 8-20.' }],
         cpwd: [{
           required: true,
           message: 'confirm password',
@@ -220,9 +220,13 @@ $cursor: #fff;
 
 /* reset element-ui css */
 .register-container {
+  // display: flex;
+  //justify-content: center; /* 水平居中 */
+  //align-items: center;
+
   .el-input {
     display: inline-block;
-    height: 47px;
+    height: 100%;
     width: 95%;
 
     input {
@@ -232,7 +236,7 @@ $cursor: #fff;
       -webkit-appearance: none;
       padding: 12px 5px 12px 15px;
       color: $light_gray;
-      height: 47px;
+      height: 50px;
       caret-color: $cursor;
 
       &:-webkit-autofill {
@@ -252,12 +256,13 @@ $cursor: #fff;
 }
 </style>
 
+
 <style lang="scss" scoped>
 $bg: #2d3a4b;
 $dark_gray: #889aa4;
 $light_gray: #eee;
 
-.register-container {
+body {
   min-height: 100%;
   width: 100%;
   background-color: $bg;
@@ -294,7 +299,7 @@ $light_gray: #eee;
 
     .status {
       font-size: 12px;
-      margin-left: 20px;
+      margin-left: 10%;
       color: #e6a23c;
     }
 
@@ -307,7 +312,7 @@ $light_gray: #eee;
     float: right;
     font-size: 14px;
     color: #fff;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 
     span {
       &:first-of-type {
@@ -317,6 +322,7 @@ $light_gray: #eee;
   }
 }
 </style>
+
 
 <style scoped>
 /* 修改验证器样式 */

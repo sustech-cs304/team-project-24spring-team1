@@ -122,7 +122,7 @@
               </li>
               <div class="dropdown-divider"></div>
               <li class="nav-link">
-                <a href="#/dashboard" class="nav-item dropdown-item">Log out</a>
+                <a href="#/login" class="nav-item dropdown-item">Log out</a>
               </li>
             </base-dropdown>
           </ul>

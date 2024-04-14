@@ -21,12 +21,14 @@ const MyMoment = () =>
 const MyEvent = () =>
   import("@/pages/MyEvent.vue");
 
+const Login = () => import('@/pages/login');
+
 
 const routes = [
   {
     path: '/login',
-    component: () => import('@/pages/login'),
-    hidden: true
+    component: Login,
+    hidden:true,
   },
   {
     path: '/register',
@@ -42,7 +44,6 @@ const routes = [
   {
     path: "/dashboard",
     component: DashboardLayout,
-    // redirect: "/dashboard",
     children: [
       {
         path: "dashboard",

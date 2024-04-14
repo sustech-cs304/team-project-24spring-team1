@@ -13,7 +13,7 @@
         <el-input
           ref="userName"
           v-model="loginForm.userName"
-          placeholder="邮箱"
+          placeholder="email"
           name="userName"
           type="text"
           tabindex="1"
@@ -30,7 +30,7 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="密码"
+          placeholder="password"
           name="password"
           tabindex="2"
           auto-complete="on"
@@ -44,7 +44,7 @@
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">LOGIN</el-button>
 
       <p class="tips">
-        <a href="/register" type="primary">no account? register now.</a>
+        <a href="#/register" type="primary">no account? register now.</a>
       </p>
 
     </el-form>
@@ -137,7 +137,7 @@ $cursor: #fff;
 .login-container {
   .el-input {
     display: inline-block;
-    height: 47px;
+    height: 90%; /*47px;*/
     width: 85%;
 
     input {
@@ -171,7 +171,7 @@ $bg:#2d3a4b;
 $dark_gray:#889aa4;
 $light_gray:#eee;
 
-.login-container {
+body {
   min-height: 100%;
   width: 100%;
   background-color: $bg;
@@ -230,6 +230,8 @@ $light_gray:#eee;
   }
 }
 </style>
+
+
 
 <style scoped>
 /* 修改验证器样式 */
