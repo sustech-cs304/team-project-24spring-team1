@@ -22,6 +22,8 @@ const MyEvent = () =>
   import("@/pages/MyEvent.vue");
 const Login = () => import('@/pages/login');
 
+const Event = () =>
+    import('@/pages/Event/Event.vue');
 
 const routes = [
   {
@@ -88,6 +90,11 @@ const routes = [
         path: "myevent",
         name: "myevent",
         component: MyEvent,
+      },
+      {
+        path: "event",
+        name: "event",
+        component: Event,
       },
     ],
   },

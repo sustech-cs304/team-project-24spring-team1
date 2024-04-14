@@ -70,11 +70,12 @@
         </card>
       </div>
     </div>
+
     <div class="row">
       <div class="row">
-        <div v-for="(card, index) in events" :key="index" class="col-lg-4" :class="{ 'text-right': false }">
-          <card style="width: 20rem;">
-            <img slot="image" class="card-img-top" :src="getEventImagePath(index)" :alt="card.title"/>
+        <div v-for="(card, index) in events" :key="index" class="col-lg-4 mb-4" :class="{ 'text-right': false }">
+          <card style="width: 23rem; margin-left: 10px">
+            <img slot="image" class="card-img-top" :src="getEventImagePath(index)" :alt="card.title" style="width: 60rem; height: 16rem;" />
             <h4 class="card-title">{{ card.title }}</h4>
             <p class="card-text">{{ card.description }}</p>
             <base-button tag="a" type="primary" :href="getEventUrlPath(index)" role="button" aria-pressed="true"
@@ -83,6 +84,7 @@
           </card>
         </div>
     </div>
+
   </div>
   </div>
 </template>
@@ -106,6 +108,7 @@ import TaskList from "./Dashboard/TaskList";
 import UserTable from "./Dashboard/UserTable";
 import config from "@/config";
 import {BaseCheckbox} from "@/components";
+import Event from '@/pages/Event/Event.vue';
 
 export default {
   components: {
@@ -114,6 +117,7 @@ export default {
     TaskList,
     UserTable,
     BaseCheckbox,
+    Event,
   },
   data() {
     return {
@@ -272,7 +276,7 @@ export default {
     },
     getEventUrlPath(index) {
       return `#/event/${index + 1}`;
-      // return '#/dashboard/activity'
+      // return `#/dashboard/event/${index+1}`;
     },
     initBigChart(index) {
       let chartData = {

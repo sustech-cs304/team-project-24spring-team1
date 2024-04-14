@@ -64,6 +64,9 @@
 
 <script>
 export default {
+  // props: {
+  //   eventId: Number,
+  // },
   data() {
     return {
       eventId: null,
@@ -75,6 +78,7 @@ export default {
     this.eventId = this.$route.params.id;
     this.fetchEventData(this.eventId);
   },
+
   methods: {
     getEventID(){
       return this.eventId;
