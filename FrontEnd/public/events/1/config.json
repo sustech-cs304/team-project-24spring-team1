@@ -3,6 +3,24 @@
     "holder": "Event Holder Name 1",
     "time": "Event Time 1",
     "classification": "Event Classification 1",
-    "introduction": "Event Introduction 1"
+    "introduction": "Event Introduction 1",
+    "content": "Event 1 content",
+    "comments": [
+      {
+        "username": "Alice",
+        "comment": "This is a great event!",
+        "time": "2024-04-15T10:30:00"
+      },
+      {
+        "username": "Bob",
+        "comment": "I enjoyed it a lot!",
+        "time": "2024-04-15T11:45:00"
+      },
+      {
+        "username": "Charlie",
+        "comment": "Looking forward to the next one!",
+        "time": "2024-04-15T13:20:00"
+      }
+    ]
   }
   
