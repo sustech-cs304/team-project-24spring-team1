@@ -4,7 +4,7 @@
     <div class="content"style="margin-top: 80px;">
       <fade-transition :duration="100" mode="out-in">
         <div class="col-lg-4" :class="{ 'text-right': false }">
-          <card type="nav-tabs" class="text-left" style="width: 60rem;">
+          <card type="nav-tabs" class="text-left" style="width: 50rem;">
             <div v-if="error" class="error">{{ error }}</div>
             <div v-else>
               <div slot="header" class="card-header-primary">
