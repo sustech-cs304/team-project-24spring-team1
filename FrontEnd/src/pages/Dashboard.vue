@@ -56,10 +56,12 @@
       <div class="row">
         <div v-for="(card, index) in events" :key="index" class="col-lg-4" :class="{ 'text-right': false }">
           <card style="width: 20rem;">
-            <img slot="image" class="card-img-top" :src="getEventImagePath(index + 1)" :alt="card.title"/>
+            <img slot="image" class="card-img-top" :src="getEventImagePath(index)" :alt="card.title"/>
             <h4 class="card-title">{{ card.title }}</h4>
             <p class="card-text">{{ card.description }}</p>
-            <a :href="card.link" class="btn btn-primary btn-center">Check Event</a>
+            <base-button tag="a" type="primary" :href="getEventUrlPath(index)" role="button" aria-pressed="true"
+              class="animation-on-hover btn-center"> Check Event
+            </base-button>
           </card>
         </div>
       </div>
@@ -323,7 +325,10 @@ export default {
   },
   methods: {
     getEventImagePath(index) {
-      return `events/${index}/1.jpg`;
+      return `events/${index + 1}/1.jpg`;
+    },
+    getEventUrlPath(index) {
+      return `#/event/${index + 1}`;
     },
     initBigChart(index) {
       let chartData = {
