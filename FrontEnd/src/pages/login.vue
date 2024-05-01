@@ -63,17 +63,27 @@ export default {
         userName: '',
         password: ''
       },
+      ifAdmin: false,
       loginRules: {
-        userName: [{ type: 'email', required: true, trigger: 'blur', message: 'please enter your email' }],
+        userName: [{ type: 'email', required: true, trigger: 'blur', message: 'please enter your email' },
+          {
+            validator: (rule, value, callback) => {
+              if (value && value.endsWith('admin.com')) {
+                this.ifAdmin = true;
+              }
+              callback(); // 继续验证流程
+            }
+          },
+        ],
         password: [{
           required: true,
-          message: 'create password',
+          message: 'enter password',
           trigger: 'blur'
         }, { pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, message: 'password has to contain both letters and digits, and length 8-20.' }]
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
     }
   },
 
@@ -108,7 +118,11 @@ export default {
           // }).catch(() => {
           //   this.loading = false
           // })
-          this.$router.push({ path: '/Dashboard/dashboard' }) // 想跳转的页面路径
+          let path= '/Dashboard/dashboard';
+          if (this.ifAdmin) {
+            path = '/admin/publish';
+          }
+          this.$router.push({ path: path }) // 想跳转的页面路径
         } else {
           console.log('error submit!!')
           return false

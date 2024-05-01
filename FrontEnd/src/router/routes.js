@@ -1,5 +1,7 @@
 import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue";
 import NotFound from "@/pages/NotFoundPage.vue";
+import adminPublish from "@/pages/adminPublish.vue";
+import AdminLayout from "@/layout/admin/AdminLayout.vue";
 // import { component } from "vue/types/umd.js";
 
 // Admin pages
@@ -21,6 +23,8 @@ const MyMoment = () =>
 const MyEvent = () =>
   import("@/pages/MyEvent.vue");
 const Login = () => import('@/pages/login');
+const AdminProfile = () =>
+    import(/* webpackChunkName: "common" */ "@/pages/Profile.vue");
 
 const Event = () =>
     import('@/pages/Event/Event.vue');
@@ -41,7 +45,28 @@ const routes = [
     // component: () => import('@/pages/register'),
     redirect: '/login'// '/dashboard/dashboard',
   },
-
+  {
+    path: '/admin',
+    name: 'admin',
+    component: AdminLayout,
+    children:[
+      {
+        path: 'publish',
+        name: 'publish',
+        component: adminPublish, // 不用const可以吗
+      },
+      {
+        path: "profile",
+        name: "profile",
+        component: Profile,
+      },
+      {
+        path: "notifications",
+        name: "notifications",
+        component: Notifications,
+      },
+    ]
+  },
   {
     path: "/dashboard",
     component: DashboardLayout,
