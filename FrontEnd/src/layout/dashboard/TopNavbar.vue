@@ -115,10 +115,10 @@
                 <p class="d-lg-none">Log out</p>
               </a>
               <li class="nav-link">
-                <a href="#/dashboard/profile" class="nav-item dropdown-item">Profile</a>
+                <a href="#/dashboard/profile" class="nav-item dropdown-item" @click="sendProfileMessage">Profile</a>
               </li>
               <li class="nav-link">
-                <a href="#/dashboard/profile" class="nav-item dropdown-item">Settings</a>
+                <a href="#/dashboard/setting" class="nav-item dropdown-item" @click="sendProfileMessage">Settings</a>
               </li>
               <div class="dropdown-divider"></div>
               <li class="nav-link">
@@ -131,6 +131,7 @@
     </div>
   </nav>
 </template>
+
 <script>
 import { CollapseTransition } from "vue2-transitions";
 import Modal from "@/components/Modal";
@@ -182,6 +183,12 @@ export default {
       // Navigate to Dashboard page
       this.$router.push('/dashboard/dashboard'); //'Dashboard'
     },
+    sendProfileMessage() {
+      var id = "2";
+      var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjIsImlhdCI6MTcxNDcyNzg4MywiZXhwIjoxNzE0ODE0MjgzfQ._31NCmSRJy0Dua0HQJNMDkVx70";
+      localStorage.setItem('id', id);
+      localStorage.setItem('token', token);
+    }
   },
 };
 </script>

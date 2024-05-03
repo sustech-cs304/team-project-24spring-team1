@@ -1,4 +1,104 @@
 <template>
+  <card type="user">
+    <p class="card-text"></p>
+    <div class="author">
+      <div class="block block-one"></div>
+      <div class="block block-two"></div>
+      <div class="block block-three"></div>
+      <div class="block block-four"></div>
+      <a href="#">
+        <img class="avatar" src="img/anime6.png" alt="..." />
+        <h5 class="title">Name: {{ user.name }}</h5>
+        <h5 class="title">SID: {{ user.sid }}</h5>
+      </a>
+      <p class="description">
+        Role: {{ user.role }}
+      </p>
+    </div>
+    <p></p>
+    <p class="card-description">
+      {{ user.description }}
+    </p>
+    <div slot="footer" class="button-container">
+      <base-button icon round class="primary">
+        <i class="tim-icons icon-chat-33"></i>
+      </base-button>
+      <base-button icon round class="primary">
+        <i class="tim-icons icon-email-85"></i>
+      </base-button>
+    </div>
+  </card>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      user: {
+        sid: null,
+        name: null,
+        role: null,
+        description: null
+      },
+      token: null
+    };
+  },
+  mounted() {
+    this.token = localStorage.getItem('token');
+    if (!this.token) {
+      console.log("Token not found.");
+      return;
+    }
+
+    this.user.sid = localStorage.getItem('id');
+    const apiUrl = `https://backend.sustech.me/api/account/${this.user.sid}/profile`;
+
+    axios.get(apiUrl, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    })
+    .then(response => {
+      const userData = response.data;
+      this.user.name = userData.name;
+      this.user.role = userData.role;
+      this.user.description = userData.bio;
+    })
+    .catch(error => {
+      console.error('Error fetching profile data:', error);
+    });
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <template>
   <div class="row">
     <div class="col-md-8">
       <edit-profile-form :model="model"> </edit-profile-form>
@@ -14,7 +114,6 @@ import EditProfileForm from "./Profile/EditProfileForm";
 import UserCard from "./Profile/UserCard";
 export default {
   components: {
-    EditProfileForm,
     UserCard,
   },
   data() {
@@ -40,4 +139,4 @@ export default {
   },
 };
 </script>
-<style></style>
+<style></style> -->

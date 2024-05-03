@@ -7,6 +7,8 @@ const Dashboard = () =>
   import(/* webpackChunkName: "dashboard" */ "@/pages/Dashboard.vue");
 const Profile = () =>
   import(/* webpackChunkName: "common" */ "@/pages/Profile.vue");
+const SettingProfile = () =>
+  import("@/pages/SettingProfile.vue");
 const Notifications = () =>
   import(/* webpackChunkName: "common" */ "@/pages/Notifications.vue");
 const Icons = () =>
@@ -55,6 +57,11 @@ const routes = [
         path: "profile",
         name: "profile",
         component: Profile,
+      },
+      {
+        path: "setting",
+        name: "setting",
+        component: SettingProfile,
       },
       {
         path: "notifications",
