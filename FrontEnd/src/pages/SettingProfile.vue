@@ -1,109 +1,141 @@
-<!-- eslint-disable vue/no-mutating-props -->
 <template>
     <card>
-      <h5 slot="header" class="title">Edit Profile</h5>
-      <div class="row">
-        <div class="col-md-5 pr-md-1">
-          <base-input
-            label="Company (disabled)"
-            placeholder="Company"
-            v-model="model.company"
-            disabled
-          >
-          </base-input>
+        <h5 slot="header" class="title">Edit Profile</h5>
+        <div class="row">
+            <div class="col-md-5 pr-md-1">
+                <base-input
+                    label="Role"
+                    placeholder="role"
+                    v-model="user.role"
+                    disabled
+                >
+                </base-input>
+            </div>
+            <div class="col-md-3 px-md-1">
+                <base-input
+                    label="Name"
+                    placeholder="name"
+                    v-model="user.name"
+                    disabled
+                >
+                </base-input>
+            </div>
+            <div class="col-md-4 pl-md-1">
+                <base-input
+                    label="SID"
+                    placeholder="sid"
+                    v-model="user.sid"
+                    disabled
+                >
+                </base-input>
+            </div>
         </div>
-        <div class="col-md-3 px-md-1">
-          <base-input
-            label="Username"
-            placeholder="Username"
-            v-model="model.username"
-          >
-          </base-input>
+        <div class="row">
+            <div class="col-md-12">
+                <base-input
+                    label="Email"
+                    type="email"
+                    :placeholder="user.sid + '@mail.sustech.edu.cn'"
+                >
+                </base-input>
+            </div>
         </div>
-        <div class="col-md-4 pl-md-1">
-          <base-input
-            label="Email address"
-            type="email"
-            placeholder="mike@email.com"
-          >
-          </base-input>
+        <div class="row">
+            <div class="col-md-8">
+                <base-input>
+                    <label>About Me</label>
+                    <textarea
+                        rows="4"
+                        cols="80"
+                        class="form-control"
+                        :placeholder="user.description ? user.description : 'This is your description'"
+                        v-model="user.description"
+                    >
+                    </textarea>
+                </base-input>
+            </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-md-6 pr-md-1">
-          <base-input
-            label="First Name"
-            v-model="model.firstName"
-            placeholder="First Name"
-          >
-          </base-input>
-        </div>
-        <div class="col-md-6 pl-md-1">
-          <base-input
-            label="Last Name"
-            v-model="model.lastName"
-            placeholder="Last Name"
-          >
-          </base-input>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-          <base-input
-            label="Address"
-            v-model="model.address"
-            placeholder="Home Address"
-          >
-          </base-input>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-4 pr-md-1">
-          <base-input label="City" v-model="model.city" placeholder="City">
-          </base-input>
-        </div>
-        <div class="col-md-4 px-md-1">
-          <base-input
-            label="Country"
-            v-model="model.country"
-            placeholder="Country"
-          >
-          </base-input>
-        </div>
-        <div class="col-md-4 pl-md-1">
-          <base-input label="Postal Code" placeholder="ZIP Code"> </base-input>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-8">
-          <base-input>
-            <label>About Me</label>
-            <textarea
-              rows="4"
-              cols="80"
-              class="form-control"
-              placeholder="Here can be your description"
-              v-model="model.about"
-            >
-            </textarea>
-          </base-input>
-        </div>
-      </div>
-      <base-button slot="footer" type="primary" fill>Save</base-button>
+        <base-button slot="footer" type="primary" fill @click="saveProfile">Save</base-button>
+        <base-alert v-if="showSuccessAlert" type="success">
+            <strong>Success!</strong> Profile updated successfully.
+        </base-alert>
+        <base-alert v-if="showErrorAlert" type="danger">
+            <strong>Error!</strong> Failed to update profile. {{ errorMessage }}
+        </base-alert>
     </card>
-  </template>
+</template>
   
-  <script>
-  export default {
-    props: {
-      model: {
-        type: Object,
-        default: () => {
-          return {};
-        },
-      },
+<script>
+import axios from 'axios';
+
+export default {
+    data() {
+        return {
+            user: {
+                id: null,
+                sid: null,
+                name: null,
+                role: null,
+                description: null
+            },
+            token: null,
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            errorMessage: ''
+        };
     },
-  };
-  </script>
-  <style></style>
-  
+    mounted() {
+        this.token = localStorage.getItem('token');
+        if (!this.token) {
+            console.log("Token not found.");
+            return;
+        }
+
+        this.user.id = localStorage.getItem('id');
+        const apiUrl = `https://backend.sustech.me/api/account/${this.user.id}/profile`;
+
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${this.token}`
+            }
+        })
+        .then(response => {
+            const userData = response.data;
+            this.user.sid = 12111611;
+            this.user.name = userData.name;
+            this.user.role = userData.role;
+            this.user.description = userData.bio;
+        })
+        .catch(error => {
+            console.error('Error fetching profile data:', error);
+        });
+    },
+    methods: {
+        saveProfile() {
+            const apiUrl = 'https://backend.sustech.me/api/account/self/profile';
+            const requestBody = {
+                bio: this.user.description
+            };
+
+            axios.put(apiUrl, requestBody, {
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
+            })
+            .then(response => {
+                console.log('Profile updated successfully:', response.data);
+                this.showSuccessAlert = true;
+                this.showErrorAlert = false;
+            })
+            .catch(error => {
+                console.error('Error updating profile:', error);
+                this.showSuccessAlert = false;
+                this.showErrorAlert = true;
+                this.errorMessage = error.response.data.message;
+            });
+        }
+    }
+}
+</script>
+
+<style></style>

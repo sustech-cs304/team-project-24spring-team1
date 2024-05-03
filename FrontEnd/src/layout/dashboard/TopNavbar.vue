@@ -185,7 +185,7 @@ export default {
     },
     sendProfileMessage() {
       var id = "2";
-      var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjIsImlhdCI6MTcxNDcyNzg4MywiZXhwIjoxNzE0ODE0MjgzfQ._31NCmSRJy0Dua0HQJNMDkVx70";
+      var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjIsImlhdCI6MTcxNDczOTYwNywiZXhwIjoxNzE0ODI2MDA3fQ.3aAr4aFPHVsTt_NsximC6FX6MXORTom6XIPmjL-EM1U";
       localStorage.setItem('id', id);
       localStorage.setItem('token', token);
     }
