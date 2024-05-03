@@ -97,7 +97,8 @@ export default {
             token: null,
             showSuccessAlert: false,
             showErrorAlert: false,
-            errorMessage: ''
+            errorMessage: '',
+            fileToUpload: null
         };
     },
     mounted() {
@@ -131,6 +132,43 @@ export default {
     },
     methods: {
         saveProfile() {
+            if (this.fileToUpload) {
+                this.uploadFile();
+            } else {
+                this.updateProfile();
+            }
+        },
+        openFileInput() {
+            this.$refs.fileInput.click();
+        },
+        handleFileUpload(event) {
+            this.fileToUpload = event.target.files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(this.fileToUpload);
+            reader.onload = (event) => {
+                this.imageUrl = event.target.result;
+            };
+        },
+        uploadFile() {
+            const formData = new FormData();
+            formData.append('file', this.fileToUpload);
+
+            axios.post('https://backend.sustech.me/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            .then(response => {
+                console.log('File uploaded successfully:', response.data);
+                const filename = response.data.split('/').pop().replace('.webp', '');
+                this.user.avatar_edited = filename;
+                this.updateProfile();
+            })
+            .catch(error => {
+                console.error('Error uploading file:', error);
+            });
+        },
+        updateProfile() {
             const apiUrl = `https://backend.sustech.me/api/account/${this.user.id}/profile`;
             const requestBody = {
                 bio: this.user.description_edited ? this.user.description_edited : this.user.description,
@@ -158,28 +196,6 @@ export default {
                 this.showSuccessAlert = false;
                 this.showErrorAlert = true;
                 this.errorMessage = error.response.data.message;
-            });
-        },
-        openFileInput() {
-            this.$refs.fileInput.click();
-        },
-        handleFileUpload(event) {
-            const file = event.target.files[0];
-            const formData = new FormData();
-            formData.append('file', file);
-
-            axios.post('https://backend.sustech.me/upload', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            })
-            .then(response => {
-                console.log('File uploaded successfully:', response.data);
-                const filename = response.data.split('/').pop().replace('.webp', '');
-                this.user.avatar_edited = filename;
-            })
-            .catch(error => {
-                console.error('Error uploading file:', error);
             });
         }
     }
