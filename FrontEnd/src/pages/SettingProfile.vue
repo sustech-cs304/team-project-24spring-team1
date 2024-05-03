@@ -35,7 +35,7 @@
                 <base-input
                     label="Email"
                     type="email"
-                    :placeholder="user.sid + '@mail.sustech.edu.cn'"
+                    :placeholder="user.email"
                 >
                 </base-input>
             </div>
@@ -60,7 +60,8 @@
             <strong>Success!</strong> Profile updated successfully.
         </base-alert>
         <base-alert v-if="showErrorAlert" type="danger">
-            <strong>Error!</strong> Failed to update profile. {{ errorMessage }}
+            <strong>Error!</strong> Failed to update profile. Error Message: {{ errorMessage }}. 
+            Your token is: {{token}}
         </base-alert>
     </card>
 </template>
@@ -76,6 +77,8 @@ export default {
                 sid: null,
                 name: null,
                 role: null,
+                email: null,
+                avatar: null,
                 description: null
             },
             token: null,
@@ -101,9 +104,11 @@ export default {
         })
         .then(response => {
             const userData = response.data;
-            this.user.sid = 12111611;
+            this.user.sid = userData.sustech_id;
             this.user.name = userData.name;
             this.user.role = userData.role;
+            this.user.email = userData.email;
+            this.user.avatar = userData.avatar;
             this.user.description = userData.bio;
         })
         .catch(error => {
@@ -112,7 +117,7 @@ export default {
     },
     methods: {
         saveProfile() {
-            const apiUrl = 'https://backend.sustech.me/api/account/self/profile';
+            const apiUrl = `https://backend.sustech.me/api/account/${this.user.id}/profile`;
             const requestBody = {
                 bio: this.user.description
             };

@@ -7,7 +7,7 @@
       <div class="block block-three"></div>
       <div class="block block-four"></div>
       <a href="#">
-        <img class="avatar" src="img/anime6.png" alt="..." />
+        <img class="avatar" :src="imageUrl" alt="User Avatar" />
         <h5 class="title">Name: {{ user.name }}</h5>
         <h5 class="title">SID: {{ user.sid }}</h5>
       </a>
@@ -23,7 +23,7 @@
       <base-button icon round class="primary">
         <i class="tim-icons icon-chat-33"></i>
       </base-button>
-      <base-button icon round class="primary">
+      <base-button icon round class="primary" @click="sendEmail">
         <i class="tim-icons icon-email-85"></i>
       </base-button>
     </div>
@@ -36,10 +36,14 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      imageUrl: '',
       user: {
+        id: null,
         sid: null,
         name: null,
         role: null,
+        email: null,
+        avatar: null,
         description: null
       },
       token: null
@@ -62,13 +66,23 @@ export default {
     })
     .then(response => {
       const userData = response.data;
+      this.user.sid = userData.sustech_id;
       this.user.name = userData.name;
       this.user.role = userData.role;
+      this.user.email = userData.email;
+      this.user.avatar = userData.avatar;
       this.user.description = userData.bio;
+      this.imageUrl = `https://backend.sustech.me/uploads/${userData.avatar}.webp`;
     })
     .catch(error => {
       console.error('Error fetching profile data:', error);
     });
+  },
+  methods: {
+    sendEmail() {
+      const mailtoLink = `mailto:${this.user.email}`;
+      window.location.href = mailtoLink;
+    }
   }
 }
 </script>
