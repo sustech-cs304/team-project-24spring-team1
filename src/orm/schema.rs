@@ -25,6 +25,9 @@ diesel::table! {
         bio -> Text,
         registered_at -> Timestamp,
         updated_at -> Timestamp,
+        avatar -> Uuid,
+        #[max_length = 48]
+        email -> Varchar,
     }
 }
 

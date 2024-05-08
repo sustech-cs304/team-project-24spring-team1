@@ -10,7 +10,7 @@ actix-web = { version = "4", default-features = false, features = ["macros"] }
 argon2 = { version = "0.5", features = ["std"] }
 chrono = { version = "^0.4.37", features = ["serde"] }
 deadpool = "0.9"
-diesel = { version = "2.1", features = ["chrono"] }
+diesel = { version = "2.1", features = ["chrono", "uuid"] }
 diesel-async = { version = "^0.4.1", features = ["postgres", "deadpool"] }
 diesel-derive-enum = { version = "^2.1.0", features = ["postgres"] }
 dotenvy = "^0.15.7"
@@ -25,5 +25,5 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 thiserror = "1.0"
 tokio = { version = "1.37", features = [] }
-#validator = { version = "0.17", features = ["derive"] }
-validator = { git = "https://github.com/Keats/validator.git", features = ["derive"] }
+uuid = { version = "1.8.0", features = ["serde"] }
+validator = { version = "0.18", features = ["derive"] }

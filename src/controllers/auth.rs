@@ -17,8 +17,7 @@ use validator::Validate;
 
 use super::AppState;
 use crate::error::{Error, Result};
-use crate::orm::account::{Account, AccountCredential, NewAccount};
-use crate::orm::schema::accounts;
+use crate::orm::account::{Account, AccountCredential, NewAccount, Role};
 use crate::orm::utils::RunQueryDsl;
 
 lazy_static! {
@@ -31,11 +30,14 @@ const ALGORITHM: Algorithm = Algorithm::HS256;
 
 pub struct JwtAuth {
     pub account_id: i32,
+    pub role: Role,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct TokenClaims {
     pub sub: i32,
+    pub role: Role,
+
     pub iat: usize,
     pub exp: usize,
 }
@@ -59,10 +61,11 @@ fn verify_password(password: &str, password_hash: &str) -> Result<()> {
     }
 }
 
-fn generate_token(account_id: i32) -> String {
+fn generate_token(account_id: i32, role: Role) -> String {
     let now = Utc::now();
     let claims: TokenClaims = TokenClaims {
         sub: account_id,
+        role,
         exp: (now + Duration::hours(24)).timestamp() as usize,
         iat: now.timestamp() as usize,
     };
@@ -103,8 +106,10 @@ fn request_to_jwt_middleware(req: &HttpRequest) -> Result<JwtAuth> {
         Error::Unauthorized(String::from("Invalid token"))
     })?;
 
-    let account_id = claims.claims.sub;
-    Ok(JwtAuth { account_id })
+    Ok(JwtAuth {
+        account_id: claims.claims.sub,
+        role: claims.claims.role,
+    })
 }
 
 impl FromRequest for JwtAuth {
@@ -154,25 +159,27 @@ async fn register(
     form.validate()?;
 
     let password_hash = hash_password(&form.password)?;
+    let default_email = format!("{}@mail.sustech.edu.cn", form.sustech_id);
     let new_account = NewAccount {
         sustech_id: form.sustech_id,
         name: &form.name,
+        email: &default_email,
         password: &password_hash,
     };
 
-    let account_id = new_account
+    let AccountCredential { id, role, .. } = new_account
         .as_insert()
-        .returning(accounts::id)
+        .returning(AccountCredential::as_select())
         .get_result(&mut state.pool.get().await?)
         .await?;
 
     debug!(
-        "New account created: {:?}, sid={}, id={account_id}",
+        "New account created: {:?}, sid={}, id={id}",
         form.name, form.sustech_id
     );
     let resp = AuthResponse {
-        account_id,
-        token: generate_token(account_id),
+        account_id: id,
+        token: generate_token(id, role),
     };
     Ok(web::Json(resp))
 }
@@ -182,7 +189,7 @@ async fn login(state: web::Data<AppState>, form: web::Json<LoginForm>) -> Result
     let form = form.into_inner();
     form.validate()?;
 
-    let AccountCredential { id, password } = Account::by_sustech_id(form.sustech_id)
+    let AccountCredential { id, password, role } = Account::by_sustech_id(form.sustech_id)
         .select(AccountCredential::as_select())
         .first(&mut state.pool.get().await?)
         .await?;
@@ -191,7 +198,7 @@ async fn login(state: web::Data<AppState>, form: web::Json<LoginForm>) -> Result
     debug!("Account logged in: sid={}, id={id}", form.sustech_id);
     let resp = AuthResponse {
         account_id: id,
-        token: generate_token(id),
+        token: generate_token(id, role),
     };
     Ok(web::Json(resp))
 }
