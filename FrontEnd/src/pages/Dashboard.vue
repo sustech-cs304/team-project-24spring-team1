@@ -27,7 +27,17 @@
           <card style="width: 23rem; margin-left: 10px">
             <img slot="image" class="card-img-top" :src="getEventImagePath(index)" :alt="card.title" style="width: 60rem; height: 16rem;" />
             <h4 class="card-title">{{ card.title }}</h4>
-            <p class="card-text">{{ card.description }}</p>
+            <div>
+              <i class="tim-icons icon-time-alarm" style="display: inline-block;"></i>
+              <span style="margin-left: 10px;"></span>
+              <p class="card-text" style="display: inline-block;">{{ card.time }}</p>
+            </div>
+            <div>
+              <i class="tim-icons icon-square-pin" style="display: inline-block;"></i>
+              <span style="margin-left: 10px;"></span>
+              <p class="card-text" style="display: inline-block;">{{ card.location }}</p>
+            </div>
+            <br>
             <base-button tag="a" simple type="primary" :href="getEventUrlPath(index)" role="button" aria-pressed="true"
               class="animation-on-hover btn-center"> Event Detail
             </base-button>
@@ -81,54 +91,47 @@ export default {
       events: [
         {
           title: 'Card 1',
+          time: '07-29 08:00 ～ 07-31 18:00',
+          location: 'Lecture Hall 1',
           description: 'Description for Card 1',
           link: '#'
         },
         {
           title: 'Card 2',
+          time: '07-29 08:00 ～ 07-31 18:00',
+          location: 'Lecture Hall 1',
           description: 'Description for Card 2',
           link: '#'
         },
         {
           title: 'Card 3',
+          time: '07-29 08:00 ～ 07-31 18:00',
+          location: 'Lecture Hall 1',
           description: 'Description for Card 3',
           link: '#'
         },
         {
           title: 'Card 4',
+          time: '07-29 08:00 ～ 07-31 18:00',
+          location: 'Lecture Hall 1',
           description: 'Description for Card 4',
           link: '#'
         },
         {
           title: 'Card 5',
+          time: '07-29 08:00 ～ 07-31 18:00',
+          location: 'Lecture Hall 1',
           description: 'Description for Card 5',
           link: '#'
         },
         {
           title: 'Card 6',
+          time: '07-29 08:00 ～ 07-31 18:00',
+          location: 'Lecture Hall 1',
           description: 'Description for Card 6',
           link: '#'
         },
       ],
-      blueBarChart: {
-        extraOptions: chartConfigs.barChartOptions,
-        chartData: {
-          labels: ["USA", "GER", "AUS", "UK", "RO", "BR"],
-          datasets: [
-            {
-              label: "Countries",
-              fill: true,
-              borderColor: config.colors.info,
-              borderWidth: 2,
-              borderDash: [],
-              borderDashOffset: 0.0,
-              data: [53, 20, 10, 80, 100, 45],
-            },
-          ],
-        },
-        gradientColors: config.colors.primaryGradient,
-        gradientStops: [1, 0.4, 0],
-      },
     };
   },
   computed: {
