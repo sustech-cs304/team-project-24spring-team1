@@ -1,5 +1,5 @@
 use chrono::prelude::*;
-use diesel::dsl::{self, AsSelect, InnerJoin, Select};
+use diesel::dsl::{self, AsSelect, Eq, Filter, InnerJoin, Select};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::query_builder::InsertStatement;
@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use super::account::AccountCard;
 use super::misc::Place;
 use super::schema::*;
-use super::utils::{Bracket, BracketDsl, CountReferencesDsl, CountReferencesIn};
+use super::utils::{Bracket, BracketDsl, CountReferencesDsl, CountReferencesIn, Update};
 
 #[derive(Debug, Serialize, Deserialize, DbEnum)]
 #[serde(rename_all = "snake_case")]
@@ -50,6 +50,7 @@ pub struct Event {
     pub organizer_id: i32,
     pub tickets: Option<i32>,
     pub registeration_deadline: Option<NaiveDateTime>,
+    pub is_deleted: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -95,19 +96,31 @@ pub struct EventWithParticipation<T: Serialize> {
     pub inner: T,
 }
 
+#[derive(Debug, Default, AsChangeset)]
+#[diesel(table_name = events)]
+pub struct EventChangeset {
+    pub is_deleted: Option<bool>,
+}
+
 type Table = events::table;
 
-type All = Select<Table, AsSelect<Event, Pg>>;
+type RawAll = Select<Table, AsSelect<Event, Pg>>;
+type All = Filter<RawAll, Eq<events::is_deleted, bool>>;
+type UpdateAll = Update<Table>;
+type WithId = Eq<events::id, i32>;
 type Find = dsl::Find<All, i32>;
 type FindJoin = InnerJoin<InnerJoin<Find, accounts::table>, places::table>;
 type ParticipationCount = Bracket<CountReferencesIn<accounts::id, participation::account_id>>;
 type FindWithParticipationAs<T> = Select<FindJoin, (ParticipationCount, AsSelect<T, Pg>)>;
 type Join = InnerJoin<InnerJoin<All, accounts::table>, places::table>;
 type JoinWithParticipation<T> = Select<Join, (ParticipationCount, AsSelect<T, Pg>)>;
+type UpdateId = Filter<UpdateAll, WithId>;
 
 impl Event {
     pub fn all() -> All {
-        events::table.select(Event::as_select())
+        events::table
+            .select(Event::as_select())
+            .filter(events::is_deleted.eq(false))
     }
 
     pub fn joined() -> Join {
@@ -151,6 +164,10 @@ impl Event {
                 .bracket(),
             EventSummary::as_select(),
         ))
+    }
+
+    pub fn update(id: i32) -> UpdateId {
+        diesel::update(events::table).filter(events::id.eq(id))
     }
 
     pub fn venue(&self) -> super::misc::PlaceFindName {

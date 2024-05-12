@@ -8,7 +8,7 @@ use super::auth::JwtAuth;
 use super::AppState;
 use crate::error::{Error, Result};
 use crate::orm::event::{
-    Event, EventDisplay, EventSummary, EventType, EventWithParticipation, NewEvent,
+    Event, EventChangeset, EventDisplay, EventSummary, EventType, EventWithParticipation, NewEvent,
 };
 use crate::orm::misc::Participation;
 use crate::orm::schema::events;
@@ -169,6 +169,37 @@ async fn get_event(state: web::Data<AppState>, path: web::Path<i32>) -> Result<i
     Ok(web::Json(event))
 }
 
+#[delete("/{id}")]
+async fn delete_event(
+    state: web::Data<AppState>,
+    path: web::Path<i32>,
+    auth: JwtAuth,
+) -> Result<impl Responder> {
+    let id = path.into_inner();
+
+    let organizer_id = Event::find(id)
+        .select(events::organizer_id)
+        .get_result::<i32>(&mut state.pool.get().await?)
+        .await?;
+    if organizer_id != auth.account_id {
+        return Err(Error::Unauthorized(
+            "You can only delete events you created".into(),
+        ));
+    }
+
+    let affected = Event::update(id)
+        .set(EventChangeset {
+            is_deleted: Some(true),
+            ..Default::default()
+        })
+        .execute(&mut state.pool.get().await?)
+        .await?;
+    // The event is guaranteed to exist
+    assert_eq!(affected, 1);
+
+    Ok(web::Json(serde_json::Value::Object(Default::default())))
+}
+
 #[post("/{id}/register")]
 async fn register_event(
     state: web::Data<AppState>,
@@ -213,6 +244,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(new_event)
         .service(list_events)
         .service(get_event)
+        .service(delete_event)
         .service(register_event)
         .service(unregister_event);
 }

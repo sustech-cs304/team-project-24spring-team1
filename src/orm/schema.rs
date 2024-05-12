@@ -49,6 +49,7 @@ diesel::table! {
         registeration_deadline -> Nullable<Timestamp>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        is_deleted -> Bool,
     }
 }
 
