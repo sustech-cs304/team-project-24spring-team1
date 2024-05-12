@@ -1,3 +1,12 @@
+<style>
+    .notification {
+        position: absolute;
+        top: 17px;
+        right: 0px;
+        width: 6px;
+        height: 6px;
+    }
+</style>
 <template>
   <nav
     class="navbar navbar-expand-lg navbar-absolute"
@@ -73,13 +82,13 @@
             >
               <a
                 slot="title"
-                href="#/dashboard"
                 class="dropdown-toggle nav-link"
                 data-toggle="dropdown"
                 aria-expanded="true"
               >
-                <div class="notification d-none d-lg-block d-xl-block"></div>
+                <!-- <div class="notification d-none d-lg-block d-xl-block"></div> -->
                 <i class="tim-icons icon-bell-55"></i>
+                <!-- <i class="notification"></i> -->
                 <p class="d-lg-none">New Notifications</p>
               </a>
               <li class="nav-link">
@@ -188,7 +197,7 @@ export default {
       var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzE0NzQwODU0LCJleHAiOjE3MTQ4MjcyNTR9.mR4fZRmYqex2YgYMCsVo7tmvEj_jJXCmm2kyoTnGrgs";
       localStorage.setItem('id', id);
       localStorage.setItem('token', token);
-    }
+    },
   },
 };
 </script>

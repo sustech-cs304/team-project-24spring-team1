@@ -1,3 +1,12 @@
+<style>
+    .notification {
+        position: absolute;
+        top: 17px;
+        right: 120px;
+        width: 6px;
+        height: 6px;
+    }
+</style>
 <template>
     <div>
         <div class="row">
@@ -8,8 +17,10 @@
                     </template>
                     <p class="card-text">{{ card.content }}</p>
                     <div class="d-flex justify-content-around">
+                        <!-- <base-button v-for="(button, bIndex) in card.buttons" :key="bIndex" round icon type="primary" @click="toggleIcon(bIndex)"> -->
                         <base-button v-for="(button, bIndex) in card.buttons" :key="bIndex" round icon type="primary">
                             <i :class="button.icon"></i>
+                            
                         </base-button>
                     </div>
                     <div class="dropdown-divider"></div>
@@ -35,11 +46,12 @@ export default {
             moment: [
                 {
                     id: 1,
+
                     content: "Content 1",
                     buttons: [
                         { icon: "tim-icons icon-heart-2" },
-                        { icon: "tim-icons icon-chat-33" },
-                        { icon: "tim-icons icon-simple-delete" }
+                        { icon: "tim-icons icon-chat-33" },                        
+                        //{ icon: "tim-icons icon-simple-delete" }
                     ],
                     comments: [
                         { username: "User 1", comment: "This is a wider card...", time: "Last updated 1 mins ago" },
@@ -52,20 +64,35 @@ export default {
                     buttons: [
                         { icon: "tim-icons icon-heart-2" },
                         { icon: "tim-icons icon-chat-33" },
-                        { icon: "tim-icons icon-simple-delete" }
+                        //{ icon: "tim-icons icon-simple-delete" }
                     ],
                     comments: [
                         { username: "User 3", comment: "This is a wider card...", time: "Last updated 2 mins ago" },
                         { username: "User 4", comment: "This is a wider card...", time: "Last updated 5 mins ago" }
                     ]
                 }
-            ]
+            ]           
         }
     },
     methods: {
         getMomentImagePath(momentId, imageNumber) {
             return `users/testuser/moment/${momentId}-${imageNumber}.jpg`;
+        },
+        toggleIcon(bIndex) {
+            if (bIndex === 0) {
+                // 点击第一个按钮，弹出提示
+                alert('You clicked the first button!'); 
+            } else if (bIndex === 1) {
+                // 点击第二个按钮，切换成另一个图标
+                //alert('You clicked the second button!');
+                this.card.buttons[bIndex].icon = "tim-icons icon-satisfied";
+                const userInput = prompt('请输入内容：');
+                if (userInput !== null) {
+                    console.log('用户输入的内容是：', input);
+                }
+            }
         }
+
     }
 }
 </script>
