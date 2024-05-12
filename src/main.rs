@@ -1,22 +1,30 @@
-#![feature(trait_alias)]
-#![feature(int_roundings)]
-#![feature(let_chains)]
+use actix_web::{App, HttpServer};
+use clap::Parser;
+use diesel_async::pooled_connection::deadpool::Pool;
+use diesel_async::pooled_connection::AsyncDieselConnectionManager;
+use diesel_async::AsyncPgConnection;
 
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate lazy_static;
+use backend::AppBuilder;
 
-mod controllers;
-mod error;
-mod orm;
-mod utils;
+#[derive(Debug, Parser)]
+#[command(version, about, long_about = None)]
+struct Opts {
+    /// The port to listen on
+    #[clap(short, long, env, default_value = "8080")]
+    port: u16,
+
+    /// The address to bind to
+    #[clap(long, env, default_value = "127.0.0.1")]
+    host: String,
+
+    /// The URL of the database to connect to
+    #[clap(long, env)]
+    database_url: String,
+}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    if let Err(e) = dotenvy::dotenv() {
-        eprintln!("Warning: failed to load .env file: {e}");
-    }
+    let _ = dotenvy::dotenv();
 
     if std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "info");
@@ -24,5 +32,21 @@ async fn main() -> std::io::Result<()> {
 
     pretty_env_logger::init();
 
-    controllers::run().await
+    let opts = Opts::parse();
+
+    let pool_config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(&opts.database_url);
+    let pool = Pool::builder(pool_config).build().unwrap();
+
+    log::info!("Starting server on {}:{}", opts.host, opts.port);
+    HttpServer::new(move || {
+        App::new().configure(
+            AppBuilder::new()
+                .with_pool(pool.clone())
+                .into_configurator(),
+        )
+    })
+    .bind((opts.host, opts.port))?
+    .workers(2)
+    .run()
+    .await
 }
