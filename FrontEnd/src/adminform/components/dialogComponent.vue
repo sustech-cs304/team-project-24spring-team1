@@ -5,7 +5,7 @@
         :title="dialogTitle"
         class="dialog-component"
         :visible.sync="showDialog"
-        width="500px"
+        width="600px"
         @close="closeDialog(0)"
     >
 
@@ -18,7 +18,7 @@
           :inline="true" >
 
         <el-form-item label="roomName" prop="roomName">
-          <el-input v-model="formInfo.roomName" placeholder="room name" clearable />
+          <el-input v-model="formInfo.activityName" placeholder="room name" clearable />
         </el-form-item>
 
         <el-form-item label="department" prop="department" required>
@@ -47,7 +47,7 @@
         <el-time-select
             style="width:150px;"
             :clearable="false"
-            placeholder="起始时间"
+            placeholder="startTime"
             v-model="formInfo.startTime"
             :picker-options="{
               start: '00:00',
@@ -62,7 +62,7 @@
         <el-form-item prop="endTime">
         <el-time-select
             style="width:150px;"
-            placeholder="结束时间"
+            placeholder="endTime"
             :clearable="false"
             v-model="formInfo.endTime"
             :picker-options="{
@@ -97,13 +97,40 @@
           <el-input v-model="formInfo.duration" placeholder="max duration" clearable />
         </el-form-item>
 
-        <el-form-item style="text-align: right;">
-          <el-button type="primary" @click="submitForm('formInfo')" size="medium">确定新建</el-button>
-          <el-button type="primary" @click="submitFormEdit('formInfo')" size="medium">提交修改</el-button>
-          <el-button type="primary" @click="closeDialog(0)">取消</el-button>
-          <el-button type="primary" @click="clearEntry">清空</el-button>
+        <el-form-item label="上传图片" prop="images">
+          <el-upload
+              action=""
+              :limit="3"
+              list-type="picture-card"
+              :on-exceed="handleExceed"
+              :before-upload="beforeUpload"
+              :on-remove="handleRemove"
+              :file-list="fileList"
+          >
+            <i class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
         </el-form-item>
-77
+
+        <el-form-item>
+<!--          <el-button @click="getFile" style="margin-top: 10px">-->
+<!--            <i class="el-icon-upload"></i>&nbsp;{{$i18n.t('CLICK_UPLOAD')}}-->
+<!--          </el-button>-->
+<!--          <input type="file" ref="file" style="display: none;" v-on:change="handleFileUpload($event)">-->
+          <el-upload
+              action="https://jsonplaceholder.typicode.com/posts/"
+              :http-request="onUpload"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
+        </el-form-item>
+
+        <el-form-item style="text-align: right;">
+          <el-button type="primary" @click="submitForm('formInfo')" size="medium">confirm publish</el-button>
+          <el-button type="primary" @click="submitFormEdit('formInfo')" size="medium">submit change</el-button>
+          <el-button type="primary" @click="closeDialog(0)">cancel</el-button>
+          <el-button type="primary" @click="clearEntry">clear</el-button>
+        </el-form-item>
+
       </el-form>
     </el-dialog>
   </transition>
@@ -118,7 +145,7 @@ export default {
   props: {
     dialogTitle: {
       type: String,
-      default: "添加",
+      default: "publish event",
     },
     itemInfo: {
       type: Object,
@@ -141,13 +168,8 @@ export default {
         endInfo:"23:00"
       },
       formInfoRules:{
-        roomName: [
-          { required:true,message: "请输入用户名", trigger: "blur" },
-          {
-            pattern:/^[A-Za-z]+\d+$/,
-            message: "字母（大小写均可）+数字",
-            trigger: "blur",
-          },
+        AcitivityName: [
+          { required:true,message: "please enter activity name", trigger: "blur" },
         ],
         roomType: [{required:true}],
         loc1:[
@@ -202,27 +224,57 @@ export default {
           return time.getTime() < Date.now() - 8.64e7;
         }
       },
-      /*endtimepickerop:{
-        disabledDate: (time) => {
-          return time.getTime() > this.formInfo.startTime;
-        }
-      }*/
+
     };
   },
 
   methods: {
+    // 上传文件
+    onUpload (file) {
+      let formData = new FormData()
+      formData.append('file',file.file)
+      postUpload(formData).then((res) => {
+        console.log(res)
+        this.$message.success(this.$t('UPLOAD_SUCCESS'))
+      }).catch((e) => {
+        this.$message.error(e.message)
+      })
+    },
+
+    // 打开文件
+    getFile () {
+      this.$refs.file.click()
+    },
+    handleFileUpload(event){
+      // 阻止发生默认行为
+      event.preventDefault();
+      let formData = new FormData()
+      let file = this.$refs.file.files[0]
+      formData.append('file',file)
+      // console.log(formData.get('file'))
+      this.onUpload(formData)
+    },
+//     onUpload (formData) {
+//       postUpload(formData).then((res) => {
+//         this.mdl.pic = res.result.uri
+//         this.$message.success(this.$t('UPLOAD_SUCCESS'))
+//       }).catch((e) => {
+//         this.$message.error(e.message)
+//       })
+//     },
+
     submitForm(formName) {
       const that = this;
       //const params = Object.assign(this.formInfo, {});
       that.$refs[formName].validate((valid) => {
         if (valid) {
           that.$message({
-            message: "操作成功！",
+            message: "success! ",
             type: "success",
           });
           //console.log(this.dialogTitle) console.log(that.formInfo)
           const sentData={
-            roomName:this.formInfo.roomName,
+            activityName:this.formInfo.roomName,
             department:this.formInfo.department,
             roomType:this.formInfo.roomType,
             loc1:this.formInfo.loc1,
@@ -247,13 +299,42 @@ export default {
       });
     },
 
+    handleRemove(file) {
+      this.fileList = this.fileList.filter(item => item.uid !== file.uid);
+    },
+    handleExceed() {
+      this.msgError("最多只能传3张照片");
+    },
+    beforeUpload(file) {
+      const isJPG = file.type === "image/jpeg" || file.type == "image/png";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG 或 PNG 格式!");
+        return;
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!");
+        return;
+      }
+      const fileData = new FormData();
+      fileData.append("avatar", file);
+      //upload为上传的接口
+      upload(fileData).then(res => {
+        this.imgUrl = res.imgUrl;
+        //对返回的图片地址进行回显
+        this.$set(this.form, "avatar", this.imgUrl);
+      });
+      //阻止传到本地浏览器
+      return false;
+    },
+
     submitFormEdit(formName) {
       const that = this;
       //const params = Object.assign(this.formInfo, {});
       that.$refs[formName].validate((valid) => {
         if (valid) {
           that.$message({
-            message: "操作成功！",
+            message: "success！",
             type: "success",
           });
           //console.log(this.dialogTitle) console.log(that.formInfo)
@@ -296,6 +377,7 @@ export default {
 
 
 <style scoped lang="scss">
+
 .dialog-fade-enter-active {
   -webkit-animation: dialog-fade-in 0.3s;
   animation: dialog-fade-in 0.3s;

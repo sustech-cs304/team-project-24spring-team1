@@ -23,11 +23,10 @@ const MyMoment = () =>
 const MyEvent = () =>
   import("@/pages/MyEvent.vue");
 const Login = () => import('@/pages/login');
-const AdminProfile = () =>
-    import(/* webpackChunkName: "common" */ "@/pages/Profile.vue");
-
 const Event = () =>
     import('@/pages/Event/Event.vue');
+const AdminForm = () =>
+    import('@/adminform/components/dialogInd.vue');
 
 const routes = [
   {
@@ -53,7 +52,7 @@ const routes = [
       {
         path: 'publish',
         name: 'publish',
-        component: adminPublish, // 不用const可以吗
+        component: AdminForm, //adminPublish, // 不用const可以吗
       },
       {
         path: "profile",

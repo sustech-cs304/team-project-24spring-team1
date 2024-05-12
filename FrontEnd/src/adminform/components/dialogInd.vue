@@ -1,14 +1,12 @@
 <template>
   <div class="dialog-demo" :style="{ backgroundImage:  'url(' + imgUrl + ')' }">
-    <!--el-divider content-position="left">conference table</el-divider-->
-      <p class="title"> conference room </p>
-    <el-row>
-      <el-button type="primary" @click="addItem" size="medium">NEW</el-button>
-      <el-button type="primary" @click="deleteSelectedRows" size="medium" style="margin-left:40px;">
-        delete selection</el-button>
-      <!--el-button type="primary" @click="selectAll" size="medium" style="margin-left:40px;">select all</el-button-->
-      <el-button type="primary" @click="deleteAllRows" size="medium" class="primary"
-                 style="margin-left:40px; background-color: #fa3434;">delete all</el-button>
+    <p class="title"> Activity Management </p>
+    <el-row style="margin-top: 25px;margin-bottom: 10px">
+      <base-button type="primary" @click="addItem" size="medium">PUBLISH</base-button>
+      <base-button type="primary" @click="deleteSelectedRows" size="medium" style="margin-left:40px;">
+        delete selection</base-button>
+      <base-button type="primary" size="medium" @click="deleteAllRows" style="margin-left:40px;">
+        delete all </base-button>
     </el-row>
 
     <el-table
@@ -16,28 +14,27 @@
         :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
         :page-size="5" stripe pagination
         class="storeTable"
-        style="width: 98%; margin-top: 6px;"
+        style="width: 100%; margin-top: 35px;"
         @selection-change="handleSelectionChange"
     >
       <!--"v-for="item in tableItem" :key="checked"-->
-      <el-table-column label="select" width="80" type="selection"></el-table-column>
-
-      <el-table-column label="roomName" prop="roomName"></el-table-column>
-      <el-table-column label="department" prop="department"></el-table-column>
-      <el-table-column label="roomType" prop="roomType"></el-table-column>
+      <el-table-column label="select" width="70" type="selection"></el-table-column>
+      <el-table-column label="activityName" prop="activityName" width="110"></el-table-column>
+      <el-table-column label="department" prop="department" width="100"></el-table-column>
+      <el-table-column label="roomType" prop="roomType" width="105"></el-table-column>
       <el-table-column label="Date" prop="date"></el-table-column>
-      <el-table-column label="startTime" prop="startTime"></el-table-column>
+      <el-table-column label="startTime" prop="startTime" width="110"></el-table-column>
       <el-table-column label="endTime" prop="endTime"></el-table-column>
-      <el-table-column label="location" prop="loc1" width="160"></el-table-column>
-      <el-table-column prop="loc2"></el-table-column>
+      <el-table-column label="location" prop="loc1" width="140"></el-table-column>
+      <el-table-column prop="loc2" label="loc_detail" width="90"></el-table-column>
       <el-table-column label="duration" prop="duration" width="100"></el-table-column>
 
-      <el-table-column label="operation" width="120">
+      <el-table-column label="operation" width="100">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" id="editBtn"
-                     @click.native.prevent="editRow(scope.$index,scope.row)" plain>EDIT</el-button>
-          <el-button type="primary" size="small" id="deleteBtn" style="background-color: red;text-decoration-color: #e8198b"
-                     @click.native.prevent="deleteRow(scope.$index)" round>DELETE</el-button>
+          <base-button type="primary" size=sm id="editBtn"
+                     @click.native.prevent="editRow(scope.$index,scope.row)" round>EDIT</base-button>
+          <base-button type="primary" size=sm id="deleteBtn" style="background-color: red"
+                     @click.native.prevent="deleteRow(scope.$index)" round>DEL</base-button>
         </template>
       </el-table-column>
       <!--index需要加$-->
@@ -72,7 +69,7 @@
 
 
 <script>
-import DialogComponent from "@/components/dialogComponent.vue";
+import DialogComponent from "@/adminform/components/dialogComponent.vue";
 
 export default {
   name: "DialogDemo",
@@ -81,7 +78,7 @@ export default {
     return {
       tableLoading: false,
       showDialog: false,
-      dialogTitle: "添加会议",
+      dialogTitle: "PUBLISH EVENT",
       pageSize:5,
       currentPage: 1,
       ifE: false,
@@ -96,7 +93,7 @@ export default {
         {department:'defv', roomType:'small', loc1:'', loc2:'',duration:'8'},
       ],
       tableItem: {
-        roomName:'',
+        activityName:'',
         department:'',
         roomType:'',
         loc1:'',
@@ -140,7 +137,7 @@ export default {
 
     addItem() {
       this.tableItem={
-        roomName:'',
+        activityName:'',
         department:'',
           roomType:'',
           loc1:'',
@@ -150,7 +147,7 @@ export default {
           endTime:'',
           duration:'',
       };
-      this.dialogTitle = "添加";
+      this.dialogTitle = "publish";
       this.showDialog = true;
       this.$nextTick(() => {
         this.$refs["dialogComponent"].showDialog = true;
@@ -159,7 +156,7 @@ export default {
 
     editRow(ind,row) {
       this.tableItem = row;
-      this.dialogTitle = "编辑";
+      this.dialogTitle = "edit";
       this.ifE=true;
       this.editrowNum=ind;
       this.showDialog = true;
@@ -205,7 +202,6 @@ export default {
     deleteAllRows() {
       this.tableData = [];
     },
-
   },
 };
 </script>
@@ -214,45 +210,44 @@ export default {
 <style scoped lang="scss">
 .dialog-demo{
   position: absolute;
-  padding: 20px;
+  padding: 50px 115px;
+  justify-content: center;
+  //top: 60%;
+  //left: 50%;
+  //transform: translate(-50%, -50%);
   .instructions {
-    font-size: 14px;
+    font-size: 20px;
     padding: 10px 0;
     color: #304455;
   }
   .desc-list {
     padding: 10px 0 30px 40px;
     line-height: 30px;
-    font-size: 14px;
+    font-size: 15px;
     color: #606266;
     list-style-type: disc;
   }
-
 }
 
 .storeTable{
-  width: 150px;
+  width: 210px;
   background-color: rgba(255, 255, 255,0.6);
   opacity: 0.95;
 }
 
   .title{
     animation-name: colorChange;
-    animation-duration: 3s;
+    animation-duration: 6s;
     animation-iteration-count: infinite;
-    font-size: 40px;
+    font-size: 35px;
     font-weight: bolder;
-    text-shadow:
-        3px 3px 1px rgba(255, 0, 0, 0.2),
-        -3px -3px 0px rgba(0, 0, 255, 0.2),
-        3px -3px 0px rgba(0, 255, 0, 0.2),
-        -3px 3px 0px rgba(255, 255, 0, 0.2);
+    //text-shadow: -3px -3px 0px rgba(0, 0, 255, 0.2),
   }
 
   @keyframes colorChange {
-    0% { color: red; }
-    50% { color: blue; }
-    100% { color: green; }
+    0% { color: #b895d5; }
+    50% { color: #a16cc5; }
+    100% { color: #805bb6; }
   }
 
 </style>

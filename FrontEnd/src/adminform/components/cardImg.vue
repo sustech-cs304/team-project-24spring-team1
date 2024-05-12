@@ -8,7 +8,7 @@
     >
       <el-card :body-style="{ padding: '0px' }">
         <img alt="image unable to render"
-            src="@/assets/bigRoom.png"
+            src="@/adminform/assets/bigRoom.png"
             class="image"
         />
         <div style="padding: 14px">
@@ -29,7 +29,7 @@
     >
       <el-card :body-style="{ padding: '0px' }">
         <img alt="image unable to render"
-             src="@/assets/img.png"
+             src="@/adminform/assets/img.png"
              class="image"
         />
         <div style="padding: 14px">

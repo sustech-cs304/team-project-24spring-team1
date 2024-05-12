@@ -4,11 +4,11 @@
     :class="{ 'bg-white': showMenu, 'navbar-transparent': !showMenu }"
   >
     <div class="container-fluid">
+
       <div class="navbar-wrapper">
         <div
           class="navbar-toggle d-inline"
           :class="{ toggled: $sidebar.showSidebar }"
-
         >
           <button
             type="button"
@@ -21,8 +21,8 @@
             <span class="navbar-toggler-bar bar3"></span>
           </button>
         </div>
-<!--        <a class="navbar-brand" href="#pablo">{{ routeName }}</a>-->
-        <a class="navbar-brand" href="#/admin/publish">SUSTech Event</a>
+
+        <a class="navbar-brand" href="#/admin/publish">SUSTech Event Admin</a>
       </div>
 
       <button
@@ -42,6 +42,7 @@
       <collapse-transition>
         <div class="collapse navbar-collapse show" v-show="showMenu">
           <ul class="navbar-nav" :class="$rtl.isRTL ? 'mr-auto' : 'ml-auto'">
+
             <div
               class="search-bar input-group"
               @click="searchModalVisible = true"
@@ -56,6 +57,7 @@
                 <i class="tim-icons icon-zoom-split"></i>
               </button>
             </div>
+
             <base-dropdown
               tag="li"
               :menu-on-right="!$rtl.isRTL"
@@ -119,6 +121,7 @@
           </ul>
         </div>
       </collapse-transition>
+
     </div>
   </nav>
 </template>
@@ -132,11 +135,6 @@ export default {
     Modal,
   },
   computed: {
-    routeName() {
-      return "SUSTech Event";
-      // const { name } = this.$route;
-      // return this.capitalizeFirstLetter(name);
-    },
     isRTL() {
       return this.$rtl.isRTL;
     },
@@ -165,9 +163,6 @@ export default {
     hideSidebar() {
       this.$sidebar.displaySidebar(false);
     },
-    // toggleMenu() {
-    //   this.showMenu = !this.showMenu;
-    // },
     toggleMenu() {
       this.showMenu = !this.showMenu;
       // Navigate to Dashboard page
