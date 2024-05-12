@@ -176,7 +176,6 @@ export default {
       console.log(this.editrowNum)
       this.tableData.splice(this.editrowNum,1,data)
       this.$nextTick(() => {
-
       });
       console.log(this.tableData)
     },

@@ -1,6 +1,5 @@
 import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue";
 import NotFound from "@/pages/NotFoundPage.vue";
-import adminPublish from "@/pages/adminPublish.vue";
 import AdminLayout from "@/layout/admin/AdminLayout.vue";
 // import { component } from "vue/types/umd.js";
 

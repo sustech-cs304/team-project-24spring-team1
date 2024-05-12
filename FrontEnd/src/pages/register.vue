@@ -76,6 +76,7 @@
 <script>
 import { getEmailCode, register } from '@/api/register'
 import { encrypt } from '@/login/utils/rsaEncrypt'
+import axios from 'axios';
 
 export default {
   name: 'Register',
@@ -86,6 +87,7 @@ export default {
       isDisable: false,
       codeLoading: false,
       ruleForm: {
+        sustech_id: '',
         email: '',
         code: '',
         pwd: '',
@@ -129,6 +131,25 @@ export default {
       }
     }
   },
+  mounted() {
+    const apiUrl = `https://backend.sustech.me/api/auth/register`;
+    const requestData = {
+      sustech_id: this.sustech_id,
+      name: this.userName,
+      password: this.password
+    };
+
+    axios.post(apiUrl, requestData)
+        .then(response => {
+          const userData = response.data;
+          this.token = userData.token;
+          console.log('successfully created account：', response.data);
+        })
+        .catch(error => {
+          console.error('failed to create an account：', error);
+        });
+  },
+
   methods: {
     sendMsg: function() {
       const self = this

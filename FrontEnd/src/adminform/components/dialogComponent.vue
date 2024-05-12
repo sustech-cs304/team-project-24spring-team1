@@ -138,6 +138,7 @@
 
 
 <script>
+import axios from "axios";
 //import dateP from "@/components/dateP.vue";
 export default {
   name: "DialogComponent",
@@ -214,6 +215,9 @@ export default {
             message: "numbers",
             trigger: "blur"
           }],
+        description:[{required:false, message:"describe the activity",trigger:"blur"}],
+        tickets: [{required:true, trigger:"blur"}],
+        deadline: [{required:true, trigger:"blur"}],
       },
       timeInfo:{
         startTimeInfo: '08:00',
@@ -224,10 +228,11 @@ export default {
           return time.getTime() < Date.now() - 8.64e7;
         }
       },
-
     };
   },
+  mounted() {
 
+  },
   methods: {
     // 上传文件
     onUpload (file) {
@@ -254,14 +259,6 @@ export default {
       // console.log(formData.get('file'))
       this.onUpload(formData)
     },
-//     onUpload (formData) {
-//       postUpload(formData).then((res) => {
-//         this.mdl.pic = res.result.uri
-//         this.$message.success(this.$t('UPLOAD_SUCCESS'))
-//       }).catch((e) => {
-//         this.$message.error(e.message)
-//       })
-//     },
 
     submitForm(formName) {
       const that = this;
@@ -284,15 +281,30 @@ export default {
             endTime:this.formInfo.endTime,
             duration:this.formInfo.duration,
           }
-          // if(this.$props) {
-          //   this.$emit('editDialog',sentData)
-          // } else {
+          const requestData={
+            name:this.formInfo.roomName,
+            kind:this.formInfo.roomType,
+            description: this.formInfo.description,
+            venue_id:this.formInfo.loc1,
+            // date:this.formInfo.date,
+            start_at:this.formInfo.startTime,
+            end_at:this.formInfo.endTime,
+            tickets: this.formInfo.tickets,
+            registration_deadline: this.formInfo.deadline,
+          }
+
+          const apiUrl = `https://backend.sustech.me/api/event`;
+          axios.post(apiUrl,requestData)
+              .then(response => {
+                const actiData = response.data;
+                this.activityId = actiData.id;
+              })
+              .catch(error => {
+                console.error('failed to publish event：', error);
+              })
+
           this.$emit("pushDialogData",sentData);
-          //与that不同，this是空白that是无]undefined
-          //else that.$emit("editData",this.$refs[formName])
           that.closeDialog(1);
-          /*const dialogData=this.$refs["dialogComponent"].$data;
-          this.tableData.push(dialogData);*/
         } else {
           return false;
         }
