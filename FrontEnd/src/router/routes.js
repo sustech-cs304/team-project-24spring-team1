@@ -1,5 +1,7 @@
 import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue";
 import NotFound from "@/pages/NotFoundPage.vue";
+import adminPublish from "@/pages/adminPublish.vue";
+import AdminLayout from "@/layout/admin/AdminLayout.vue";
 // import { component } from "vue/types/umd.js";
 
 // Admin pages
@@ -7,8 +9,6 @@ const Dashboard = () =>
   import(/* webpackChunkName: "dashboard" */ "@/pages/Dashboard.vue");
 const Profile = () =>
   import(/* webpackChunkName: "common" */ "@/pages/Profile.vue");
-const SettingProfile = () =>
-  import("@/pages/SettingProfile.vue");
 const Notifications = () =>
   import(/* webpackChunkName: "common" */ "@/pages/Notifications.vue");
 const Icons = () =>
@@ -23,9 +23,10 @@ const MyMoment = () =>
 const MyEvent = () =>
   import("@/pages/MyEvent.vue");
 const Login = () => import('@/pages/login');
-
 const Event = () =>
     import('@/pages/Event/Event.vue');
+const AdminForm = () =>
+    import('@/adminform/components/dialogInd.vue');
 
 const routes = [
   {
@@ -43,7 +44,28 @@ const routes = [
     // component: () => import('@/pages/register'),
     redirect: '/login'// '/dashboard/dashboard',
   },
-
+  {
+    path: '/admin',
+    name: 'admin',
+    component: AdminLayout,
+    children:[
+      {
+        path: 'publish',
+        name: 'publish',
+        component: AdminForm, //adminPublish, // 不用const可以吗
+      },
+      {
+        path: "profile",
+        name: "profile",
+        component: Profile,
+      },
+      {
+        path: "notifications",
+        name: "notifications",
+        component: Notifications,
+      },
+    ]
+  },
   {
     path: "/dashboard",
     component: DashboardLayout,
@@ -57,11 +79,6 @@ const routes = [
         path: "profile",
         name: "profile",
         component: Profile,
-      },
-      {
-        path: "setting",
-        name: "setting",
-        component: SettingProfile,
       },
       {
         path: "notifications",
