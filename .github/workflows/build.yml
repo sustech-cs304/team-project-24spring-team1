@@ -25,6 +25,20 @@ jobs:
   build:
     name: Build and Test Project
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
     - uses: actions/checkout@master
 
@@ -49,11 +63,12 @@ jobs:
     - name: Build
       run: cargo build
 
-    - name: Build Release
-      run: cargo build --release
-
     - name: Run Clippy
       run: cargo clippy
 
-    - name: Run Unit Tests
+    - name: Run Integration Tests
       run: cargo test
+      env:
+        TEST_DATABASE_URL: "postgres://postgres:postgres@localhost/postgres"
+        RUST_LOG: "debug,backend=trace,test_main=trace,tokio_postgres=info"
+        JWT_SECRET: "secret"
