@@ -23,7 +23,39 @@ jobs:
 
 
   build:
-    name: Build and Test Project
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Install Rust nightly
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: nightly
+        components: clippy
+
+    - name: Cache Rust dependcies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}-
+          ${{ runner.os }}-cargo-
+
+    - name: Build
+      run: cargo build
+
+    - name: Run Clippy
+      run: cargo clippy --all-targets
+
+
+  test:
+    name: Test and Coverage
     runs-on: ubuntu-latest
 
     services:
@@ -60,15 +92,21 @@ jobs:
           ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}-
           ${{ runner.os }}-cargo-
 
-    - name: Build
-      run: cargo build
-
-    - name: Run Clippy
-      run: cargo clippy --all-targets
-
     - name: Run Integration Tests
       run: cargo test
       env:
+        CARGO_INCREMENTAL: '0'
+        RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off'
+        RUSTDOCFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off'
+
         TEST_DATABASE_URL: "postgres://postgres:postgres@localhost/postgres"
         RUST_LOG: "debug,backend=trace,test_main=trace,tokio_postgres=info"
         JWT_SECRET: "secret"
+
+    - name: rust-grcov
+      uses: actions-rs/grcov@v0.1
+    - name: Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
