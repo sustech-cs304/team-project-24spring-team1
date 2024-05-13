@@ -18,6 +18,7 @@ pub struct LoginForm<'a> {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AccountInfo {
     pub account_id: i32,
     pub token: String,
