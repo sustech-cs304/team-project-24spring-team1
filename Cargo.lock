@@ -310,6 +310,8 @@ checksum = "f1fdabc7756949593fe60f30ec81974b613357de856987752631dea1e3394c80"
 name = "backend"
 version = "0.1.0"
 dependencies = [
+ "actix-http",
+ "actix-service",
  "actix-web",
  "argon2",
  "chrono",
@@ -318,6 +320,7 @@ dependencies = [
  "diesel",
  "diesel-async",
  "diesel-derive-enum",
+ "diesel_async_migrations",
  "dotenvy",
  "jsonwebtoken",
  "lazy_static",
@@ -637,6 +640,29 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.57",
+]
+
+[[package]]
+name = "diesel_async_migrations"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a700d6b83a17973b94d3065970fd2b36f1036c3fe08adcbdce1c9beb8fb25553"
+dependencies = [
+ "diesel",
+ "diesel-async",
+ "diesel_async_migrations_macros",
+ "scoped-futures",
+ "tracing",
+]
+
+[[package]]
+name = "diesel_async_migrations_macros"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05de210f31e6ac18162501b03c37f839af9f9fd6dd6de2bb4031ae6691c47679"
+dependencies = [
+ "proc-macro2",
+ "quote",
 ]
 
 [[package]]
@@ -1703,7 +1729,19 @@ dependencies = [
  "pin-project-lite",
  "signal-hook-registry",
  "socket2",
+ "tokio-macros",
  "windows-sys 0.48.0",
+]
+
+[[package]]
+name = "tokio-macros"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5b8a1e28f2deaa14e508979454cb3a223b10b938b45af148bc0986de36f1923b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.57",
 ]
 
 [[package]]
@@ -1754,7 +1792,19 @@ checksum = "c3523ab5a71916ccf420eebdf5521fcef02141234bbc0b8a49f2fdc4544364ef"
 dependencies = [
  "log",
  "pin-project-lite",
+ "tracing-attributes",
  "tracing-core",
+]
+
+[[package]]
+name = "tracing-attributes"
+version = "0.1.27"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "34704c8d6ebcbc939824180af020566b01a7c01f80641264eba0999f6c2b6be7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.57",
 ]
 
 [[package]]
