@@ -28,6 +28,15 @@ pub struct AccountProfile {
     pub bio: String,
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AccountCard {
+    pub id: i32,
+    pub name: String,
+    pub avatar: Uuid,
+    pub role: Role,
+}
+
 #[derive(Debug, Default, Serialize)]
 struct UpdateProfileForm<'a> {
     pub email: Option<&'a str>,

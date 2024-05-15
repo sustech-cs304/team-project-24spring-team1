@@ -41,6 +41,13 @@ pub async fn setup() {
             #[allow(clippy::borrow_interior_mutable_const)]
             MIGRATIONS.run_pending_migrations(&mut conn).await.unwrap();
 
+            log::debug!("Inserting default places...");
+            conn.batch_execute(
+                "INSERT INTO places(name) VALUES ('Place 1'), ('Place 2'), ('Place 3');",
+            )
+            .await
+            .unwrap();
+
             log::info!("Database for testing initialized");
         })
         .await;
