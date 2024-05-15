@@ -11,7 +11,7 @@ use super::misc::Place;
 use super::schema::*;
 use super::utils::{Bracket, BracketDsl, CountReferencesDsl, CountReferencesIn, Update};
 
-#[derive(Debug, Serialize, Deserialize, DbEnum)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, DbEnum)]
 #[serde(rename_all = "snake_case")]
 #[ExistingTypePath = "crate::orm::schema::sql_types::Eventtype"]
 pub enum EventType {
