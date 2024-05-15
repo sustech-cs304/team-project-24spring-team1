@@ -56,7 +56,7 @@ pub async fn get_profile(app: impl TestApp, account_id: i32) -> AccountProfile {
     profile
 }
 
-#[tokio::test]
+#[actix_web::test]
 async fn test_profile() {
     let app = create_app().await;
     let account = create_default_account(&app).await;
@@ -67,7 +67,7 @@ async fn test_profile() {
     assert_eq!(profile.name, TEST_DEFAULT_ACCOUNT_FORM.name);
 }
 
-#[tokio::test]
+#[actix_web::test]
 async fn test_profile_update() {
     let app = create_app().await;
     let account = create_default_account(&app).await;
@@ -89,7 +89,7 @@ async fn test_profile_update() {
     assert_eq!(profile.bio, NEW_BIO);
 }
 
-#[tokio::test]
+#[actix_web::test]
 async fn test_profile_no_update_other() {
     let app = create_app().await;
     let account = create_default_account(&app).await;

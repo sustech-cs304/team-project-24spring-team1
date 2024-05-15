@@ -131,7 +131,7 @@ pub async fn create_default_event(app: impl TestApp, account: &AccountInfo) -> i
     create_event(app, account, &DEFAULT_EVENT).await
 }
 
-#[tokio::test]
+#[actix_web::test]
 async fn test_event_create_and_get() {
     let app = create_app().await;
     let account = create_default_account(&app).await;
@@ -154,7 +154,7 @@ async fn test_event_create_and_get() {
     assert_eq!(event.inner.organizer.id, account.account_id);
 }
 
-#[tokio::test]
+#[actix_web::test]
 async fn test_event_list() {
     let app = create_app().await;
 
@@ -225,7 +225,7 @@ async fn test_event_list() {
     assert_eq!(event.inner.name, EVENT_NAME_2);
 }
 
-#[tokio::test]
+#[actix_web::test]
 async fn test_event_delete() {
     let app = create_app().await;
     let account = create_default_account(&app).await;
@@ -245,7 +245,7 @@ async fn test_event_delete() {
     assert_eq!(resp.status(), StatusCode::NOT_FOUND);
 }
 
-#[tokio::test]
+#[actix_web::test]
 async fn test_event_participate() {
     let app = create_app().await;
     let account = create_default_account(&app).await;

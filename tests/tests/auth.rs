@@ -49,14 +49,14 @@ pub async fn create_default_account(app: impl TestApp) -> AccountInfo {
     create_account(app, &TEST_DEFAULT_ACCOUNT_FORM).await
 }
 
-#[tokio::test]
+#[actix_web::test]
 async fn test_register() {
     let app = create_app().await;
 
     let _account = create_default_account(&app).await;
 }
 
-#[tokio::test]
+#[actix_web::test]
 async fn test_login() {
     let app = create_app().await;
     let account = create_default_account(&app).await;
@@ -75,7 +75,7 @@ async fn test_login() {
     assert_eq!(info.account_id, account.account_id);
 }
 
-#[tokio::test]
+#[actix_web::test]
 async fn test_token() {
     let app = create_app().await;
     let account = create_default_account(&app).await;
@@ -89,7 +89,7 @@ async fn test_token() {
     assert_eq!(resp.status(), StatusCode::OK);
 }
 
-#[tokio::test]
+#[actix_web::test]
 async fn test_token_invalid_schema() {
     let app = create_app().await;
     let account = create_default_account(&app).await;
@@ -103,7 +103,7 @@ async fn test_token_invalid_schema() {
     assert_eq!(resp.status(), StatusCode::UNAUTHORIZED);
 }
 
-#[tokio::test]
+#[actix_web::test]
 async fn test_token_invalid_data() {
     let app = create_app().await;
 
