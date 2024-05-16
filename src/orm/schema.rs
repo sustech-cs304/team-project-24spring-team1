@@ -19,15 +19,15 @@ diesel::table! {
         sustech_id -> Int4,
         #[max_length = 30]
         name -> Varchar,
+        #[max_length = 48]
+        email -> Varchar,
         #[max_length = 128]
         password -> Nullable<Varchar>,
+        avatar -> Uuid,
         role -> Role,
         bio -> Text,
         registered_at -> Timestamp,
         updated_at -> Timestamp,
-        avatar -> Uuid,
-        #[max_length = 48]
-        email -> Varchar,
     }
 }
 
@@ -58,9 +58,9 @@ diesel::table! {
         venue_id -> Int4,
         tickets -> Nullable<Int4>,
         registeration_deadline -> Nullable<Timestamp>,
+        is_deleted -> Bool,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        is_deleted -> Bool,
     }
 }
 

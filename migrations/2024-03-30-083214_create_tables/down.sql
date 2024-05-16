@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS participation;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS places;
