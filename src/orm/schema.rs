@@ -20,7 +20,7 @@ diesel::table! {
         #[max_length = 30]
         name -> Varchar,
         #[max_length = 128]
-        password -> Varchar,
+        password -> Nullable<Varchar>,
         role -> Role,
         bio -> Text,
         registered_at -> Timestamp,

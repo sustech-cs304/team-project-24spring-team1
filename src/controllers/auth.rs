@@ -267,7 +267,7 @@ async fn login(state: web::Data<AppState>, form: web::Json<LoginForm>) -> Result
         .select(AccountCredential::as_select())
         .first(&mut state.pool.get().await?)
         .await?;
-    verify_password(&form.password, &password)?;
+    verify_password(&form.password, password.as_deref().unwrap_or(""))?;
 
     debug!("Account logged in: sid={}, id={id}", form.sustech_id);
     let resp = AuthResponse {

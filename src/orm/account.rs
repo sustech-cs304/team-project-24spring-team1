@@ -35,7 +35,7 @@ pub struct Account {
     pub sustech_id: i32,
     pub name: String,
     pub email: String,
-    pub password: String,
+    pub password: Option<String>,
     pub avatar: Uuid,
     pub role: Role,
     pub bio: String,
@@ -47,7 +47,7 @@ pub struct Account {
 #[diesel(table_name = accounts)]
 pub struct AccountCredential {
     pub id: i32,
-    pub password: String,
+    pub password: Option<String>,
     pub role: Role,
 }
 
