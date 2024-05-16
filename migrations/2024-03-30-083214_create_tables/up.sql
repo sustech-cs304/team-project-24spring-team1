@@ -47,6 +47,15 @@ CREATE TABLE participation (
     PRIMARY KEY (account_id, event_id)
 );
 
+CREATE TABLE comments (
+    id SERIAL PRIMARY KEY NOT NULL,
+    account_id INT NOT NULL REFERENCES accounts(id),
+    event_id INT NOT NULL REFERENCES events(id),
+    content TEXT NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 CREATE INDEX ON events (kind);
 CREATE INDEX ON events (start_at);
 CREATE INDEX ON events (end_at);

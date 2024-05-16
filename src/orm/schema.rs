@@ -32,6 +32,17 @@ diesel::table! {
 }
 
 diesel::table! {
+    comments (id) {
+        id -> Int4,
+        account_id -> Int4,
+        event_id -> Int4,
+        content -> Text,
+        is_deleted -> Bool,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     use diesel::sql_types::*;
     use super::sql_types::Eventtype;
 
@@ -68,9 +79,11 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(comments -> accounts (account_id));
+diesel::joinable!(comments -> events (event_id));
 diesel::joinable!(events -> accounts (organizer_id));
 diesel::joinable!(events -> places (venue_id));
 diesel::joinable!(participation -> accounts (account_id));
 diesel::joinable!(participation -> events (event_id));
 
-diesel::allow_tables_to_appear_in_same_query!(accounts, events, participation, places,);
+diesel::allow_tables_to_appear_in_same_query!(accounts, comments, events, participation, places,);
