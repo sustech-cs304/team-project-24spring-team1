@@ -10,6 +10,6 @@ extern crate lazy_static;
 mod controllers;
 mod error;
 pub mod orm;
-mod utils;
+pub mod utils;
 
 pub use controllers::AppBuilder;

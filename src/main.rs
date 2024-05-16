@@ -4,6 +4,7 @@ use diesel_async::pooled_connection::deadpool::Pool;
 use diesel_async::pooled_connection::AsyncDieselConnectionManager;
 use diesel_async::AsyncPgConnection;
 
+use backend::utils::auth::CRAProvider;
 use backend::AppBuilder;
 
 #[derive(Debug, Parser)]
@@ -36,17 +37,15 @@ async fn main() -> std::io::Result<()> {
 
     let pool_config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(&opts.database_url);
     let pool = Pool::builder(pool_config).build().unwrap();
+    let configurator = AppBuilder::new()
+        .with_pool(pool.clone())
+        .with_auth_provider(Box::new(CRAProvider::new()))
+        .into_configurator();
 
     log::info!("Starting server on {}:{}", opts.host, opts.port);
-    HttpServer::new(move || {
-        App::new().configure(
-            AppBuilder::new()
-                .with_pool(pool.clone())
-                .into_configurator(),
-        )
-    })
-    .bind((opts.host, opts.port))?
-    .workers(2)
-    .run()
-    .await
+    HttpServer::new(move || App::new().configure(configurator.clone().as_function()))
+        .bind((opts.host, opts.port))?
+        .workers(2)
+        .run()
+        .await
 }

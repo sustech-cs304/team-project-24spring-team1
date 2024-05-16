@@ -25,7 +25,7 @@ pub struct NewAccount<'a> {
     pub sustech_id: i32,
     pub name: &'a str,
     pub email: &'a str,
-    pub password: &'a str,
+    pub password: Option<&'a str>,
 }
 
 #[derive(Debug, Selectable, Identifiable, Queryable)]

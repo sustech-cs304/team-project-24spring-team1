@@ -2,6 +2,7 @@ use actix_web::middleware::{Logger, NormalizePath};
 use actix_web::web::{self, ServiceConfig};
 use diesel_async::pooled_connection::deadpool::Pool;
 use diesel_async::AsyncPgConnection;
+use std::sync::Mutex;
 
 mod account;
 mod auth;
@@ -10,14 +11,22 @@ mod event;
 mod metadata;
 
 use crate::error::Error;
+use crate::utils::auth::AuthProvider;
 
 pub struct AppState {
     pool: Pool<AsyncPgConnection>,
+    auth_provider: Mutex<Box<dyn AuthProvider + Send>>,
 }
 
 #[derive(Default)]
 pub struct AppBuilder {
     pool: Option<Pool<AsyncPgConnection>>,
+    auth_provider: Option<Mutex<Box<dyn AuthProvider + Send>>>,
+}
+
+#[derive(Clone)]
+pub struct AppConfigurator {
+    data: web::Data<AppState>,
 }
 
 impl AppBuilder {
@@ -30,9 +39,23 @@ impl AppBuilder {
         self
     }
 
-    pub fn into_configurator(self) -> impl FnOnce(&mut ServiceConfig) {
-        let pool = self.pool.expect("pool must be set");
+    pub fn with_auth_provider(mut self, auth_provider: Box<dyn AuthProvider + Send>) -> Self {
+        self.auth_provider = Some(Mutex::new(auth_provider));
+        self
+    }
 
+    pub fn into_configurator(self) -> AppConfigurator {
+        let data = web::Data::new(AppState {
+            pool: self.pool.expect("pool must be set"),
+            auth_provider: self.auth_provider.expect("auth_provider must be set"),
+        });
+
+        AppConfigurator { data }
+    }
+}
+
+impl AppConfigurator {
+    pub fn as_function(&self) -> impl FnOnce(&mut ServiceConfig) + '_ {
         move |cfg| {
             let json_cfg = web::JsonConfig::default()
                 .limit(1024 * 32)
@@ -44,7 +67,7 @@ impl AppBuilder {
             let query_cfg = web::QueryConfig::default()
                 .error_handler(|err, _req| Error::BadRequest(err.to_string()).into());
 
-            cfg.app_data(web::Data::new(AppState { pool: pool.clone() }))
+            cfg.app_data(self.data.clone())
                 .app_data(json_cfg)
                 .app_data(path_cfg)
                 .app_data(query_cfg)

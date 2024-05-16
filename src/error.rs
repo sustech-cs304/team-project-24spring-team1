@@ -5,6 +5,7 @@ use actix_web::{
     HttpResponse,
 };
 use argon2::password_hash::errors::Error as PasswordHashError;
+use awc::error::{PayloadError, SendRequestError};
 use diesel::result::Error as DieselError;
 use diesel_async::pooled_connection::deadpool::PoolError;
 use serde::Serialize;
@@ -52,6 +53,12 @@ pub enum InternalError {
 
     #[error("PasswordHash: {0}")]
     PasswordHash(#[from] PasswordHashError),
+
+    #[error("awc: SendRequest: {0}")]
+    AwcSendRequest(#[from] SendRequestError),
+
+    #[error("awc: Payload: {0}")]
+    AwcPayload(#[from] PayloadError),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

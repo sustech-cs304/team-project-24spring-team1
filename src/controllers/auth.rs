@@ -1,6 +1,7 @@
 use actix_web::dev::Payload;
-use actix_web::http::header;
-use actix_web::{get, post, web, FromRequest, HttpRequest, Responder};
+use actix_web::http::{header, StatusCode};
+use actix_web::web::Buf;
+use actix_web::{get, post, web, FromRequest, HttpRequest, HttpResponse, Responder};
 use argon2::{
     password_hash::{
         errors::Error as PasswordHashError, rand_core::OsRng, PasswordHash, PasswordHasher,
@@ -13,12 +14,14 @@ use diesel::prelude::*;
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use std::future::{ready, Ready};
+use uuid::Uuid;
 use validator::Validate;
 
 use super::AppState;
 use crate::error::{Error, Result};
 use crate::orm::account::{Account, AccountCredential, NewAccount, Role};
 use crate::orm::utils::RunQueryDsl;
+use crate::utils::auth::AuthResult;
 
 lazy_static! {
     static ref JWT_SECRET: String = std::env::var("JWT_SECRET").unwrap_or_else(|_| {
@@ -150,6 +153,77 @@ struct AuthResponse {
     pub token: String,
 }
 
+#[derive(Debug, Serialize)]
+struct IdentifierResponse {
+    pub identifier: Uuid,
+}
+
+#[derive(Debug, Deserialize)]
+struct IdentifierQuery {
+    pub identifier: Uuid,
+}
+
+#[derive(Debug, Deserialize)]
+struct CallbackQuery {
+    pub identifier: Uuid,
+    pub ticket: String,
+}
+
+#[get("/identifier")]
+async fn get_identifier(state: web::Data<AppState>) -> Result<impl Responder> {
+    let identifier = state.auth_provider.lock().unwrap().alloc_identifier();
+    log::trace!("New identifier generated: {identifier}");
+    Ok(web::Json(IdentifierResponse { identifier }))
+}
+
+#[get("/poll")]
+async fn poll(
+    state: web::Data<AppState>,
+    query: web::Query<IdentifierQuery>,
+) -> Result<impl Responder> {
+    let identifier = query.into_inner().identifier;
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    state
+        .auth_provider
+        .lock()
+        .unwrap()
+        .subscribe(identifier, tx)?;
+
+    log::trace!("Polling for identifier: {identifier}");
+    let Ok(result) = rx.await else {
+        return Err(Error::NotAcceptable(
+            "Current identifier has been unsubscribed".to_owned(),
+        ));
+    };
+    let AccountCredential { id, role, .. } = get_account_or_create(&state, &result).await?;
+
+    debug!("Account logged in: sid={}, id={id}", result.sustech_id);
+    let resp = AuthResponse {
+        account_id: id,
+        token: generate_token(id, role),
+    };
+    Ok(web::Json(resp))
+}
+
+#[get("/callback")]
+async fn callback(
+    state: web::Data<AppState>,
+    query: web::Query<CallbackQuery>,
+) -> Result<impl Responder> {
+    let CallbackQuery { identifier, ticket } = query.into_inner();
+    let result = validate_ticket(&ticket).await?;
+    state
+        .auth_provider
+        .lock()
+        .unwrap()
+        .callback(identifier, result)?;
+
+    // Return a response that will close the window
+    Ok(HttpResponse::build(StatusCode::OK)
+        .content_type("text/html")
+        .body("<script>window.close();</script>"))
+}
+
 #[post("/register")]
 async fn register(
     state: web::Data<AppState>,
@@ -164,7 +238,7 @@ async fn register(
         sustech_id: form.sustech_id,
         name: &form.name,
         email: &default_email,
-        password: &password_hash,
+        password: Some(&password_hash),
     };
 
     let AccountCredential { id, role, .. } = new_account
@@ -209,5 +283,107 @@ async fn check(_auth: JwtAuth) -> Result<impl Responder> {
 }
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
-    cfg.service(register).service(login).service(check);
+    cfg.service(get_identifier)
+        .service(poll)
+        .service(callback)
+        .service(register)
+        .service(login)
+        .service(check);
+}
+
+// ===== Other Functions =====
+
+async fn get_account_or_create(
+    state: &web::Data<AppState>,
+    auth_result: &AuthResult,
+) -> Result<AccountCredential> {
+    match Account::by_sustech_id(auth_result.sustech_id)
+        .select(AccountCredential::as_select())
+        .first(&mut state.pool.get().await?)
+        .await
+    {
+        Ok(credential) => Ok(credential),
+        Err(diesel::result::Error::NotFound) => {
+            log::debug!(
+                "Account not found, creating new account, sid={}, name={}",
+                auth_result.sustech_id,
+                auth_result.name
+            );
+
+            let new_account = NewAccount {
+                sustech_id: auth_result.sustech_id,
+                name: &auth_result.name,
+                email: &auth_result.email,
+                password: None,
+            };
+            Ok(new_account
+                .as_insert()
+                .returning(AccountCredential::as_select())
+                .get_result(&mut state.pool.get().await?)
+                .await?)
+        }
+        Err(err) => Err(err.into()),
+    }
+}
+
+#[derive(Debug, Serialize)]
+struct ValidateQuery<'a> {
+    service: &'a str,
+    ticket: &'a str,
+}
+
+#[derive(Debug, Deserialize)]
+struct Value(#[serde(rename = "$text")] String);
+
+#[derive(Debug, Deserialize)]
+#[serde(rename = "serviceResponse")]
+struct CASResponse {
+    #[serde(rename = "authenticationSuccess")]
+    authentication: CASAuthentication,
+}
+
+#[derive(Debug, Deserialize)]
+struct CASAuthentication {
+    #[serde(rename = "attributes")]
+    attributes: CASAttributes,
+    #[serde(rename = "user")]
+    user: Value,
+}
+
+#[derive(Debug, Deserialize)]
+struct CASAttributes {
+    #[serde(rename = "mail")]
+    email: Value,
+    #[serde(rename = "cn")]
+    name: Value,
+}
+
+async fn validate_ticket(ticket: &str) -> Result<AuthResult> {
+    log::trace!("Validating ticket: {ticket}");
+
+    let client = awc::Client::default();
+    let mut response = client
+        .get("https://sso.cra.ac.cn/realms/cra-service-realm/protocol/cas/serviceValidate")
+        .query(&ValidateQuery {
+            service: "https://backend.sustech.me",
+            ticket,
+        })
+        .unwrap()
+        .send()
+        .await?;
+
+    let body = response.body().await?;
+    let cas = match quick_xml::de::from_reader::<_, CASResponse>(body.reader()) {
+        Ok(cas) => cas.authentication,
+        Err(err) => {
+            error!("CAS response parse error: {err:?}");
+            return Err(Error::BadRequest("CAS response parse error".to_owned()));
+        }
+    };
+
+    Ok(AuthResult {
+        sustech_id: cas.user.0.parse().unwrap(),
+        email: cas.attributes.email.0,
+        name: cas.attributes.name.0,
+    })
 }

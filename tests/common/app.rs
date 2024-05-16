@@ -6,6 +6,7 @@ use deadpool::managed::{Hook, HookResult, Metrics, Pool};
 use diesel_async::{AsyncConnection, AsyncPgConnection};
 use std::sync::{Arc, Mutex};
 
+use backend::utils::auth::CRAProvider;
 use backend::AppBuilder;
 
 use crate::common::setup;
@@ -39,12 +40,10 @@ pub async fn create_app() -> impl TestApp {
         .build()
         .unwrap();
 
-    test::init_service(
-        App::new().configure(
-            AppBuilder::new()
-                .with_pool(pool.clone())
-                .into_configurator(),
-        ),
-    )
-    .await
+    let configurator = AppBuilder::new()
+        .with_pool(pool.clone())
+        .with_auth_provider(Box::new(CRAProvider::new()))
+        .into_configurator();
+
+    test::init_service(App::new().configure(configurator.as_function())).await
 }

@@ -12,7 +12,7 @@ CREATE TABLE accounts (
     sustech_id INT NOT NULL UNIQUE CHECK (1000000 <= sustech_id AND sustech_id <= 99999999),
     name VARCHAR(30) NOT NULL UNIQUE,
     email VARCHAR(48) NOT NULL UNIQUE,
-    password VARCHAR(128) NOT NULL,
+    password VARCHAR(128),
     avatar UUID NOT NULL DEFAULT '98e90a01-9fd6-4010-add4-9190e8ee0b6c',  -- magic value
     role Role NOT NULL DEFAULT 'student',
     bio TEXT NOT NULL DEFAULT '',
