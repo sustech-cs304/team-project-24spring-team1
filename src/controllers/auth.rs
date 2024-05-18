@@ -197,7 +197,10 @@ async fn poll(
     };
     let AccountCredential { id, role, .. } = get_account_or_create(&state, &result).await?;
 
-    debug!("Account logged in: sid={}, id={id}", result.sustech_id);
+    debug!(
+        "Account logged in via SSO: sid={}, id={id}",
+        result.sustech_id
+    );
     let resp = AuthResponse {
         account_id: id,
         token: generate_token(id, role),
@@ -381,9 +384,12 @@ async fn validate_ticket(ticket: &str) -> Result<AuthResult> {
         }
     };
 
-    Ok(AuthResult {
+    let result = AuthResult {
         sustech_id: cas.user.0.parse().unwrap(),
         email: cas.attributes.email.0,
         name: cas.attributes.name.0,
-    })
+    };
+    log::trace!("CAS validate response: {result:?}");
+
+    Ok(result)
 }
