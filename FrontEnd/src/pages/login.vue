@@ -85,6 +85,7 @@ export default {
       loading: false,
       passwordType: 'password',
       redirect: undefined,
+      // token:'',
     }
   },
   watch: {
@@ -115,11 +116,9 @@ export default {
         // Step 1: Make a request to /api/auth/identifier to get an identifier
         const response = await axios.get('https://backend.sustech.me/api/auth/identifier');
         const identifier = response.data.identifier;
-
         // Step 2: Open a new tab in the browser for login
         const loginUrl = `https://sso.cra.ac.cn/realms/cra-service-realm/protocol/cas/login?service=https://backend.sustech.me/api/auth/callback?identifier=${identifier}`;
         window.open(loginUrl, '_blank');
-
         // Step 3: Make a request to /api/auth/poll with the identifier obtained in step 1
         this.checkLoginStatus(identifier);
       },
@@ -128,9 +127,9 @@ export default {
         try {
           const response = await axios.get(`https://backend.sustech.me/api/auth/poll?identifier=${identifier}`);
           const userData = response.data;
-          this.token = userData.token;
-          this.account_id = userData.account_id;
-          if (this.token && this.account_id) {
+          localStorage.setItem('id', userData.account_id);
+          localStorage.setItem('jwt_token', userData.token);
+          if (userData.token && userData.account_id) {
             // clearInterval(pollInterval);
             this.showMessage("登录成功");
             this.$refs.loginForm.validate(valid => {

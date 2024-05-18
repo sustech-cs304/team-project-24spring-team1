@@ -28,11 +28,11 @@
             </el-col>
           </el-form-item>
 
-          <el-form-item label="email" prop="email">
+          <el-form-item label="sustech_id" prop="sustech_id">
             <el-col :span="10">
               <el-input
                 v-model="ruleForm.sustech_id"
-                placeholder="enter your email address and click to do verification"
+                placeholder="enter your sustech id"
               />
             </el-col>
             <el-button
@@ -57,12 +57,14 @@
 
           <el-form-item label="pwd" prop="pwd">
             <el-col :span="10">
-              <el-input v-model="ruleForm.pwd" type="password" />
+              <el-input v-model="ruleForm.pwd" type="password"
+              placeholder="enter your password"/>
             </el-col>
           </el-form-item>
           <el-form-item label="confirm pwd" prop="cpwd">
             <el-col :span="10">
-              <el-input v-model="ruleForm.cpwd" type="password" />
+              <el-input v-model="ruleForm.cpwd" type="password"
+              placeholder="enter your password again"/>
             </el-col>
           </el-form-item>
 
@@ -87,7 +89,6 @@ import { encrypt } from '@/login/utils/rsaEncrypt'
 import axios from 'axios';
 
 export default {
-  name: 'Register',
   data() {
     return {
       statusMsg: '',
@@ -95,8 +96,7 @@ export default {
       isDisable: false,
       codeLoading: false,
       ruleForm: {
-        sustech_id: '',
-        // email: '',
+        sustech_id: '', // email: '',
         name: '',
         code: '',
         pwd: '',
@@ -115,6 +115,7 @@ export default {
         //   message: 'please enter verification code',
         //   trigger: 'blur'
         // }],
+        name: [{required:true,trigger:'blur'}],
         sustech_id: [
           {required: true,
           trigger: 'blur'}
@@ -214,7 +215,6 @@ export default {
     register: function() {
       this.$refs['ruleForm'].validate((valid) => {
         if (valid) {
-          // 发送注册请求
           const apiUrl = `https://backend.sustech.me/api/auth/register`;
           const userData = {
             sustech_id: this.ruleForm.sustech_id,
@@ -254,7 +254,6 @@ export default {
 
 
 <style lang="scss">
-
 $bg: #283443;
 $light_gray: #fff;
 $cursor: #b92929;
