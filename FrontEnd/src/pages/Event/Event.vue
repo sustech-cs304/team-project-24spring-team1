@@ -41,6 +41,11 @@
                     </div>
                     <br>
                     <div>
+                      <h4 class="card-text" style="display: inline-block;">Tickets Left: 100</h4>
+                    </div>
+
+                    <br>
+                    <div>
                       <base-button class="animation-on-hover" type="primary">Reserve</base-button>
                     </div>
 
@@ -89,8 +94,6 @@
               </div>
 
             </div>
-
-
           </card>
         </div>
       </fade-transition>
