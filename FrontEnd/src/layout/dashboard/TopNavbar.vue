@@ -194,7 +194,7 @@ export default {
     },
     sendProfileMessage() {
       var id = "2";
-      var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzE0NzQwODU0LCJleHAiOjE3MTQ4MjcyNTR9.mR4fZRmYqex2YgYMCsVo7tmvEj_jJXCmm2kyoTnGrgs";
+      var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzE2MDEwODMyLCJleHAiOjE3MTYwOTcyMzJ9.EvfsW1EKvwYTTYfJ9aVw3F5q2tBG7Se--hKuFATsRJo";
       localStorage.setItem('id', id);
       localStorage.setItem('token', token);
     },
