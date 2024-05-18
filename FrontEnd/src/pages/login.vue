@@ -106,34 +106,61 @@ export default {
         this.$refs.password.focus()
       })
     },
-
-    handleLogin() {
+    async handleLogin() {
       const apiUrl = `https://backend.sustech.me/api/auth/login`;
       const requestData = {
         sustech_id: this.userName,
         password: this.password
       };
+        // Step 1: Make a request to /api/auth/identifier to get an identifier
+        const response = await axios.get('https://backend.sustech.me/api/auth/identifier');
+        const identifier = response.data.identifier;
 
-      axios.post(apiUrl, requestData)
-          .then(response => {
-            const userData = response.data;
-            this.token = userData.token;
-            this.account_id = userData.account_id;
-            console.log('successfully logged in：', response.data);
+        // Step 2: Open a new tab in the browser for login
+        const loginUrl = `https://sso.cra.ac.cn/realms/cra-service-realm/protocol/cas/login?service=https://backend.sustech.me/api/auth/callback?identifier=${identifier}`;
+        window.open(loginUrl, '_blank');
+
+        // Step 3: Make a request to /api/auth/poll with the identifier obtained in step 1
+        this.checkLoginStatus(identifier);
+      },
+
+      async checkLoginStatus(identifier) {
+        try {
+          const response = await axios.get(`https://backend.sustech.me/api/auth/poll?identifier=${identifier}`);
+          const userData = response.data;
+          this.token = userData.token;
+          this.account_id = userData.account_id;
+          if (this.token && this.account_id) {
+            // clearInterval(pollInterval);
+            this.showMessage("登录成功");
             this.$refs.loginForm.validate(valid => {
               if (valid) {
-                let path= '/Dashboard/dashboard';
+                let path = '/Dashboard/dashboard';
                 if (this.ifAdmin) {
                   path = '/admin/publish';
                 }
-                this.$router.push({ path: path })
+                this.$router.push({path: path});
               }
-            })
-          })
-          .catch(error => {
-            console.error('login failed ：', error);
-          });
-    }
+            });}
+          else { // Login process is not completed, continue polling
+            setTimeout(() => {
+              this.checkLoginStatus(identifier); // Polling for login status
+            }, 40000); // Polling interval: 5 seconds
+          }
+        } catch (error) {
+          this.showMessage("登录失败! ");
+        }
+        },
+
+    showMessage(message) {
+      this.successMessage = message;
+      // 显示弹窗
+      this.$message({
+        message: this.successMessage,
+        type: 'success'
+      });
+    },
+
   }
 }
 </script>
