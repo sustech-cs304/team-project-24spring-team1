@@ -26,6 +26,8 @@ const Event = () =>
     import('@/pages/Event/Event.vue');
 const AdminForm = () =>
     import('@/adminform/components/dialogInd.vue');
+const SettingProfile = () =>
+  import("@/pages/SettingProfile.vue");
 
 const routes = [
   {
@@ -78,6 +80,11 @@ const routes = [
         path: "profile",
         name: "profile",
         component: Profile,
+      },
+      {
+        path: "setting",
+        name: "setting",
+        component: SettingProfile,
       },
       {
         path: "notifications",
