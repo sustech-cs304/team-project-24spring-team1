@@ -41,7 +41,11 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">LOGIN</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;"
+                 @click.native.prevent="visitor_login">visitor LOGIN</el-button>
+
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;"
+                 @click.native.prevent="handleLogin">go to CAS login</el-button>
 
       <p class="tips">
         <a href="#/register" type="primary">no account? register now.</a>
@@ -53,6 +57,7 @@
 
 <script>
 import axios from 'axios';
+import api from "js-cookie";
 // import {debug} from "script-ext-html-webpack-plugin/lib/common";
 
 export default {
@@ -107,12 +112,34 @@ export default {
         this.$refs.password.focus()
       })
     },
-    async handleLogin() {
+    visitor_login(){
       const apiUrl = `https://backend.sustech.me/api/auth/login`;
       const requestData = {
-        sustech_id: this.userName,
-        password: this.password
+        sustech_id: parseInt(this.loginForm.userName),
+        password: this.loginForm.password
       };
+      axios.post(apiUrl, requestData)
+          .then(response => {
+            const token = response.data.token;
+            const account_id = response.data.account_id;
+            this.showSuccessMessage("登录成功");
+            this.$refs.loginForm.validate(valid => {
+              if (valid) {
+                let path = '/Dashboard/dashboard';
+                if (this.ifAdmin) {
+                  path = '/admin/publish';
+                }
+                this.$router.push({path: path});
+              }
+            })
+          })
+          .catch(error => {
+            // console.error("data:", eventData);
+            console.error('failed to publish event：', error);
+            this.showFailMessage(`登录失败`);
+          })
+    },
+    async handleLogin(){
         // Step 1: Make a request to /api/auth/identifier to get an identifier
         const response = await axios.get('https://backend.sustech.me/api/auth/identifier');
         const identifier = response.data.identifier;
@@ -122,7 +149,6 @@ export default {
         // Step 3: Make a request to /api/auth/poll with the identifier obtained in step 1
         this.checkLoginStatus(identifier);
       },
-
       async checkLoginStatus(identifier) {
         try {
           const response = await axios.get(`https://backend.sustech.me/api/auth/poll?identifier=${identifier}`);
@@ -131,7 +157,7 @@ export default {
           localStorage.setItem('jwt_token', userData.token);
           if (userData.token && userData.account_id) {
             // clearInterval(pollInterval);
-            this.showMessage("登录成功");
+            this.showSuccessMessage("登录成功");
             this.$refs.loginForm.validate(valid => {
               if (valid) {
                 let path = '/Dashboard/dashboard';
@@ -147,16 +173,22 @@ export default {
             }, 40000); // Polling interval: 5 seconds
           }
         } catch (error) {
-          this.showMessage("登录失败! ");
+          this.showFailMessage("登录失败! ");
         }
         },
 
-    showMessage(message) {
+    showSuccessMessage(message) {
       this.successMessage = message;
-      // 显示弹窗
       this.$message({
         message: this.successMessage,
         type: 'success'
+      });
+    },
+    showFailMessage(message) {
+      this.Message = message;
+      this.$message({
+        message: this.Message,
+        type: 'error'
       });
     },
 
