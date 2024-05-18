@@ -22,9 +22,10 @@
         size="medium"
       >
         <div style="padding-top: 10px">
+
           <el-form-item label="enter your name" prop="name">
             <el-col :span="10">
-              <el-input v-model="ruleForm.name" type="text" />
+              <el-input v-model="ruleForm.name" />
             </el-col>
           </el-form-item>
 
@@ -35,25 +36,26 @@
                 placeholder="enter your sustech id"
               />
             </el-col>
-            <el-button
-              :loading="codeLoading"
-              :disabled="isDisable"
-              size="small"
-              round
-              @click="sendMsg"
-            >send verification code</el-button>
-            <span class="status">{{ statusMsg }}</span>
           </el-form-item>
+<!--            <el-button-->
+<!--              :loading="codeLoading"-->
+<!--              :disabled="isDisable"-->
+<!--              size="small"-->
+<!--              round-->
+<!--              @click="sendMsg"-->
+<!--            >send verification code</el-button>-->
+<!--            <span class="status">{{ statusMsg }}</span>-->
 
-          <el-form-item label="verification" prop="code">
-            <el-col :span="10">
-              <el-input
-                v-model="ruleForm.code"
-                maxlength="6"
-                placeholder="verification code sent to your email please check"
-              />
-            </el-col>
-          </el-form-item>
+
+<!--          <el-form-item label="verification" prop="code">-->
+<!--            <el-col :span="10">-->
+<!--              <el-input-->
+<!--                v-model="ruleForm.code"-->
+<!--                maxlength="6"-->
+<!--                placeholder="verification code sent to your email please check"-->
+<!--              />-->
+<!--            </el-col>-->
+<!--          </el-form-item>-->
 
           <el-form-item label="pwd" prop="pwd">
             <el-col :span="10">
@@ -61,6 +63,7 @@
               placeholder="enter your password"/>
             </el-col>
           </el-form-item>
+
           <el-form-item label="confirm pwd" prop="cpwd">
             <el-col :span="10">
               <el-input v-model="ruleForm.cpwd" type="password"
@@ -75,6 +78,7 @@
               @click="register"
             >REGISTER</el-button>
           </el-form-item>
+
         </div>
       </el-form>
     </section>
@@ -98,29 +102,18 @@ export default {
       ruleForm: {
         sustech_id: '', // email: '',
         name: '',
-        code: '',
+        // code: '',
         pwd: '',
         cpwd: ''
       },
       rules: {
-        // email: [{
-        //   required: true,
-        //   type: 'email',
-        //   message: 'please enter your email',
-        //   trigger: 'blur'
-        // }],
-        // code: [{
-        //   required: true,
-        //   type: 'string',
-        //   message: 'please enter verification code',
-        //   trigger: 'blur'
-        // }],
-        name: [{required:true,trigger:'blur'}],
+        name: [{required:true,trigger:'blur',message: 'enter name'}],
         sustech_id: [
           {required: true,
-          trigger: 'blur'}
+          trigger: 'blur',
+          message: 'enter your sustech_id' }
         ],
-        code:[{required:false, trigger:'blur'}],
+        // code:[{required:false, trigger:'blur'}],
         pwd: [{
           required: true,
           message: 'set password',
@@ -147,25 +140,6 @@ export default {
       }
     }
   },
-  // mounted() {
-  //   const apiUrl = `https://backend.sustech.me/api/auth/register`;
-  //   const requestData = {
-  //     sustech_id: this.sustech_id,
-  //     name: this.userName,
-  //     password: this.password
-  //   };
-  //   axios.post(apiUrl, requestData)
-  //       .then(response => {
-  //         const userData = response.data;
-  //         this.token = userData.token;
-  //         console.log('successfully created account：', response.data);
-  //
-  //       })
-  //       .catch(error => {
-  //         console.error('failed to create an account：', error);
-  //       });
-  // },
-
   methods: {
     sendMsg: function() {
       const self = this
@@ -211,23 +185,22 @@ export default {
       }
     },
 
-    // 用户注册
     register: function() {
       this.$refs['ruleForm'].validate((valid) => {
         if (valid) {
           const apiUrl = `https://backend.sustech.me/api/auth/register`;
           const userData = {
-            sustech_id: this.ruleForm.sustech_id,
-            name: this.ruleForm.userName,
-            password: this.ruleForm.password //encrypt(this.ruleForm.pwd)
+            sustech_id: parseInt(this.ruleForm.sustech_id),
+            name: this.ruleForm.name,
+            password: this.ruleForm.pwd //encrypt(this.ruleForm.pwd)
           };
 
           axios.post(apiUrl, userData)  // register(user).then(res => {
               .then(response => {
                 const userData = response.data;
-                this.token = userData.token;
-                console.log('successfully created account：', response.data);
-                // 注册成功后跳转到登录页面
+                this.account_id = userData.account_id;
+                this.showSuccessMessage(`注册成功 ${this.account_id}`);
+
                 this.$message({
                   showClose: true,
                   message: 'successfully registered, linking to login page...',
@@ -235,15 +208,31 @@ export default {
                 });
                 setTimeout(() => {
                   this.$router.push('/')
-                }, 2000);
+                }, 1000);
+
               })
               .catch(error => {
+                console.error("data: ", userData);
                 console.error('failed to create an account：', error);
-                console.log(error.response.data.message);
+                this.showFailMessage("注册失败");
               });
         }
       })
-    }
+    },
+    showSuccessMessage(message) {
+      this.successMessage = message;
+      this.$message({
+        message: this.successMessage,
+        type: 'success'
+      });
+    },
+    showFailMessage(message) {
+      this.Message = message;
+      this.$message({
+        message: this.Message,
+        type: 'error'
+      });
+    },
   }
 
 }
