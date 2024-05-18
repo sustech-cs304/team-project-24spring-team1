@@ -1,19 +1,13 @@
 <template>
-  <div class="sidebar" :data ="backgroundColor">
-    <!--
-            Tip 1: you can change the color of the sidebar's background using: data-background-color="white | black | darkblue"
-            Tip 2: you can change the color of the active button using the data-active-color="primary | info | success | warning | danger"
-        -->
-    <!-- -->
-    <div class="sidebar-wrapper" id="style-3">
+  <div class="sidebar" :data ="backgroundColor" data-background-color="white">
+      <!--
+              Tip 1: you can change the color of the sidebar's background using: data-background-color="white | black | darkblue"
+              Tip 2: you can change the color of the active button using the data-active-color="primary | info | success | warning | danger"
+          -->
+      <!-- -->
+    <div class="sidebar-wrapper" id="style-3 ">
       <div class="logo">
-        <a
-          aria-label="sidebar mini logo"
-          class="simple-text logo-mini"
-
-        >
-        </a>
-        <a class="simple-text logo-normal" style="margin-right: -1000px;">
+        <a class="simple-text logo-normal">
           <i class="fas fa-filter"></i>
           {{ title }}
         </a>
@@ -47,7 +41,7 @@ export default {
     },
     backgroundColor: {
       type: String,
-      default: "vue",
+      default: "green",
     },
     activeColor: {
       type: String,

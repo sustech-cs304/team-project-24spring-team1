@@ -1,4 +1,4 @@
-<template>
+<template class="white-content">
   <div>
     <notifications></notifications>
     <router-view :key="$route.fullPath"></router-view>

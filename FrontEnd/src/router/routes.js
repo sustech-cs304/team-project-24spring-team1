@@ -1,5 +1,6 @@
 import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue";
 import NotFound from "@/pages/NotFoundPage.vue";
+import AdminLayout from "@/layout/admin/AdminLayout.vue";
 // import { component } from "vue/types/umd.js";
 
 // Admin pages
@@ -20,13 +21,19 @@ const MyMoment = () =>
   import("@/pages/MyMoment.vue");
 const MyEvent = () =>
   import("@/pages/MyEvent.vue");
-
+const Login = () => import('@/pages/login');
+const Event = () =>
+    import('@/pages/Event/Event.vue');
+const AdminForm = () =>
+    import('@/adminform/components/dialogInd.vue');
+const SettingProfile = () =>
+  import("@/pages/SettingProfile.vue");
 
 const routes = [
   {
     path: '/login',
-    component: () => import('@/pages/login'),
-    hidden: true
+    component: Login,
+    hidden:true,
   },
   {
     path: '/register',
@@ -38,11 +45,31 @@ const routes = [
     // component: () => import('@/pages/register'),
     redirect: '/login'// '/dashboard/dashboard',
   },
-
+  {
+    path: '/admin',
+    name: 'admin',
+    component: AdminLayout,
+    children:[
+      {
+        path: 'publish',
+        name: 'publish',
+        component: AdminForm, //adminPublish, // 不用const可以吗
+      },
+      {
+        path: "profile",
+        name: "profile",
+        component: Profile,
+      },
+      {
+        path: "notifications",
+        name: "notifications",
+        component: Notifications,
+      },
+    ]
+  },
   {
     path: "/dashboard",
     component: DashboardLayout,
-    // redirect: "/dashboard",
     children: [
       {
         path: "dashboard",
@@ -53,6 +80,11 @@ const routes = [
         path: "profile",
         name: "profile",
         component: Profile,
+      },
+      {
+        path: "setting",
+        name: "setting",
+        component: SettingProfile,
       },
       {
         path: "notifications",
@@ -88,6 +120,11 @@ const routes = [
         path: "myevent",
         name: "myevent",
         component: MyEvent,
+      },
+      {
+        path: "event",
+        name: "event",
+        component: Event,
       },
     ],
   },

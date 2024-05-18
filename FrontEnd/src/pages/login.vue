@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Welcome to website!</h3>
+        <h3 class="title">Welcome to SUSTech Event!</h3>
       </div>
 
       <el-form-item prop="userName">
@@ -13,7 +13,7 @@
         <el-input
           ref="userName"
           v-model="loginForm.userName"
-          placeholder="邮箱"
+          placeholder="email"
           name="userName"
           type="text"
           tabindex="1"
@@ -30,7 +30,7 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="密码"
+          placeholder="password"
           name="password"
           tabindex="2"
           auto-complete="on"
@@ -44,7 +44,7 @@
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">LOGIN</el-button>
 
       <p class="tips">
-        <a href="/register" type="primary">no account? register now.</a>
+        <a href="#/register" type="primary">no account? register now.</a>
       </p>
 
     </el-form>
@@ -52,31 +52,41 @@
 </template>
 
 <script>
-
+import axios from 'axios';
 // import {debug} from "script-ext-html-webpack-plugin/lib/common";
 
 export default {
-  name: 'Login',
   data() {
     return {
       loginForm: {
         userName: '',
-        password: ''
+        password: '',
       },
+      ifAdmin: false,
       loginRules: {
-        userName: [{ type: 'email', required: true, trigger: 'blur', message: 'please enter your email' }],
+        userName: [ // type: 'email',
+          { required: true, trigger: 'blur', message: 'please enter your id' },
+          // {
+          //   validator: (rule, value, callback) => {
+          //     if (value && value.endsWith('admin.com')) {
+          //       this.ifAdmin = true;
+          //     }
+          //     callback(); // 继续验证流程
+          //   }
+          // },
+        ],
         password: [{
           required: true,
-          message: 'create password',
+          message: 'enter password',
           trigger: 'blur'
-        }, { pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, message: 'password has to contain both letters and digits, and length 8-20.' }]
+        },]
+          // { pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, message: 'password has to contain both letters and digits, and length 8-20.' }]
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
     }
   },
-
   watch: {
     $route: {
       handler: function(route) {
@@ -84,6 +94,31 @@ export default {
       },
       immediate: true
     }
+  },
+
+  mounted() {
+    const apiUrl = `https://backend.sustech.me/api/auth/login`;
+    const requestData = {
+      sustech_id: this.userName,
+      password: this.password
+    };
+
+    axios.post(apiUrl, requestData)
+        .then(response => {
+          const userData = response.data;
+          this.token = userData.token;
+          this.account_id = userData.account_id;
+          console.log('successfully logged in：', response.data);
+          let path= '/Dashboard/dashboard';
+          if (this.ifAdmin) {
+            path = '/admin/publish';
+          }
+          this.$router.push({ path: path })
+        })
+        .catch(error => {
+          console.error('login failed ：', error);
+        });
+
   },
 
   methods: {
@@ -101,19 +136,14 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          // this.loading = true
-          // this.$store.dispatch('login', this.loginForm).then(() => {
-          //   this.$router.push({ path: this.redirect || '/' })
-          //   this.loading = false
-          // }).catch(() => {
-          //   this.loading = false
-          // })
-          this.$router.push({ path: '/Dashboard/dashboard' }) // 想跳转的页面路径
-        } else {
-          console.log('error submit!!')
-          return false
+          let path= '/Dashboard/dashboard';
+          if (this.ifAdmin) {
+            path = '/admin/publish';
+          }
+          this.$router.push({ path: path })
         }
       })
+
     }
   }
 }
@@ -137,7 +167,7 @@ $cursor: #fff;
 .login-container {
   .el-input {
     display: inline-block;
-    height: 47px;
+    height: 90%; /*47px;*/
     width: 85%;
 
     input {
@@ -171,7 +201,7 @@ $bg:#2d3a4b;
 $dark_gray:#889aa4;
 $light_gray:#eee;
 
-.login-container {
+body {
   min-height: 100%;
   width: 100%;
   background-color: $bg;
@@ -230,6 +260,8 @@ $light_gray:#eee;
   }
 }
 </style>
+
+
 
 <style scoped>
 /* 修改验证器样式 */

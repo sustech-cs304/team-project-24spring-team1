@@ -1,3 +1,12 @@
+<style>
+    .notification {
+        position: absolute;
+        top: 17px;
+        right: 0px;
+        width: 6px;
+        height: 6px;
+    }
+</style>
 <template>
   <nav
     class="navbar navbar-expand-lg navbar-absolute"
@@ -73,13 +82,13 @@
             >
               <a
                 slot="title"
-                href="#/dashboard"
                 class="dropdown-toggle nav-link"
                 data-toggle="dropdown"
                 aria-expanded="true"
               >
-                <div class="notification d-none d-lg-block d-xl-block"></div>
+                <!-- <div class="notification d-none d-lg-block d-xl-block"></div> -->
                 <i class="tim-icons icon-bell-55"></i>
+                <!-- <i class="notification"></i> -->
                 <p class="d-lg-none">New Notifications</p>
               </a>
               <li class="nav-link">
@@ -115,14 +124,14 @@
                 <p class="d-lg-none">Log out</p>
               </a>
               <li class="nav-link">
-                <a href="#/dashboard/profile" class="nav-item dropdown-item">Profile</a>
+                <a href="#/dashboard/profile" class="nav-item dropdown-item" @click="sendProfileMessage">Profile</a>
               </li>
               <li class="nav-link">
-                <a href="#/dashboard/profile" class="nav-item dropdown-item">Settings</a>
+                <a href="#/dashboard/setting" class="nav-item dropdown-item" @click="sendProfileMessage">Settings</a>
               </li>
               <div class="dropdown-divider"></div>
               <li class="nav-link">
-                <a href="#/dashboard" class="nav-item dropdown-item">Log out</a>
+                <a href="#/login" class="nav-item dropdown-item">Log out</a>
               </li>
             </base-dropdown>
           </ul>
@@ -131,6 +140,7 @@
     </div>
   </nav>
 </template>
+
 <script>
 import { CollapseTransition } from "vue2-transitions";
 import Modal from "@/components/Modal";
@@ -181,6 +191,12 @@ export default {
       this.showMenu = !this.showMenu;
       // Navigate to Dashboard page
       this.$router.push('/dashboard/dashboard'); //'Dashboard'
+    },
+    sendProfileMessage() {
+      var id = "2";
+      var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzE2MDEwODMyLCJleHAiOjE3MTYwOTcyMzJ9.EvfsW1EKvwYTTYfJ9aVw3F5q2tBG7Se--hKuFATsRJo";
+      localStorage.setItem('id', id);
+      localStorage.setItem('token', token);
     },
   },
 };

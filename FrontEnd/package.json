@@ -24,7 +24,8 @@
     "vue-i18n": "8.28.2",
     "vue-router": "3.6.5",
     "vue-router-prefetch": "1.6.3",
-    "vue2-transitions": "0.3.0"
+    "vue2-transitions": "0.3.0",
+    "vuex": "^1.0.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "7.21.8",
@@ -47,7 +48,9 @@
     "sass": "1.62.1",
     "sass-loader": "10.2.0",
     "vue-cli-plugin-i18n": "2.3.2",
-    "vue-template-compiler": "2.7.14"
+    "vue-template-compiler": "2.7.14",
+    "body-parser": "^1.20.2",
+    "chokidar": "^3.6.0"
   },
   "browserslist": [
     "> 1%",
