@@ -62,8 +62,9 @@ impl AuthProvider for CRAProvider {
 
     fn callback(&mut self, identifier: Uuid, result: AuthResult) -> Result<()> {
         self.check_identifier_exists(identifier)?;
-        let tx = self.subscribers.remove(&identifier).flatten().unwrap();
-        tx.send(result).unwrap();
+        if let Some(tx) = self.subscribers.remove(&identifier).flatten() {
+            tx.send(result).unwrap();
+        }
         Ok(())
     }
 }
