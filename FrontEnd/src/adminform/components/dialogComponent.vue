@@ -17,31 +17,29 @@
           label-width="100px"
           :inline="true" >
 
-        <el-form-item label="roomName" prop="roomName">
-          <el-input v-model="formInfo.activityName" placeholder="room name" clearable />
+        <el-form-item label="activityName" prop="activityName">
+          <el-input v-model="formInfo.activityName" placeholder="activity name" clearable/>
         </el-form-item>
 
-        <el-form-item label="department" prop="department" required>
-          <el-input placeholder="department" v-model="formInfo.department" clearable />
+        <div style="display:flex;flex-wrap:wrap;">
+        <el-form-item label="kind" prop="kind">
+          <el-radio v-model="formInfo.kind" label="Free">Free</el-radio>
+          <el-radio v-model="formInfo.kind" label="FullyPaid">FullyPaid</el-radio>
+          <el-radio v-model="formInfo.kind" label="SchoolDiscount">SchoolDiscount</el-radio>
         </el-form-item>
+        </div>
 
-        <el-form-item label="roomType" prop="roomType">
-          <el-radio v-model="formInfo.roomType" label="small">small</el-radio>
-          <el-radio v-model="formInfo.roomType" label="medium">medium</el-radio>
-          <el-radio v-model="formInfo.roomType" label="big">big</el-radio>
-        </el-form-item>
-
-        <el-form-item label="date" prop="date" label-width="150px">
-          <el-date-picker
-              v-model="formInfo.date"
-              type="date"
-              placeholder="Pick a date"
-              value-format="yyyy-MM-dd"
-              style="width: 250px"
-              :picker-options="dateOptions"
-              clearable
-          />
-        </el-form-item>
+<!--        <el-form-item label="date" prop="date" label-width="150px">-->
+<!--          <el-date-picker-->
+<!--              v-model="formInfo.date"-->
+<!--              type="date"-->
+<!--              placeholder="Pick a date"-->
+<!--              value-format="yyyy-MM-dd"-->
+<!--              style="width: 250px"-->
+<!--              :picker-options="dateOptions"-->
+<!--              clearable-->
+<!--          />-->
+<!--        </el-form-item>-->
 
         <el-form-item prop="startTime">
         <el-time-select
@@ -74,30 +72,26 @@
         </el-time-select>
         </el-form-item>
 
-        <el-form-item label="loc1" prop="loc1">
+        <el-form-item label="venue_id" prop="venue_id">
           <el-select
-              v-model="formInfo.loc1"
-              placeholder="department"
+              v-model="formInfo.venue_id"
+              placeholder="venue_id"
               clearable
           >
             <el-option label="--" value="none" />
-            <el-option label="Teaching Building No.1" value="Teaching-Building-No.1" />
-            <el-option label="Lecture Hall" value="Lecture-Hall" />
-            <el-option label="Research Building Lecture Hall" value="Research Building Lecture Hall" />
-            <el-option label="Library Conference Hall" value="Library Conference Hall" />
-            <el-option label="south Building" value="South Building" />
+            <el-option label="Teaching Building No.1" value="1" />
+            <el-option label="Lecture Hall" value="2" />
+            <el-option label="Research Building Lecture Hall" value="3" />
+            <el-option label="Library Conference Hall" value="4" />
+            <el-option label="south Building" value="5" />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="loc2" prop="loc2">
-          <el-input v-model="formInfo.loc2" placeholder="detail location" clearable />
+        <el-form-item label="tickets" prop="tickets">
+          <el-input v-model="formInfo.tickets" placeholder="tickets available" clearable :pattern="'^[0-9]+$'" />
         </el-form-item>
 
-        <el-form-item label="duration" prop="duration">
-          <el-input v-model="formInfo.duration" placeholder="max duration" clearable />
-        </el-form-item>
-
-        <el-form-item label="上传图片" prop="images">
+        <el-form-item label="UPLOAD IMAGE" prop="images">
           <el-upload
               action=""
               :limit="3"
@@ -111,18 +105,14 @@
           </el-upload>
         </el-form-item>
 
-        <el-form-item>
-<!--          <el-button @click="getFile" style="margin-top: 10px">-->
-<!--            <i class="el-icon-upload"></i>&nbsp;{{$i18n.t('CLICK_UPLOAD')}}-->
-<!--          </el-button>-->
-<!--          <input type="file" ref="file" style="display: none;" v-on:change="handleFileUpload($event)">-->
-          <el-upload
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :http-request="onUpload"
-          >
-            <el-button size="small" type="primary">点击上传</el-button>
-          </el-upload>
-        </el-form-item>
+<!--        <el-form-item>-->
+<!--          <el-upload-->
+<!--              action="https://jsonplaceholder.typicode.com/posts/"-->
+<!--              :http-request="onUpload"-->
+<!--          >-->
+<!--            <el-button size="small" type="primary">CLICK TO UPLOAD</el-button>-->
+<!--          </el-upload>-->
+<!--        </el-form-item>-->
 
         <el-form-item style="text-align: right;">
           <el-button type="primary" @click="submitForm('formInfo')" size="medium">confirm publish</el-button>
@@ -168,60 +158,35 @@ export default {
         startInfo:"08:00",
         endInfo:"23:00"
       },
+      activityId: 0,
       formInfoRules:{
         AcitivityName: [
           { required:true,message: "please enter activity name", trigger: "blur" },
         ],
-        roomType: [{required:true}],
-        loc1:[
-          { required:true ,message:"choose end time",trigger:blur},
-          { pattern: /^(?!none$)/, message: 'Please select a valid option', trigger: 'change' }
-        ],
-        startTime: [{required:true,message:"choose start time",trigger:blur},
-          {}],
-        endTime: [
-          { required:true,message:"choose end time",trigger:blur},
+        kind: [{required:true}],
+        venue_id:[{ required:true ,message:"venue",trigger:blur}],
+        startTime: [{required:true,message:"choose start time",trigger:blur}],
+        endTime: [{ required:true,message:"choose end time",trigger:blur},],
+        // date:[
+        //   { required:true,message:"choose end time",trigger:blur},
+        //   {
+        //     //min: "2023-10-11",
+        //     message: "please choose a date no earlier",
+        //     trigger:"blur"
+        //   }
+        // ],
+        description: [{required: false, message: "enter description", trigger: "blur" },],
+        tickets:[{required:true,message:"tickets available",trigger:"blur"},
           {
-            //min:tableItem.startTime,
-            message: "end time no earlier than startTime",
-            trigger:"blur"
-          }
-        ],
-        date:[
-          { required:true,message:"choose end time",trigger:blur},
-          {
-            //min: "2023-10-11",
-            message: "please choose a date no earlier",
-            trigger:"blur"
-          }
-        ],
-        department: [
-          { required: true, message: "请输入", trigger: "blur" },
-          {
-            pattern: /^[A-Za-z]+$/,
-            message: "letters",
-            trigger: "blur",
-          }
-        ],
-        loc2:[{required:false,message:"in",trigger:"blur"},
-          {
-            pattern: /^\d+[A-E]+$/,
-            message: "layer+room(A-E)",
+            pattern: /^\d+$/,
+            message: "number of tickets, no less than 0",
             trigger: "blur"
           }],
-        duration:[{required:true,message:"input",trigger:"blur"},
-          {
-            pattern:/^\d+$/,
-            message: "numbers",
-            trigger: "blur"
-          }],
-        description:[{required:false, message:"describe the activity",trigger:"blur"}],
-        tickets: [{required:true, trigger:"blur"}],
         deadline: [{required:true, trigger:"blur"}],
       },
       timeInfo:{
-        startTimeInfo: '08:00',
-        endTimeInfo: '08:00',
+        startTimeInfo: '2024-03-02 08:00',
+        endTimeInfo: '2024-03-03 20:00',
       },
       dateOptions: {
         disabledDate(time) {
@@ -230,9 +195,7 @@ export default {
       },
     };
   },
-  mounted() {
 
-  },
   methods: {
     // 上传文件
     onUpload (file) {
@@ -245,8 +208,6 @@ export default {
         this.$message.error(e.message)
       })
     },
-
-    // 打开文件
     getFile () {
       this.$refs.file.click()
     },
@@ -270,31 +231,19 @@ export default {
             type: "success",
           });
           //console.log(this.dialogTitle) console.log(that.formInfo)
-          const sentData={
-            activityName:this.formInfo.roomName,
-            department:this.formInfo.department,
-            roomType:this.formInfo.roomType,
-            loc1:this.formInfo.loc1,
-            loc2:this.formInfo.loc2,
-            date:this.formInfo.date,
-            startTime:this.formInfo.startTime,
-            endTime:this.formInfo.endTime,
-            duration:this.formInfo.duration,
-          }
-          const requestData={
-            name:this.formInfo.roomName,
-            kind:this.formInfo.roomType,
+          const eventData={
+            name:this.formInfo.activityName,
+            kind:this.formInfo.kind,
             description: this.formInfo.description,
-            venue_id:this.formInfo.loc1,
-            // date:this.formInfo.date,
+            venue_id:this.formInfo.venue_id,
             start_at:this.formInfo.startTime,
-            end_at:this.formInfo.endTime,
-            tickets: this.formInfo.tickets,
-            registration_deadline: this.formInfo.deadline,
+            end_at:this.formInfo.endTime, //"2021-05-21T14:00:00",
+            tickets: this.formInfo.tickets, //100 | null,
+            registration_deadline: this.formInfo.deadline, //"2021-05-21T11:00:00" | null
           }
 
           const apiUrl = `https://backend.sustech.me/api/event`;
-          axios.post(apiUrl,requestData)
+          axios.post(apiUrl,eventData, { timeout: 10000 })
               .then(response => {
                 const actiData = response.data;
                 this.activityId = actiData.id;
@@ -302,8 +251,7 @@ export default {
               .catch(error => {
                 console.error('failed to publish event：', error);
               })
-
-          this.$emit("pushDialogData",sentData);
+          this.$emit("pushDialogData",eventData);
           that.closeDialog(1);
         } else {
           return false;
@@ -342,7 +290,6 @@ export default {
 
     submitFormEdit(formName) {
       const that = this;
-      //const params = Object.assign(this.formInfo, {});
       that.$refs[formName].validate((valid) => {
         if (valid) {
           that.$message({
@@ -350,19 +297,18 @@ export default {
             type: "success",
           });
           //console.log(this.dialogTitle) console.log(that.formInfo)
-          const sentData={
-            roomName:this.formInfo.roomName,
-            department:this.formInfo.department,
-            roomType:this.formInfo.roomType,
-            loc1:this.formInfo.loc1,
-            loc2:this.formInfo.loc2,
-            date:this.formInfo.date,
-            startTime:this.formInfo.startTime,
-            endTime:this.formInfo.endTime,
-            duration:this.formInfo.duration,
+          const eventData={
+            name:this.formInfo.activityName,
+            kind:this.formInfo.kind,
+            description: this.formInfo.description,
+            venue_id:this.formInfo.venue_id,
+            start_at:this.formInfo.startTime,
+            end_at:this.formInfo.endTime, //"2021-05-21T14:00:00",
+            tickets: this.formInfo.tickets, //100 | null,
+            registration_deadline: this.formInfo.deadline, //"2021-05-21T11:00:00" | null
           }
-          this.$emit('editDialog',sentData)
-          this.$parent.tableData[this.$parent.editrowNum]=sentData;
+          this.$emit('editDialog',eventData)
+          this.$parent.tableData[this.$parent.editrowNum]=eventData;
           that.closeDialog(1);
         } else {
           return false;
@@ -375,7 +321,6 @@ export default {
       this.$emit("closeDialog", flag);
       this.$refs["formInfo"].resetFields();
     },
-
     clearEntry() {
       //this.formInfo="";
       this.$refs["formInfo"].resetFields();

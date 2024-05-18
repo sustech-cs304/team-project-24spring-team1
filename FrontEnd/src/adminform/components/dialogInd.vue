@@ -1,5 +1,6 @@
 <template>
-  <div class="dialog-demo" :style="{ backgroundImage:  'url(' + imgUrl + ')' }">
+  <div class="dialog-demo">
+<!--       :style="{ backgroundImage:  'url(' + imgUrl + ')' }">-->
     <p class="title"> Activity Management </p>
     <el-row style="margin-top: 25px;margin-bottom: 10px">
       <base-button type="primary" @click="addItem" size="medium">PUBLISH</base-button>
@@ -14,20 +15,18 @@
         :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
         :page-size="5" stripe pagination
         class="storeTable"
-        style="width: 100%; margin-top: 35px;"
+        style="width: 100%; margin-top: 30px;"
         @selection-change="handleSelectionChange"
     >
       <!--"v-for="item in tableItem" :key="checked"-->
-      <el-table-column label="select" width="70" type="selection"></el-table-column>
+      <el-table-column label="select" width="100" type="selection"></el-table-column>
       <el-table-column label="activityName" prop="activityName" width="110"></el-table-column>
-      <el-table-column label="department" prop="department" width="100"></el-table-column>
-      <el-table-column label="roomType" prop="roomType" width="105"></el-table-column>
-      <el-table-column label="Date" prop="date"></el-table-column>
+      <el-table-column label="kind" prop="kind" width="105"></el-table-column>
+      <el-table-column label="venue_id" prop="venue_id" width="110"></el-table-column>
       <el-table-column label="startTime" prop="startTime" width="110"></el-table-column>
-      <el-table-column label="endTime" prop="endTime"></el-table-column>
-      <el-table-column label="location" prop="loc1" width="140"></el-table-column>
-      <el-table-column prop="loc2" label="loc_detail" width="90"></el-table-column>
-      <el-table-column label="duration" prop="duration" width="100"></el-table-column>
+      <el-table-column label="endTime" prop="endTime" width="110"></el-table-column>
+      <el-table-column label="deadline" prop="duration" width="100"></el-table-column>
+      <el-table-column label="description" prop="description" width="150"></el-table-column>
 
       <el-table-column label="operation" width="100">
         <template slot-scope="scope">
@@ -37,7 +36,6 @@
                      @click.native.prevent="deleteRow(scope.$index)" round>DEL</base-button>
         </template>
       </el-table-column>
-      <!--index需要加$-->
 
     </el-table>
 
@@ -84,30 +82,25 @@ export default {
       ifE: false,
       editrowNum:'0',
       tableData: [
-        {department:'ddd', roomType:'small', loc1:'', loc2:'4A',duration:'4'},
-        {department:'ced', roomType:'big', loc1:'', loc2:'',duration:'4'},
-        {department:'ddd', roomType:'small', loc1:'', loc2:'',duration:'6'},
-        {department:'dv', roomType:'medium', loc1:'', loc2:'',duration:'7'},
-        {department:'dvfd', roomType:'small', loc1:'', loc2:'',duration:''},
-        {department:'dd', roomType:'big', loc1:'', loc2:'',duration:''},
-        {department:'defv', roomType:'small', loc1:'', loc2:'',duration:'8'},
+        // {activityName:'ddd', kind:'Free', venue_id:'1', description:'4'},
+        // {activityName:'ddd', kind:'Free', venue_id:'3', description:'4'},
       ],
       tableItem: {
         activityName:'',
-        department:'',
-        roomType:'',
-        loc1:'',
-        loc2:'',
-        date:'',
-        startTime:'08:08',
+        description:'',
+        kind:'',
+        venue_id:'',
+        startTime:'2023-03-02 08:08',
         endTime:'',
-        duration:'',
+        deadline: '',
       },
     };
   },
+
   mounted() {
     this.fetchData();
   },
+
   computed: {
     filteredTableData() {
       const startIndex = (this.currentPage - 1) * this.pageSize;
@@ -125,27 +118,26 @@ export default {
       }, 1000);
     },
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+      console.log(`${val} records per page`);
       this.currentPage = 1;
       this.pageSize = val;
     },
     //当前页改变时触发 跳转其他页
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
+      console.log(`current page: ${val}`);
       this.currentPage = val;
     },
 
     addItem() {
       this.tableItem={
         activityName:'',
-        department:'',
-          roomType:'',
-          loc1:'',
-          loc2:'',
-          date:'',
-          startTime:'',
-          endTime:'',
-          duration:'',
+        description:'',
+        kind:'',
+        venue_id:'',
+        tickets:'',
+        startTime:'',
+        endTime:'',
+        deadline:'',
       };
       this.dialogTitle = "publish";
       this.showDialog = true;
@@ -188,6 +180,7 @@ export default {
     },
     deleteRow(index){
       this.tableData.splice(index, 1);
+
     },
     handleSelectionChange(selection) {
       this.selectedRows = selection;
@@ -206,14 +199,13 @@ export default {
 </script>
 
 
+
+
 <style scoped lang="scss">
 .dialog-demo{
   position: absolute;
   padding: 50px 115px;
-  justify-content: center;
-  //top: 60%;
-  //left: 50%;
-  //transform: translate(-50%, -50%);
+  justify-content: left; // center
   .instructions {
     font-size: 20px;
     padding: 10px 0;

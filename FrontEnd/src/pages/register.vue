@@ -22,10 +22,16 @@
         size="medium"
       >
         <div style="padding-top: 10px">
+          <el-form-item label="enter your name" prop="name">
+            <el-col :span="10">
+              <el-input v-model="ruleForm.name" type="text" />
+            </el-col>
+          </el-form-item>
+
           <el-form-item label="email" prop="email">
             <el-col :span="10">
               <el-input
-                v-model="ruleForm.email"
+                v-model="ruleForm.sustech_id"
                 placeholder="enter your email address and click to do verification"
               />
             </el-col>
@@ -36,9 +42,9 @@
               round
               @click="sendMsg"
             >send verification code</el-button>
-
             <span class="status">{{ statusMsg }}</span>
           </el-form-item>
+
           <el-form-item label="verification" prop="code">
             <el-col :span="10">
               <el-input
@@ -48,6 +54,7 @@
               />
             </el-col>
           </el-form-item>
+
           <el-form-item label="pwd" prop="pwd">
             <el-col :span="10">
               <el-input v-model="ruleForm.pwd" type="password" />
@@ -58,6 +65,7 @@
               <el-input v-model="ruleForm.cpwd" type="password" />
             </el-col>
           </el-form-item>
+
           <el-form-item>
             <el-button
               type="primary"
@@ -88,29 +96,36 @@ export default {
       codeLoading: false,
       ruleForm: {
         sustech_id: '',
-        email: '',
+        // email: '',
+        name: '',
         code: '',
         pwd: '',
         cpwd: ''
       },
       rules: {
-        email: [{
-          required: true,
-          type: 'email',
-          message: 'please enter your email',
-          trigger: 'blur'
-        }],
-        code: [{
-          required: true,
-          type: 'string',
-          message: 'please enter verification code',
-          trigger: 'blur'
-        }],
+        // email: [{
+        //   required: true,
+        //   type: 'email',
+        //   message: 'please enter your email',
+        //   trigger: 'blur'
+        // }],
+        // code: [{
+        //   required: true,
+        //   type: 'string',
+        //   message: 'please enter verification code',
+        //   trigger: 'blur'
+        // }],
+        sustech_id: [
+          {required: true,
+          trigger: 'blur'}
+        ],
+        code:[{required:false, trigger:'blur'}],
         pwd: [{
           required: true,
           message: 'set password',
           trigger: 'blur'
-        }, { pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, message: 'contain both letters and digits, length 8-20.' }],
+        }],
+          //{ pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, message: 'contain both letters and digits, length 8-20.' }],
         cpwd: [{
           required: true,
           message: 'confirm password',
@@ -131,24 +146,24 @@ export default {
       }
     }
   },
-  mounted() {
-    const apiUrl = `https://backend.sustech.me/api/auth/register`;
-    const requestData = {
-      sustech_id: this.sustech_id,
-      name: this.userName,
-      password: this.password
-    };
-
-    axios.post(apiUrl, requestData)
-        .then(response => {
-          const userData = response.data;
-          this.token = userData.token;
-          console.log('successfully created account：', response.data);
-        })
-        .catch(error => {
-          console.error('failed to create an account：', error);
-        });
-  },
+  // mounted() {
+  //   const apiUrl = `https://backend.sustech.me/api/auth/register`;
+  //   const requestData = {
+  //     sustech_id: this.sustech_id,
+  //     name: this.userName,
+  //     password: this.password
+  //   };
+  //   axios.post(apiUrl, requestData)
+  //       .then(response => {
+  //         const userData = response.data;
+  //         this.token = userData.token;
+  //         console.log('successfully created account：', response.data);
+  //
+  //       })
+  //       .catch(error => {
+  //         console.error('failed to create an account：', error);
+  //       });
+  // },
 
   methods: {
     sendMsg: function() {
@@ -199,24 +214,33 @@ export default {
     register: function() {
       this.$refs['ruleForm'].validate((valid) => {
         if (valid) {
-          const user = {
-            code: this.ruleForm.code,
-            email: this.ruleForm.email,
-            password: encrypt(this.ruleForm.pwd)
-          }
-          register(user).then(res => {
-            console.log(res)
-            this.$message({
-              showClose: true,
-              message: 'successfully registered, linking to login page...',
-              type: 'success'
-            })
-            setTimeout(() => {
-              this.$router.push('/')
-            }, 2000)
-          }).catch(err => {
-            console.log(err.response.data.message)
-          })
+          // 发送注册请求
+          const apiUrl = `https://backend.sustech.me/api/auth/register`;
+          const userData = {
+            sustech_id: this.ruleForm.sustech_id,
+            name: this.ruleForm.userName,
+            password: this.ruleForm.password //encrypt(this.ruleForm.pwd)
+          };
+
+          axios.post(apiUrl, userData)  // register(user).then(res => {
+              .then(response => {
+                const userData = response.data;
+                this.token = userData.token;
+                console.log('successfully created account：', response.data);
+                // 注册成功后跳转到登录页面
+                this.$message({
+                  showClose: true,
+                  message: 'successfully registered, linking to login page...',
+                  type: 'success'
+                });
+                setTimeout(() => {
+                  this.$router.push('/')
+                }, 2000);
+              })
+              .catch(error => {
+                console.error('failed to create an account：', error);
+                console.log(error.response.data.message);
+              });
         }
       })
     }
@@ -225,13 +249,15 @@ export default {
 }
 </script>
 
+
+
+
+
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
 $bg: #283443;
 $light_gray: #fff;
-$cursor: #fff;
+$cursor: #b92929;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
   .register-container .el-input input {
@@ -281,7 +307,7 @@ $cursor: #fff;
 <style lang="scss" scoped>
 $bg: #2d3a4b;
 $dark_gray: #889aa4;
-$light_gray: #eee;
+$light_gray: #311b1b;
 
 body {
   min-height: 100%;
@@ -290,7 +316,7 @@ body {
   overflow: hidden;
 
   .header {
-    border-bottom: 2px solid rgb(235, 232, 232);
+    border-bottom: 2px solid rgb(26, 140, 140);
     min-width: 980px;
     color: #666;
 
@@ -332,7 +358,7 @@ body {
   .tips {
     float: right;
     font-size: 14px;
-    color: #fff;
+    color: #7c1d1d;
     margin-bottom: 20px;
 
     span {

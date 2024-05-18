@@ -95,32 +95,6 @@ export default {
       immediate: true
     }
   },
-
-  mounted() {
-    const apiUrl = `https://backend.sustech.me/api/auth/login`;
-    const requestData = {
-      sustech_id: this.userName,
-      password: this.password
-    };
-
-    axios.post(apiUrl, requestData)
-        .then(response => {
-          const userData = response.data;
-          this.token = userData.token;
-          this.account_id = userData.account_id;
-          console.log('successfully logged in：', response.data);
-          let path= '/Dashboard/dashboard';
-          if (this.ifAdmin) {
-            path = '/admin/publish';
-          }
-          this.$router.push({ path: path })
-        })
-        .catch(error => {
-          console.error('login failed ：', error);
-        });
-
-  },
-
   methods: {
     showPwd() {
       if (this.passwordType === 'password') {
@@ -134,16 +108,31 @@ export default {
     },
 
     handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          let path= '/Dashboard/dashboard';
-          if (this.ifAdmin) {
-            path = '/admin/publish';
-          }
-          this.$router.push({ path: path })
-        }
-      })
+      const apiUrl = `https://backend.sustech.me/api/auth/login`;
+      const requestData = {
+        sustech_id: this.userName,
+        password: this.password
+      };
 
+      axios.post(apiUrl, requestData)
+          .then(response => {
+            const userData = response.data;
+            this.token = userData.token;
+            this.account_id = userData.account_id;
+            console.log('successfully logged in：', response.data);
+            this.$refs.loginForm.validate(valid => {
+              if (valid) {
+                let path= '/Dashboard/dashboard';
+                if (this.ifAdmin) {
+                  path = '/admin/publish';
+                }
+                this.$router.push({ path: path })
+              }
+            })
+          })
+          .catch(error => {
+            console.error('login failed ：', error);
+          });
     }
   }
 }
