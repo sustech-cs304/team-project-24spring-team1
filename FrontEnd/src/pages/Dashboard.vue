@@ -38,7 +38,7 @@
               <p class="card-text" style="display: inline-block;">{{ event.venue.name }}</p>
             </div>
             <br>
-            <base-button tag="a" simple type="primary" :href="getEventUrlPath(index)" role="button" aria-pressed="true"
+            <base-button tag="a" simple type="primary" :href="getEventUrlPath(event.id)" role="button" aria-pressed="true"
                          class="animation-on-hover btn-center"> Event Detail
             </base-button>
           </card>
@@ -144,7 +144,7 @@ export default {
       return `events/${index + 1}/1.jpg`;
     },
     getEventUrlPath(index) {
-      return `#/event/${index + 1}`;
+      return `#/event/${index}`;
       // return `#/dashboard/event/${index+1}`;
     },
   },
