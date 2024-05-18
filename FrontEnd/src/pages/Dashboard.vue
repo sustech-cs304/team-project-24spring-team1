@@ -30,12 +30,12 @@
             <div>
               <i class="tim-icons icon-time-alarm" style="display: inline-block;"></i>
               <span style="margin-left: 10px;"></span>
-              <p class="card-text" style="display: inline-block;">{{ event.start_at - event.end_at}}</p>
+              <p class="card-text" style="display: inline-block;">{{ event.start_at}}</p>
             </div>
             <div>
               <i class="tim-icons icon-square-pin" style="display: inline-block;"></i>
               <span style="margin-left: 10px;"></span>
-              <p class="card-text" style="display: inline-block;">{{ event.location }}</p>
+              <p class="card-text" style="display: inline-block;">{{ event.venue.name }}</p>
             </div>
             <br>
             <base-button tag="a" simple type="primary" :href="getEventUrlPath(index)" role="button" aria-pressed="true"
@@ -155,7 +155,7 @@ export default {
       this.$rtl.enableRTL();
     }
     const list_event_api = 'https://backend.sustech.me/api/event'
-    axios.get(apiUrl, {
+    axios.get(list_event_api, {
       headers: {
       }
     })
