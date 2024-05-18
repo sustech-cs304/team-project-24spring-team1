@@ -7,9 +7,10 @@
           <card type="nav-tabs" class="text-left" style="width: 70rem; left: 11rem">
             <div v-if="error" class="error">{{ error }}</div>
             <div v-else>
-              <div slot="header" class="card-header-primary">
-                EventID: {{ getEventID() }}
-              </div>
+<!--              <div slot="header" class="card-header-primary">-->
+<!--                EventID: {{ getEventID() }}-->
+<!--              </div>-->
+              <br>
               <div class="d-flex">
                 <div class="col">
                   <card class="card" style="width: 30rem;">
@@ -19,40 +20,45 @@
                 </div>
                 <div class="col">
                   <div>
-                    <h2 class="card-title">Theme: {{ event.title }}</h2>
+                    <h2 class="card-title">Theme: {{ event.name }}</h2>
                     <div>
-                      <base-button class="animation-on-hover" simple type="primary">Classification: {{ event.classification }}</base-button>
+                      <base-button class="animation-on-hover" simple type="primary">{{ event.kind }}</base-button>
                     </div>
                     <br>
                     <div>
                       <i class="tim-icons icon-time-alarm" style="display: inline-block;"></i>
                       <span style="margin-left: 10px;"></span>
-                      <p class="card-text" style="display: inline-block;">{{ event.time }}</p>
+                      <p class="card-text" style="display: inline-block;">{{ event.start_at }} - {{ event.end_at }}</p>
                     </div>
                     <div>
                       <i class="tim-icons icon-square-pin" style="display: inline-block;"></i>
                       <span style="margin-left: 10px;"></span>
-                      <p class="card-text" style="display: inline-block;">{{ event.location }}</p>
+                      <p class="card-text" style="display: inline-block;">{{ event.venue.name }}</p>
                     </div>
                     <div>
                       <i class="tim-icons icon-bank" style="display: inline-block;"></i>
                       <span style="margin-left: 10px;"></span>
-                      <p class="card-text" style="display: inline-block;">{{ event.holder }}</p>
+                      <p class="card-text" style="display: inline-block;">{{ event.organizer.name }}</p>
                     </div>
+                    <br>
+                    <div>
+                      <h4 class="card-text" style="display: inline-block;">Tickets Left: {{event.tickets}}</h4>
+                    </div>
+
                     <br>
                     <div>
                       <base-button class="animation-on-hover" type="primary">Reserve</base-button>
                     </div>
 
-                    <card type="nav-tabs">
-                      <div slot="header" class="card-header-success">
-                        Content
-                      </div>
-                      <blockquote class="blockquote mb-0">
-                        <p>{{ event.content }}</p>
-                        <footer class="blockquote-footer">Hold by <cite title="Source Title">{{ event.holder }}</cite></footer>
-                      </blockquote>
-                    </card>
+<!--                    <card type="nav-tabs">-->
+<!--                      <div slot="header" class="card-header-success">-->
+<!--                        Content-->
+<!--                      </div>-->
+<!--                      <blockquote class="blockquote mb-0">-->
+<!--                        <p>{{ event.description }}</p>-->
+<!--                        <footer class="blockquote-footer">Hold by <cite title="Source Title">{{ event.organizer.name }}</cite></footer>-->
+<!--                      </blockquote>-->
+<!--                    </card>-->
                   </div>
                 </div>
               </div>
@@ -61,8 +67,8 @@
 
               <br>
               <div class>
-                <h2 class="card-title text-center">Event Introduction</h2>
-                <p class>{{event.introduction}}</p>
+                <h2 class="card-title text-center">Event Description</h2>
+                <p class>{{event.description}}</p>
               </div>
 
               <div class="dropdown-divider"></div>
@@ -89,8 +95,6 @@
               </div>
 
             </div>
-
-
           </card>
         </div>
       </fade-transition>
@@ -100,6 +104,7 @@
 
 <script>
 import TopNavbar from "@/layout/dashboard/TopNavbar.vue";
+import axios from "axios";
 export default {
   components: {
     TopNavbar,
@@ -120,21 +125,18 @@ export default {
     getEventID(){
       return this.eventId;
     },
-    fetchEventData(eventId) {
-      const url = `events/${eventId}/config.json`;
-      fetch(url)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`Network response was not ok. Status: ${response.status} ${response.statusText}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          this.event = data;
-        })
-        .catch(error => {
-          this.error = `Error fetching event data: ${error.message}`;
-        });
+    fetchEventData(eventId){
+      const url = `https://backend.sustech.me/api/event/${eventId}`;
+      axios.get(url, {
+        headers: {
+        }
+      })
+          .then(response => {
+            this.event = response.data;
+          })
+          .catch(error => {
+            console.error('Error fetching profile data:', error);
+          });
     },
   }
 };

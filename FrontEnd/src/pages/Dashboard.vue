@@ -23,29 +23,30 @@
 
     <div class="row">
       <div class="row">
-        <div v-for="(card, index) in events" :key="index" class="col-lg-4 mb-4" :class="{ 'text-right': false }">
+        <div v-for="(event, index) in events" :key="index" class="col-lg-4 mb-4" :class="{ 'text-right': false }">
           <card style="width: 23rem; margin-left: 10px">
-            <img slot="image" class="card-img-top" :src="getEventImagePath(index)" :alt="card.title" style="width: 60rem; height: 16rem;" />
-            <h4 class="card-title">{{ card.title }}</h4>
+<!--            <img slot="image" class="card-img-top" :src="getEventImagePath(index)" :alt="event.title" style="width: 60rem; height: 16rem;" />-->
+            <h4 class="card-title">{{ event.name }}</h4>
             <div>
               <i class="tim-icons icon-time-alarm" style="display: inline-block;"></i>
               <span style="margin-left: 10px;"></span>
-              <p class="card-text" style="display: inline-block;">{{ card.time }}</p>
+              <p class="card-text" style="display: inline-block;">{{ event.start_at}}</p>
             </div>
             <div>
               <i class="tim-icons icon-square-pin" style="display: inline-block;"></i>
               <span style="margin-left: 10px;"></span>
-              <p class="card-text" style="display: inline-block;">{{ card.location }}</p>
+              <p class="card-text" style="display: inline-block;">{{ event.venue.name }}</p>
             </div>
             <br>
-            <base-button tag="a" simple type="primary" :href="getEventUrlPath(index)" role="button" aria-pressed="true"
-              class="animation-on-hover btn-center"> Event Detail
+            <base-button tag="a" simple type="primary" :href="getEventUrlPath(event.id)" role="button" aria-pressed="true"
+                         class="animation-on-hover btn-center"> Event Detail
             </base-button>
           </card>
         </div>
+      </div>
     </div>
 
-  </div>
+
   </div>
 </template>
 
@@ -69,6 +70,7 @@ import UserTable from "./Dashboard/UserTable";
 import config from "@/config";
 import {BaseCheckbox} from "@/components";
 import Event from '@/pages/Event/Event.vue';
+import axios from "axios";
 
 export default {
   components: {
@@ -82,56 +84,43 @@ export default {
   data() {
     return {
       filters: [
-        {label: "Lecture", checked: false},
-        {label: "Concert", checked: false},
-        {label: "Competition", checked: false},
-        {label: "Social", checked: false},
-        {label: "Volunteering", checked: false},
+        {label: "show", checked: false},
+        {label: "lecture", checked: false},
+        {label: "competition", checked: false},
       ],
-      events: [
-        {
-          title: 'Card 1',
-          time: '07-29 08:00 ～ 07-31 18:00',
-          location: 'Lecture Hall 1',
-          description: 'Description for Card 1',
-          link: '#'
-        },
-        {
-          title: 'Card 2',
-          time: '07-29 08:00 ～ 07-31 18:00',
-          location: 'Lecture Hall 1',
-          description: 'Description for Card 2',
-          link: '#'
-        },
-        {
-          title: 'Card 3',
-          time: '07-29 08:00 ～ 07-31 18:00',
-          location: 'Lecture Hall 1',
-          description: 'Description for Card 3',
-          link: '#'
-        },
-        {
-          title: 'Card 4',
-          time: '07-29 08:00 ～ 07-31 18:00',
-          location: 'Lecture Hall 1',
-          description: 'Description for Card 4',
-          link: '#'
-        },
-        {
-          title: 'Card 5',
-          time: '07-29 08:00 ～ 07-31 18:00',
-          location: 'Lecture Hall 1',
-          description: 'Description for Card 5',
-          link: '#'
-        },
-        {
-          title: 'Card 6',
-          time: '07-29 08:00 ～ 07-31 18:00',
-          location: 'Lecture Hall 1',
-          description: 'Description for Card 6',
-          link: '#'
-        },
-      ],
+      // events: [
+      //   {
+      //     title: 'Card 1',
+      //     description: 'Description for Card 1',
+      //     link: '#'
+      //   },
+      //   {
+      //     title: 'Card 2',
+      //     description: 'Description for Card 2',
+      //     link: '#'
+      //   },
+      //   {
+      //     title: 'Card 3',
+      //     description: 'Description for Card 3',
+      //     link: '#'
+      //   },
+      //   {
+      //     title: 'Card 4',
+      //     description: 'Description for Card 4',
+      //     link: '#'
+      //   },
+      //   {
+      //     title: 'Card 5',
+      //     description: 'Description for Card 5',
+      //     link: '#'
+      //   },
+      //   {
+      //     title: 'Card 6',
+      //     description: 'Description for Card 6',
+      //     link: '#'
+      //   },
+      // ],
+      events: [],
     };
   },
   computed: {
@@ -140,9 +129,6 @@ export default {
     },
     isRTL() {
       return this.$rtl.isRTL;
-    },
-    bigLineChartCategories() {
-      return this.$t("dashboard.chartCategories");
     },
   },
   methods: {
@@ -158,46 +144,8 @@ export default {
       return `events/${index + 1}/1.jpg`;
     },
     getEventUrlPath(index) {
-      return `#/event/${index + 1}`;
+      return `#/event/${index}`;
       // return `#/dashboard/event/${index+1}`;
-    },
-    initBigChart(index) {
-      let chartData = {
-        datasets: [
-          {
-            fill: true,
-            borderColor: config.colors.primary,
-            borderWidth: 2,
-            borderDash: [],
-            borderDashOffset: 0.0,
-            pointBackgroundColor: config.colors.primary,
-            pointBorderColor: "rgba(255,255,255,0)",
-            pointHoverBackgroundColor: config.colors.primary,
-            pointBorderWidth: 20,
-            pointHoverRadius: 4,
-            pointHoverBorderWidth: 15,
-            pointRadius: 4,
-            data: this.bigLineChart.allData[index],
-          },
-        ],
-        labels: [
-          "JAN",
-          "FEB",
-          "MAR",
-          "APR",
-          "MAY",
-          "JUN",
-          "JUL",
-          "AUG",
-          "SEP",
-          "OCT",
-          "NOV",
-          "DEC",
-        ],
-      };
-      this.$refs.bigChart.updateGradients(chartData);
-      this.bigLineChart.chartData = chartData;
-      this.bigLineChart.activeIndex = index;
     },
   },
   mounted() {
@@ -206,8 +154,20 @@ export default {
       this.i18n.locale = "ar";
       this.$rtl.enableRTL();
     }
-    this.initBigChart(0);
+    const list_event_api = 'https://backend.sustech.me/api/event'
+    axios.get(list_event_api, {
+      headers: {
+      }
+    })
+        .then(response => {
+          const eventData = response.data;
+          this.events = eventData.events;
+        })
+        .catch(error => {
+          console.error('Error fetching profile data:', error);
+        });
   },
+
   beforeDestroy() {
     if (this.$rtl.isRTL) {
       this.i18n.locale = "en";
