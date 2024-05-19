@@ -20,7 +20,7 @@
                 </div>
                 <div class="col">
                   <div>
-                    <h2 class="card-title">Theme: {{ event.name }}</h2>
+                    <h2 class="card-title">{{ event.name }}</h2>
                     <div>
                       <base-button class="animation-on-hover" simple type="primary">{{ event.kind }}</base-button>
                     </div>
@@ -30,13 +30,15 @@
                       <span style="margin-left: 10px;"></span>
                       <p class="card-text" style="display: inline-block;">{{ event.start_at }} - {{ event.end_at }}</p>
                     </div>
+
                     <div>
                       <i class="tim-icons icon-square-pin" style="display: inline-block;"></i>
                       <span style="margin-left: 10px;"></span>
                       <p class="card-text" style="display: inline-block;">{{ event.venue.name }}</p>
                     </div>
+
                     <div>
-                      <i class="tim-icons icon-bank" style="display: inline-block;"></i>
+                      <i class="tim-icons icon-single-02" style="display: inline-block;"></i>
                       <span style="margin-left: 10px;"></span>
                       <p class="card-text" style="display: inline-block;">{{ event.organizer.name }}</p>
                     </div>
@@ -47,7 +49,7 @@
 
                     <br>
                     <div>
-                      <base-button class="animation-on-hover" type="primary">Reserve</base-button>
+                      <base-button class="animation-on-hover" type="primary" @click="registerForEvent">Register</base-button>
                     </div>
 
 <!--                    <card type="nav-tabs">-->
@@ -79,13 +81,13 @@
               </div>
               <card>
                 <div style="display: flex; align-items: center;">
-                  <input type="text" class="form-control" placeholder="Comment here..." style="color: black;">
-                  <base-button class="animation-on-hover" type="success" style="margin-left: 10px;">Comment</base-button>
+                  <input type="text" class="form-control" v-model="newComment" placeholder="Comment here..." style="color: black;">
+                  <base-button class="animation-on-hover" type="success" style="margin-left: 10px;" @click="submitComment">Comment</base-button>
                 </div>
               </card>
 
               <div>
-                <div v-for="(comment, cIndex) in event.comments" :key="cIndex">
+                <div v-for="(comment, cIndex) in comments" :key="cIndex">
                   <card class="mb-3">
                     <h4 class="card-title">{{ comment.username }}</h4>
                     <p class="card-text">{{ comment.comment }}</p>
@@ -114,11 +116,14 @@ export default {
       eventId: null,
       event: {},
       error: null,
+      comments: [],
+      newComment: '', // 用于存储新评论的内容
     };
   },
   mounted() {
     this.eventId = this.$route.params.id;
     this.fetchEventData(this.eventId);
+    this.getComments();
   },
 
   methods: {
@@ -135,7 +140,62 @@ export default {
             this.event = response.data;
           })
           .catch(error => {
-            console.error('Error fetching profile data:', error);
+            console.error('Error fetching event data:', error);
+          });
+    },
+
+
+    registerForEvent() {
+      const apiUrl = `https://backend.sustech.me/api/event/${this.eventId}/register`;
+      this.token = localStorage.getItem('token');
+      if (!this.token) {
+        console.log("Token not found.");
+        return;
+      }
+
+      axios.post(apiUrl, {}, {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      })
+          .then(response => {
+            // Handle successful registration
+            alert('Successfully registered for the event.');
+          })
+          .catch(error => {
+            console.error('Error Register:', error);
+          });
+    },
+
+    submitComment() {
+      const commentUrl = `https://backend.sustech.me/api/event/${this.eventId}/comment`;
+      const commentData = {
+        content: this.newComment
+      };
+
+      axios.post(commentUrl, commentData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+          .then(response => {
+            // Handle successful comment submission
+            alert('Comment submitted successfully.');
+            this.newComment = ''; // Clear the comment input
+            this.getComments(); // Refresh the comments list
+          })
+          .catch(error => {
+            console.error('Error submitting comment:', error);
+          });
+    },
+    getComments() {
+      const commentUrl = `https://backend.sustech.me/api/event/${this.eventId}/comment`;
+      axios.get(commentUrl)
+          .then(response => {
+            this.comments = response.data;
+          })
+          .catch(error => {
+            console.error('Error fetching comments:', error);
           });
     },
   }

@@ -10,7 +10,7 @@
                 :key="index"
                 :style="filterStyles(index)"
             >
-              <BaseCheckbox v-model="filter.checked" :id="'filter' + index">
+              <BaseCheckbox v-model="filter.checked" :id="'filter' + index" @change="applyFilters">
                 {{ filter.label }}
               </BaseCheckbox>
             </div>
@@ -22,26 +22,28 @@
     </div>
 
     <div class="row">
-      <div class="row">
-        <div v-for="(event, index) in events" :key="index" class="col-lg-4 mb-4" :class="{ 'text-right': false }">
-          <card style="width: 23rem; margin-left: 10px">
-<!--            <img slot="image" class="card-img-top" :src="getEventImagePath(index)" :alt="event.title" style="width: 60rem; height: 16rem;" />-->
-            <h4 class="card-title">{{ event.name }}</h4>
-            <div>
-              <i class="tim-icons icon-time-alarm" style="display: inline-block;"></i>
-              <span style="margin-left: 10px;"></span>
-              <p class="card-text" style="display: inline-block;">{{ event.start_at}}</p>
-            </div>
-            <div>
-              <i class="tim-icons icon-square-pin" style="display: inline-block;"></i>
-              <span style="margin-left: 10px;"></span>
-              <p class="card-text" style="display: inline-block;">{{ event.venue.name }}</p>
-            </div>
-            <br>
-            <base-button tag="a" simple type="primary" :href="getEventUrlPath(event.id)" role="button" aria-pressed="true"
-                         class="animation-on-hover btn-center"> Event Detail
-            </base-button>
-          </card>
+      <div class="col-12">
+        <div class="row">
+          <div v-for="(event, index) in events" :key="index" class="col-lg-4 mb-4" :class="{ 'text-right': false }">
+            <card style="width: 23rem; margin-left: 10px">
+  <!--            <img slot="image" class="card-img-top" :src="getEventImagePath(index)" :alt="event.title" style="width: 60rem; height: 16rem;" />-->
+              <h4 class="card-title">{{ event.name }}</h4>
+              <div>
+                <i class="tim-icons icon-time-alarm" style="display: inline-block;"></i>
+                <span style="margin-left: 10px;"></span>
+                <p class="card-text" style="display: inline-block;">{{ event.start_at}}</p>
+              </div>
+              <div>
+                <i class="tim-icons icon-square-pin" style="display: inline-block;"></i>
+                <span style="margin-left: 10px;"></span>
+                <p class="card-text" style="display: inline-block;">{{ event.venue.name }}</p>
+              </div>
+              <br>
+              <base-button tag="a" simple type="primary" :href="getEventUrlPath(event.id)" role="button" aria-pressed="true"
+                           class="animation-on-hover btn-center"> Event Detail
+              </base-button>
+            </card>
+          </div>
         </div>
       </div>
     </div>
@@ -88,38 +90,6 @@ export default {
         {label: "lecture", checked: false},
         {label: "competition", checked: false},
       ],
-      // events: [
-      //   {
-      //     title: 'Card 1',
-      //     description: 'Description for Card 1',
-      //     link: '#'
-      //   },
-      //   {
-      //     title: 'Card 2',
-      //     description: 'Description for Card 2',
-      //     link: '#'
-      //   },
-      //   {
-      //     title: 'Card 3',
-      //     description: 'Description for Card 3',
-      //     link: '#'
-      //   },
-      //   {
-      //     title: 'Card 4',
-      //     description: 'Description for Card 4',
-      //     link: '#'
-      //   },
-      //   {
-      //     title: 'Card 5',
-      //     description: 'Description for Card 5',
-      //     link: '#'
-      //   },
-      //   {
-      //     title: 'Card 6',
-      //     description: 'Description for Card 6',
-      //     link: '#'
-      //   },
-      // ],
       events: [],
     };
   },
@@ -145,7 +115,27 @@ export default {
     },
     getEventUrlPath(index) {
       return `#/event/${index}`;
-      // return `#/dashboard/event/${index+1}`;
+    },
+    fetchEvents(kind) {
+      const url = 'https://backend.sustech.me/api/event';
+
+      axios.get(url,{
+        params:{
+          kind: kind
+        }
+      })
+          .then(response => {
+            this.events = response.data.events;
+          })
+          .catch(error => {
+            console.error('Error fetching events:', error);
+            this.error = 'Error fetching events';
+          });
+    },
+    applyFilters() {
+      const selectedFilters = this.filters.filter(f => f.checked).map(f => f.value);
+      const filterParams = selectedFilters.length ? { kind: selectedFilters.join(",") } : {};
+      this.fetchEvents(filterParams);
     },
   },
   mounted() {
@@ -154,18 +144,19 @@ export default {
       this.i18n.locale = "ar";
       this.$rtl.enableRTL();
     }
-    const list_event_api = 'https://backend.sustech.me/api/event'
-    axios.get(list_event_api, {
-      headers: {
-      }
-    })
-        .then(response => {
-          const eventData = response.data;
-          this.events = eventData.events;
-        })
-        .catch(error => {
-          console.error('Error fetching profile data:', error);
-        });
+    this.fetchEvents();
+    // const list_event_api = 'https://backend.sustech.me/api/event'
+    // axios.get(list_event_api, {
+    //   headers: {
+    //   }
+    // })
+    //     .then(response => {
+    //       const eventData = response.data;
+    //       this.events = eventData.events;
+    //     })
+    //     .catch(error => {
+    //       console.error('Error fetching profile data:', error);
+    //     });
   },
 
   beforeDestroy() {
