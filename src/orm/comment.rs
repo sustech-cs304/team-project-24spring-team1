@@ -1,5 +1,5 @@
 use chrono::prelude::*;
-use diesel::dsl::{AsSelect, Asc, Eq, Filter, Find, InnerJoin, Order, Select};
+use diesel::dsl::{AsSelect, Eq, Filter, Find, InnerJoin, Select};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::query_builder::InsertStatement;
@@ -44,14 +44,13 @@ type Table = comments::table;
 
 type RawAll = Select<Table, AsSelect<Comment, Pg>>;
 type All = Filter<RawAll, Eq<comments::is_deleted, bool>>;
-type AllOrdered = Order<All, Asc<comments::id>>;
-type JoinAccount = InnerJoin<AllOrdered, accounts::table>;
+type JoinAccount = InnerJoin<All, accounts::table>;
 type UpdateAll = Update<Table>;
 type WithId = Eq<comments::id, i32>;
 type WithEventId = Eq<comments::event_id, i32>;
 type FindId = Find<All, i32>;
 
-type ByEventId = Filter<AllOrdered, WithEventId>;
+type ByEventId = Filter<All, WithEventId>;
 type ByEventIdDisplay = Filter<JoinAccount, WithEventId>;
 type UpdateId = Filter<UpdateAll, WithId>;
 
@@ -62,19 +61,12 @@ impl Comment {
             .filter(comments::is_deleted.eq(false))
     }
 
-    pub fn all_ordered() -> AllOrdered {
-        comments::table
-            .select(Comment::as_select())
-            .filter(comments::is_deleted.eq(false))
-            .order(comments::id.asc())
-    }
-
     pub fn by_event_id(event_id: i32) -> ByEventId {
-        Self::all_ordered().filter(comments::event_id.eq(event_id))
+        Self::all().filter(comments::event_id.eq(event_id))
     }
 
     pub fn by_event_id_as_display(event_id: i32) -> ByEventIdDisplay {
-        Self::all_ordered()
+        Self::all()
             .inner_join(accounts::table)
             .filter(comments::event_id.eq(event_id))
     }
