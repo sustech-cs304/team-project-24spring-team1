@@ -1,4 +1,5 @@
 <template>
+  <!-- 显示的大表格 -->
   <div class="dialog-demo">
 <!--       :style="{ backgroundImage:  'url(' + imgUrl + ')' }">-->
     <p class="title"> Activity Management </p>
@@ -19,13 +20,15 @@
         @selection-change="handleSelectionChange"
     >
       <!--"v-for="item in tableItem" :key="checked"-->
+
       <el-table-column label="select" width="100" type="selection"></el-table-column>
+      <el-table-column label="id" prop="id" width="80"></el-table-column>
       <el-table-column label="activityName" prop="activityName" width="110"></el-table-column>
       <el-table-column label="kind" prop="kind" width="105"></el-table-column>
       <el-table-column label="venue_id" prop="venue_id" width="110"></el-table-column>
       <el-table-column label="startTime" prop="startTime" width="110"></el-table-column>
       <el-table-column label="endTime" prop="endTime" width="110"></el-table-column>
-      <el-table-column label="deadline" prop="duration" width="100"></el-table-column>
+<!--      <el-table-column label="deadline" prop="duration" width="100"></el-table-column>-->
       <el-table-column label="description" prop="description" width="150"></el-table-column>
 
       <el-table-column label="operation" width="100">
@@ -33,7 +36,7 @@
           <base-button type="primary" size=sm id="editBtn"
                      @click.native.prevent="editRow(scope.$index,scope.row)" round>EDIT</base-button>
           <base-button type="primary" size=sm id="deleteBtn" style="background-color: red"
-                     @click.native.prevent="deleteRow(scope.$index)" round>DEL</base-button>
+                     @click.native.prevent="deleteRow(scope.$index,true)" round>DEL</base-button>
         </template>
       </el-table-column>
 
@@ -68,6 +71,8 @@
 
 <script>
 import DialogComponent from "@/adminform/components/dialogComponent.vue";
+import axios from "axios";
+import event from "@/pages/Event/Event.vue";
 
 export default {
   name: "DialogDemo",
@@ -89,10 +94,11 @@ export default {
         activityName:'',
         description:'',
         kind:'',
-        venue_id:'',
+        venue_id:0,
         startTime:'2023-03-02 08:08',
         endTime:'',
         deadline: '',
+        id: 0,
       },
     };
   },
@@ -100,7 +106,6 @@ export default {
   mounted() {
     this.fetchData();
   },
-
   computed: {
     filteredTableData() {
       const startIndex = (this.currentPage - 1) * this.pageSize;
@@ -108,14 +113,38 @@ export default {
       return this.tableData.slice(startIndex, endIndex);
     }
   },
+
   methods: {
     fetchData() {
       const that = this;
       that.tableLoading = true;
-      console.log(this.tableData)
       setTimeout(() => {
         that.tableLoading = false;
       }, 1000);
+      const apiUrl = "https://backend.sustech.me/api/event"
+      axios.get(apiUrl, {timeout: 3000})
+          .then(response => {
+            const events = response.data.events;
+            this.tableData = [];
+            for (const event of events) {
+              let get_event = {};
+              get_event.id = event.id;
+              get_event.activityName = event.name;
+              get_event.kind = event.kind;
+              get_event.description = event.description;
+              get_event.startTime = event.start_at;
+              get_event.endTime = event.end_at; //string
+              get_event.venue_id = event.venue.id; //string
+              get_event.tickets = event.tickets;
+              get_event.deadline = event.registeration_deadline;
+              // console.log("event: ",event);
+              this.tableData.push(get_event);
+            }
+          })
+          .catch(error => {
+            console.error('failed to init activities：', error);
+            this.showFailMessage(`活动初始化失败`);
+          })
     },
     handleSizeChange(val) {
       console.log(`${val} records per page`);
@@ -138,6 +167,7 @@ export default {
         startTime:'',
         endTime:'',
         deadline:'',
+        id:'',
       };
       this.dialogTitle = "publish";
       this.showDialog = true;
@@ -161,7 +191,6 @@ export default {
     updateTable(data){
       this.tableData.push(data);
     },
-
     updateEdit(data){
       //this.tableData[this.editrowNum]=data;
       console.log("edit")
@@ -171,33 +200,83 @@ export default {
       });
       console.log(this.tableData)
     },
-
     closeDialog(flag) {
       if (flag) {
         this.fetchData();
       }
       this.showDialog = false;
     },
-    deleteRow(index){
-      this.tableData.splice(index, 1);
 
+    deleteRow(index,ifMsg){
+      // this.tableData.splice(index, 1);
+      const event_id = this.tableData.at(index).id;
+      const deleteUrl = `https://backend.sustech.me/api/event/${event_id}`
+      axios.delete(deleteUrl, {timeout: 3000,headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          })
+          .then(response => {
+            if (ifMsg) {
+              this.$message({
+                message: `删除成功`,
+                type: "success",
+              });
+            }
+          })
+          .catch(error => {
+            console.error('failed to delete event：', error);
+            this.showFailMessage(`删除活动失败`);
+            return false;
+          })
+      return true;
     },
+    showFailMessage(message) {
+      this.Message = message;
+      this.$message({
+        message: this.Message,
+        type: 'error'
+      });
+    },
+
     handleSelectionChange(selection) {
       this.selectedRows = selection;
     },
     deleteSelectedRows() {
       const indices = this.selectedRows.map(row => this.tableData.indexOf(row));
-      if (indices.length > 0) {
-        this.tableData = this.tableData.filter((_, index) => !indices.includes(index));
+      // if (indices.length > 0) {
+      //   this.tableData = this.tableData.filter((_, index) => !indices.includes(index));
+      // }
+      let check = true;
+      for (const idx of indices){
+        check = check && this.deleteRow(idx,false);
+      }
+      if (check) {
+        this.showSuccessMessage(`删除选择部分活动成功`);
+      }else{
+        this.showFailMessage(`不能删除非您发布的活动`);
       }
     },
-    deleteAllRows() {
-      this.tableData = [];
+    showSuccessMessage(message) {
+      this.successMessage = message;
+      this.$message({
+        message: this.successMessage,
+        type: 'success'
+      });
     },
+    deleteAllRows() {
+      // this.tableData = [];
+      let check = true;
+      for (let i = 0; i < this.tableData.length; i++) {
+        check= check && this.deleteRow(i, false);
+      }
+      if (!check) {
+        this.showFailMessage(`不能删除非您发布的活动`);
+      }
+    },
+
   },
 };
 </script>
-
 
 
 <style scoped lang="scss">

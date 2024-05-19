@@ -1,4 +1,5 @@
 <template>
+  <!-- 编辑活动的窗口 -->
   <transition name="dialog-fade">
     <el-dialog
         v-if="showDialog"
@@ -170,13 +171,8 @@ export default {
     return {
       showDialog: false,
       formInfo: JSON.parse(JSON.stringify(this.itemInfo)),
-      param:{
-        startInfo:"08:00",
-        endInfo:"23:00"
-      },
-      activityId: 0,
       formInfoRules:{
-        AcitivityName: [
+        acitivityName: [
           { required:true,message: "please enter activity name", trigger: "blur" },
         ],
         kind: [{required:true}],
@@ -234,25 +230,24 @@ export default {
                 }
               })
               .then(response => {
-                this.activityId = response.data.id;
                 that.$message({
                   message: "发布成功",
                   type: "success",
                 });
+                this.$emit("pushDialogData",eventData);
+                eventData.id = response.data.id;
               })
               .catch(error => {
-                console.error("data:", eventData);
                 console.error('failed to publish event：', error);
                 this.showFailMessage(`发布活动失败`);
               })
-          this.$emit("pushDialogData",eventData);
           that.closeDialog(1);
         } else {
           return false;
         }
-
       });
     },
+
     showSuccessMessage(message) {
       this.successMessage = message;
       this.$message({
@@ -271,7 +266,7 @@ export default {
       this.fileList = this.fileList.filter(item => item.uid !== file.uid);
     },
     handleExceed() {
-      this.msgError("最多只能传3张照片");
+      this.showFailMessage("最多只能传3张照片");
     },
     beforeUpload(file) {
       const isJPG = file.type === "image/jpeg" || file.type == "image/png";
@@ -298,30 +293,55 @@ export default {
 
     submitFormEdit(formName) {
       const that = this;
+      //const params = Object.assign(this.formInfo, {});
       that.$refs[formName].validate((valid) => {
         if (valid) {
-          that.$message({
-            message: "success！",
-            type: "success",
-          });
           //console.log(this.dialogTitle) console.log(that.formInfo)
+          const start_iso = new Date(this.formInfo.startTime).toISOString();
+          const end_iso = new Date(this.formInfo.endTime).toISOString();
+          const deadline_iso = new Date(this.formInfo.deadline).toISOString();
           const eventData={
             name:this.formInfo.activityName,
             kind:this.formInfo.kind,
             description: this.formInfo.description,
-            venue_id:this.formInfo.venue_id,
-            start_at:this.formInfo.startTime,
-            end_at:this.formInfo.endTime, //"2021-05-21T14:00:00",
-            tickets: this.formInfo.tickets, //100 | null,
-            registration_deadline: this.formInfo.deadline, //"2021-05-21T11:00:00" | null
+            venue_id:parseInt(this.formInfo.venue_id, 10), // 将字符串转换为i32类型 10进制
+            start_at:start_iso.substring(0, start_iso.length - 5),
+            end_at:end_iso.substring(0, end_iso.length - 5), //"2021-05-21T14:00:00",
+            tickets: parseInt(this.formInfo.tickets), //100 | null,
+            registration_deadline: deadline_iso.substring(0, start_iso.length - 5), //"2021-05-21T11:00:00" | null
           }
-          this.$emit('editDialog',eventData)
+          // this.imageUrl = `https://backend.sustech.me/uploads/${userData.avatar}.webp`;
+          this.token = localStorage.getItem('token');
+          if (!this.token) {
+            console.log("Token not found.");
+            return;
+          }
+
+          const apiUrl = `https://backend.sustech.me/api/event`;
+          axios.post(apiUrl, eventData, {timeout: 3000,headers: {
+                  Authorization: `Bearer ${this.token}`
+                }
+              })
+              .then(response => {
+                that.$message({
+                  message: "发布成功",
+                  type: "success",
+                });
+                this.$emit('editDialog',eventData)
+                eventData.id = response.data.id;
+              })
+              .catch(error => {
+                console.error('failed to publish event：', error);
+                this.showFailMessage(`发布活动失败`);
+              })
           this.$parent.tableData[this.$parent.editrowNum]=eventData;
           that.closeDialog(1);
+
         } else {
           return false;
         }
       });
+
     },
 
     closeDialog(flag) {
