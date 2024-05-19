@@ -86,12 +86,13 @@
                 </div>
               </card>
 
+
               <div>
                 <div v-for="(comment, cIndex) in comments" :key="cIndex">
                   <card class="mb-3">
-                    <h4 class="card-title">{{ comment.username }}</h4>
-                    <p class="card-text">{{ comment.comment }}</p>
-                    <p class="card-text"><small class="text-muted">{{ comment.time }}</small></p>
+                    <h4 class="card-title">{{ comment.account.name }}</h4>
+                    <p class="card-text">{{ comment.content }}</p>
+                    <p class="card-text"><small class="text-muted">{{ comment.created_at }}</small></p>
                   </card>
                 </div>
               </div>
@@ -173,9 +174,15 @@ export default {
         content: this.newComment
       };
 
+      this.token = localStorage.getItem('token');
+      if (!this.token) {
+        console.log("Token not found.");
+        return;
+      }
+
       axios.post(commentUrl, commentData, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${this.token}`
         }
       })
           .then(response => {
@@ -188,11 +195,12 @@ export default {
             console.error('Error submitting comment:', error);
           });
     },
+
     getComments() {
       const commentUrl = `https://backend.sustech.me/api/event/${this.eventId}/comment`;
       axios.get(commentUrl)
           .then(response => {
-            this.comments = response.data;
+            this.comments = response.data.comments;
           })
           .catch(error => {
             console.error('Error fetching comments:', error);
