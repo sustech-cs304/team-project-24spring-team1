@@ -122,6 +122,8 @@ export default {
           .then(response => {
             const token = response.data.token;
             const account_id = response.data.account_id;
+            localStorage.setItem('token',token);
+            localStorage.setItem('id',account_id);
             this.showSuccessMessage("登录成功");
             this.$refs.loginForm.validate(valid => {
               if (valid) {
@@ -154,7 +156,7 @@ export default {
           const response = await axios.get(`https://backend.sustech.me/api/auth/poll?identifier=${identifier}`);
           const userData = response.data;
           localStorage.setItem('id', userData.account_id);
-          localStorage.setItem('jwt_token', userData.token);
+          localStorage.setItem('token', userData.token);
           if (userData.token && userData.account_id) {
             // clearInterval(pollInterval);
             this.showSuccessMessage("登录成功");
