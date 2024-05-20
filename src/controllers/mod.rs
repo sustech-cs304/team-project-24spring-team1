@@ -6,6 +6,7 @@ use std::sync::Mutex;
 
 mod account;
 mod auth;
+mod chat;
 mod comment;
 mod event;
 mod metadata;
@@ -93,5 +94,6 @@ fn configure(cfg: &mut web::ServiceConfig) {
                 .configure(event::configure)
                 .configure(comment::configure),
         )
-        .service(web::scope("/moment").configure(moment::configure));
+        .service(web::scope("/moment").configure(moment::configure))
+        .service(web::scope("/chat").configure(chat::configure));
 }

@@ -74,13 +74,15 @@ CREATE TABLE moment_comments (
 );
 
 CREATE TABLE chats (
-    id SERIAL PRIMARY KEY NOT NULL
+    id SERIAL PRIMARY KEY NOT NULL,
+    is_group BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE chat_members (
     chat_id INT NOT NULL REFERENCES chats(id),
     account_id INT NOT NULL REFERENCES accounts(id),
-    is_group BOOLEAN NOT NULL DEFAULT FALSE,
+    last_read TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY (chat_id, account_id)
 );
 

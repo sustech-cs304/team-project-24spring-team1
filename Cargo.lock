@@ -386,6 +386,7 @@ dependencies = [
  "pretty_env_logger",
  "quick-xml",
  "regex",
+ "scoped-futures",
  "serde",
  "serde_json",
  "thiserror",

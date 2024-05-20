@@ -55,7 +55,7 @@ pub enum InternalError {
     PasswordHash(#[from] PasswordHashError),
 
     #[error("awc: SendRequest: {0}")]
-    AwcSendRequest(#[from] SendRequestError),
+    AwcSendRequest(String),
 
     #[error("awc: Payload: {0}")]
     AwcPayload(#[from] PayloadError),
@@ -143,6 +143,12 @@ impl From<DieselError> for Error {
             },
             _ => Error::Internal(InternalError::Diesel(error)),
         }
+    }
+}
+
+impl From<SendRequestError> for InternalError {
+    fn from(error: SendRequestError) -> Self {
+        InternalError::AwcSendRequest(error.to_string())
     }
 }
 

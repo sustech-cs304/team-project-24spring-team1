@@ -3,6 +3,7 @@ use diesel_async::AsyncPgConnection;
 use phf::phf_map;
 
 pub(crate) mod account;
+pub(crate) mod chat;
 pub(crate) mod comment;
 pub(crate) mod event;
 pub(crate) mod misc;

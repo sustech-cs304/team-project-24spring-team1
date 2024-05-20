@@ -35,7 +35,7 @@ diesel::table! {
     chat_members (chat_id, account_id) {
         chat_id -> Int4,
         account_id -> Int4,
-        is_group -> Bool,
+        last_read -> Timestamp,
     }
 }
 
@@ -53,6 +53,8 @@ diesel::table! {
 diesel::table! {
     chats (id) {
         id -> Int4,
+        is_group -> Bool,
+        created_at -> Timestamp,
     }
 }
 
