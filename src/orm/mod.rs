@@ -6,6 +6,8 @@ pub(crate) mod account;
 pub(crate) mod comment;
 pub(crate) mod event;
 pub(crate) mod misc;
+pub(crate) mod moment;
+pub(crate) mod moment_comment;
 pub(crate) mod schema;
 pub(crate) mod utils;
 

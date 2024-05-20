@@ -9,6 +9,7 @@ mod auth;
 mod comment;
 mod event;
 mod metadata;
+mod moment;
 
 use crate::error::Error;
 use crate::utils::auth::AuthProvider;
@@ -91,5 +92,6 @@ fn configure(cfg: &mut web::ServiceConfig) {
             web::scope("/event")
                 .configure(event::configure)
                 .configure(comment::configure),
-        );
+        )
+        .service(web::scope("/moment").configure(moment::configure));
 }

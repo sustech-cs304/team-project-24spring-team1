@@ -56,6 +56,43 @@ CREATE TABLE comments (
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE moments (
+    id SERIAL PRIMARY KEY NOT NULL,
+    account_id INT NOT NULL REFERENCES accounts(id),
+    content TEXT NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE moment_comments (
+    id SERIAL PRIMARY KEY NOT NULL,
+    account_id INT NOT NULL REFERENCES accounts(id),
+    moment_id INT NOT NULL REFERENCES moments(id),
+    content TEXT NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE chats (
+    id SERIAL PRIMARY KEY NOT NULL
+);
+
+CREATE TABLE chat_members (
+    chat_id INT NOT NULL REFERENCES chats(id),
+    account_id INT NOT NULL REFERENCES accounts(id),
+    is_group BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (chat_id, account_id)
+);
+
+CREATE TABLE chat_messages (
+    id SERIAL PRIMARY KEY NOT NULL,
+    chat_id INT NOT NULL REFERENCES chats(id),
+    account_id INT NOT NULL REFERENCES accounts(id),
+    content TEXT NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 CREATE INDEX ON events (kind);
 CREATE INDEX ON events (start_at);
 CREATE INDEX ON events (end_at);

@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize)]
 pub struct Page {
@@ -16,6 +16,11 @@ pub struct PageBuilder {
     total_item: i64,
     page_size: i64,
     current: i64,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct PaginateQuery {
+    pub page: Option<i64>,
 }
 
 impl Page {

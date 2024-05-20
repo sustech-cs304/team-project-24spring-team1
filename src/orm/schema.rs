@@ -32,6 +32,31 @@ diesel::table! {
 }
 
 diesel::table! {
+    chat_members (chat_id, account_id) {
+        chat_id -> Int4,
+        account_id -> Int4,
+        is_group -> Bool,
+    }
+}
+
+diesel::table! {
+    chat_messages (id) {
+        id -> Int4,
+        chat_id -> Int4,
+        account_id -> Int4,
+        content -> Text,
+        is_deleted -> Bool,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    chats (id) {
+        id -> Int4,
+    }
+}
+
+diesel::table! {
     comments (id) {
         id -> Int4,
         account_id -> Int4,
@@ -65,6 +90,27 @@ diesel::table! {
 }
 
 diesel::table! {
+    moment_comments (id) {
+        id -> Int4,
+        account_id -> Int4,
+        moment_id -> Int4,
+        content -> Text,
+        is_deleted -> Bool,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    moments (id) {
+        id -> Int4,
+        account_id -> Int4,
+        content -> Text,
+        is_deleted -> Bool,
+        created_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     participation (account_id, event_id) {
         account_id -> Int4,
         event_id -> Int4,
@@ -79,11 +125,29 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(chat_members -> accounts (account_id));
+diesel::joinable!(chat_members -> chats (chat_id));
+diesel::joinable!(chat_messages -> accounts (account_id));
+diesel::joinable!(chat_messages -> chats (chat_id));
 diesel::joinable!(comments -> accounts (account_id));
 diesel::joinable!(comments -> events (event_id));
 diesel::joinable!(events -> accounts (organizer_id));
 diesel::joinable!(events -> places (venue_id));
+diesel::joinable!(moment_comments -> accounts (account_id));
+diesel::joinable!(moment_comments -> moments (moment_id));
+diesel::joinable!(moments -> accounts (account_id));
 diesel::joinable!(participation -> accounts (account_id));
 diesel::joinable!(participation -> events (event_id));
 
-diesel::allow_tables_to_appear_in_same_query!(accounts, comments, events, participation, places,);
+diesel::allow_tables_to_appear_in_same_query!(
+    accounts,
+    chat_members,
+    chat_messages,
+    chats,
+    comments,
+    events,
+    moment_comments,
+    moments,
+    participation,
+    places,
+);
