@@ -1,7 +1,8 @@
 use actix_web::{get, web, Responder};
 use diesel_async::AsyncConnection;
 use scoped_futures::ScopedFutureExt;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use validator::{Validate, ValidationError, ValidationErrors};
 
 use super::auth::JwtAuth;
 use super::AppState;
@@ -13,20 +14,27 @@ use crate::orm::utils::RunQueryDsl;
 
 // ===== Handlers =====
 
+#[derive(Debug, Deserialize, Validate)]
+struct ChatIdQuery {
+    pub with: i32,
+}
+
 #[derive(Debug, Serialize)]
 struct ChatIdResponse {
     pub chat_id: i32,
 }
 
-#[get("/with/{id}")]
+#[get("/get_id")]
 async fn get_chat_id_with(
     state: web::Data<AppState>,
-    path: web::Path<i32>,
+    query: web::Query<ChatIdQuery>,
     auth: JwtAuth,
 ) -> Result<impl Responder> {
-    let members = [auth.account_id, path.into_inner()];
+    let members = [auth.account_id, query.with];
     if members[0] == members[1] {
-        return Err(Error::NotAcceptable("Cannot chat with yourself".into()));
+        let mut errors = ValidationErrors::new();
+        errors.add("with", ValidationError::new("same_account"));
+        return Err(Error::InvalidArgument(errors));
     }
 
     let mut conn = state.pool.get().await?;
