@@ -75,6 +75,7 @@ CREATE TABLE moment_comments (
 
 CREATE TABLE chats (
     id SERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR(30) NOT NULL,
     is_group BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

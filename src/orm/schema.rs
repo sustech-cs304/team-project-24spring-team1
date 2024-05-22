@@ -53,6 +53,8 @@ diesel::table! {
 diesel::table! {
     chats (id) {
         id -> Int4,
+        #[max_length = 30]
+        name -> Varchar,
         is_group -> Bool,
         created_at -> Timestamp,
     }
