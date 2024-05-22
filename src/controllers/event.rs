@@ -2,6 +2,7 @@ use actix_web::{delete, get, post, web, Responder};
 use chrono::prelude::*;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 use validator::Validate;
 
 use super::auth::JwtAuth;
@@ -12,6 +13,7 @@ use crate::orm::event::{
 };
 use crate::orm::misc::Participation;
 use crate::orm::schema::events;
+use crate::orm::utils::types::Point;
 use crate::orm::utils::{coalesce, RunQueryDsl};
 use crate::utils::page::Page;
 
@@ -21,10 +23,12 @@ use crate::utils::page::Page;
 struct NewEventForm {
     pub name: String,
     pub kind: EventType,
+    pub description: String,
+    pub cover: Option<Uuid>,
     pub start_at: NaiveDateTime,
     pub end_at: NaiveDateTime,
     pub venue_id: i32,
-    pub description: String,
+    pub location: Point,
     pub tickets: Option<i32>,
     pub registeration_deadline: Option<NaiveDateTime>,
 }
@@ -72,10 +76,12 @@ async fn new_event(
     let new_event = NewEvent {
         name: &form.name,
         kind: form.kind,
+        description: &form.description,
+        cover: form.cover,
         start_at: form.start_at,
         end_at: form.end_at,
         venue_id: form.venue_id,
-        description: &form.description,
+        location: form.location,
         organizer_id: auth.account_id,
         tickets: form.tickets,
         registeration_deadline: form.registeration_deadline,

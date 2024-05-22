@@ -12,7 +12,7 @@ use super::utils::Update;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, DbEnum)]
 #[serde(rename_all = "snake_case")]
-#[ExistingTypePath = "crate::orm::schema::sql_types::Role"]
+#[ExistingTypePath = "crate::orm::utils::sql_types::Role"]
 pub enum Role {
     Admin,
     Staff,

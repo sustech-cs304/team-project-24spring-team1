@@ -5,15 +5,17 @@ use diesel::prelude::*;
 use diesel::query_builder::InsertStatement;
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use super::account::AccountCard;
 use super::misc::Place;
 use super::schema::*;
+use super::utils::types::Point;
 use super::utils::{Bracket, BracketDsl, CountReferencesDsl, CountReferencesIn, Update};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, DbEnum)]
 #[serde(rename_all = "snake_case")]
-#[ExistingTypePath = "crate::orm::schema::sql_types::Eventtype"]
+#[ExistingTypePath = "crate::orm::utils::sql_types::Eventtype"]
 pub enum EventType {
     Show,
     Lecture,
@@ -26,10 +28,12 @@ pub enum EventType {
 pub struct NewEvent<'a> {
     pub name: &'a str,
     pub kind: EventType,
+    pub description: &'a str,
+    pub cover: Option<Uuid>,
     pub start_at: NaiveDateTime,
     pub end_at: NaiveDateTime,
     pub venue_id: i32,
-    pub description: &'a str,
+    pub location: Point,
     pub organizer_id: i32,
     pub tickets: Option<i32>,
     pub registeration_deadline: Option<NaiveDateTime>,
@@ -43,10 +47,12 @@ pub struct Event {
     pub id: i32,
     pub name: String,
     pub kind: EventType,
+    pub description: String,
+    pub cover: Uuid,
     pub start_at: NaiveDateTime,
     pub end_at: NaiveDateTime,
     pub venue_id: i32,
-    pub description: String,
+    pub location: Point,
     pub organizer_id: i32,
     pub tickets: Option<i32>,
     pub registeration_deadline: Option<NaiveDateTime>,
@@ -61,11 +67,13 @@ pub struct EventDisplay {
     pub id: i32,
     pub name: String,
     pub kind: EventType,
+    pub description: String,
+    pub cover: Uuid,
     pub start_at: NaiveDateTime,
     pub end_at: NaiveDateTime,
     #[diesel(embed)]
     pub venue: Place,
-    pub description: String,
+    pub location: Point,
     #[diesel(embed)]
     pub organizer: AccountCard,
     pub tickets: Option<i32>,
@@ -78,11 +86,13 @@ pub struct EventSummary {
     pub id: i32,
     pub name: String,
     pub kind: EventType,
+    pub description: String,
+    pub cover: Uuid,
     pub start_at: NaiveDateTime,
     pub end_at: NaiveDateTime,
     #[diesel(embed)]
     pub venue: Place,
-    pub description: String,
+    pub location: Point,
     #[diesel(embed)]
     pub organizer: AccountCard,
     pub tickets: Option<i32>,

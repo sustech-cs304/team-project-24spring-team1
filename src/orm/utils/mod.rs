@@ -5,6 +5,8 @@ mod bracket;
 mod count_ref;
 mod functions;
 mod logging;
+pub mod sql_types;
+pub mod types;
 
 pub use bracket::{Bracket, BracketDsl};
 pub use count_ref::{CountReferencesDsl, CountReferencesIn};

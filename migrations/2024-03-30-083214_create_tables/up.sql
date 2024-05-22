@@ -30,10 +30,12 @@ CREATE TABLE events (
     name VARCHAR(50) NOT NULL,
     kind EventType NOT NULL,
     description TEXT NOT NULL,
+    cover UUID NOT NULL DEFAULT '80e8f45c-6fbc-4f94-909d-d58462e845d5',  -- magic value
     organizer_id INT NOT NULL REFERENCES accounts(id),
     start_at TIMESTAMP NOT NULL,
     end_at TIMESTAMP NOT NULL,
     venue_id INT NOT NULL REFERENCES places(id),
+    location POINT NOT NULL,
     tickets INT,
     registeration_deadline TIMESTAMP,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
