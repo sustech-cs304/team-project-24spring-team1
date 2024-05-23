@@ -64,6 +64,7 @@ export default {
         Authorization: `Bearer ${this.token}`
       }
     })
+
     .then(response => {
       const userData = response.data;
       this.user.sid = userData.sustech_id;
