@@ -193,10 +193,10 @@ export default {
       this.$router.push('/dashboard/dashboard'); //'Dashboard'
     },
     sendProfileMessage() {
-      var id = "2";
-      var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzE2MDEwODMyLCJleHAiOjE3MTYwOTcyMzJ9.EvfsW1EKvwYTTYfJ9aVw3F5q2tBG7Se--hKuFATsRJo";
-      localStorage.setItem('id', id);
-      localStorage.setItem('token', token);
+      // var id = "2";
+      // var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzE2MDEwODMyLCJleHAiOjE3MTYwOTcyMzJ9.EvfsW1EKvwYTTYfJ9aVw3F5q2tBG7Se--hKuFATsRJo";
+      // localStorage.setItem('id', id);
+      // localStorage.setItem('token', token);
     },
   },
 };
