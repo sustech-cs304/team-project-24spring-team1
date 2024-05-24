@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <!-- <div>
     <div>
       <h3>Rooms</h3>
       <pre>{{ JSON.stringify(rooms, null, 2) }}</pre>
@@ -12,8 +12,8 @@
       <h3>Chat</h3>
       <pre>{{ JSON.stringify(chat, null, 2) }}</pre>
     </div>
-  </div>
-  <!-- <vue-advanced-chat
+  </div> -->
+  <vue-advanced-chat
     :current-user-id="currentUserId"
     :rooms="JSON.stringify(rooms)"
     :rooms-order="JSON.stringify(roomsOrder)"
@@ -25,7 +25,7 @@
     :show-new-messages-driver=false
     @fetch-messages="fetchMessages($event.detail[0])"
     @send-message="sendMessage($event.detail[0], $event.detail[1])"
-  /> -->
+  />
 </template>
 
 <script>
@@ -202,7 +202,7 @@ export default {
           return {
             _id: message.id.toString(),
             content: message.content,
-            // index: 1000-message.id,
+            index: 1000-message.id,
             senderId: message.account_id.toString(),
             username: sender ? sender.name : '',
             avatar: sender ? this.imageURL(sender.avatar) : '',
@@ -220,7 +220,6 @@ export default {
             replyMessage: null
           }
         })
-        chatMessages.sort((a, b) => new Date(a.index) - new Date(b.index))
 
         // 使用数组赋值而不是push方法
         this.messages = chatMessages

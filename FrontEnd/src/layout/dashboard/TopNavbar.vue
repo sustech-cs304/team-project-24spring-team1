@@ -118,10 +118,8 @@
                 aria-expanded="true"
               >
                 <div class="photo">
-<!--                  <img :src= "this.imageUrl" alt="User Avatar"/> 不能在mounted里面设置 -->
-                  <img class="avatar" :src="imageUrl" alt="User Avatar" />
+                  <img src="img/anime3.png" />
                 </div>
-
                 <b class="caret d-none d-lg-block d-xl-block"></b>
                 <p class="d-lg-none">Log out</p>
               </a>
@@ -146,7 +144,6 @@
 <script>
 import { CollapseTransition } from "vue2-transitions";
 import Modal from "@/components/Modal";
-import axios from "axios";
 
 export default {
   components: {
@@ -169,10 +166,8 @@ export default {
       showMenu: false,
       searchModalVisible: false,
       searchQuery: "",
-      imageUrl: localStorage.getItem('imageUrl'),
     };
   },
-
   methods: {
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
@@ -198,23 +193,12 @@ export default {
       this.$router.push('/dashboard/dashboard'); //'Dashboard'
     },
     sendProfileMessage() {
-      // var id = "2";
-      // var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzE2MDEwODMyLCJleHAiOjE3MTYwOTcyMzJ9.EvfsW1EKvwYTTYfJ9aVw3F5q2tBG7Se--hKuFATsRJo";
-      // localStorage.setItem('id', id);
-      // localStorage.setItem('token', token);
+      var id = "2";
+      var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzE2NDU2NDAwLCJleHAiOjE3MTY1NDI4MDB9.AwPsptt17egt2IhFVkjhcCYO0VrxC8mQl3cJC5-bEMs";
+      localStorage.setItem('id', id);
+      localStorage.setItem('token', token);
     },
   },
 };
 </script>
-
-<style>
-.photo {
-  text-align: center; /* 水平居中 */
-}
-
-.avatar {
-  display: inline-block;
-  max-width: 100%;    /* 防止图片超出容器边界 */
-  max-height: 100%;
-}
-</style>
+<style></style>
