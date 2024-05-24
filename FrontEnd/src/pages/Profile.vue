@@ -74,6 +74,7 @@ export default {
       this.user.avatar = userData.avatar;
       this.user.description = userData.bio;
       this.imageUrl = `https://backend.sustech.me/uploads/${userData.avatar}.webp`;
+      localStorage.setItem('imageUrl',this.imageUrl);
     })
     .catch(error => {
       console.error('Error fetching profile data:', error);
