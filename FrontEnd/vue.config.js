@@ -34,4 +34,18 @@ module.exports = {
     // Enable CSS source maps.
     sourceMap: process.env.NODE_ENV !== "production",
   },
+  chainWebpack: config => {
+    config.module
+      .rule('vue')
+      .use('vue-loader')
+      .tap(options => {
+        options.compilerOptions = {
+          ...(options.compilerOptions || {}),
+          isCustomElement: tagName => {
+            return tagName === 'vue-advanced-chat' || tagName === 'emoji-picker';
+          }
+        };
+        return options;
+      });
+  },
 };

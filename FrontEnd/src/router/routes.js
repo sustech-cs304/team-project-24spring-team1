@@ -28,6 +28,8 @@ const AdminForm = () =>
     import('@/adminform/components/dialogInd.vue');
 const SettingProfile = () =>
   import("@/pages/SettingProfile.vue");
+const Chat = () =>
+  import("@/pages/Chat.vue");
 
 const routes = [
   {
@@ -126,6 +128,11 @@ const routes = [
         name: "event",
         component: Event,
       },
+      {
+        path: "chat",
+        name: "chat",
+        component: Chat,
+      }
     ],
   },
   { path: "*", component: NotFound },
