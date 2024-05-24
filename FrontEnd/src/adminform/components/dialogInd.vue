@@ -132,9 +132,12 @@ export default {
               get_event.activityName = event.name;
               get_event.kind = event.kind;
               get_event.description = event.description;
+              get_event.cover=event.cover;
               get_event.startTime = event.start_at;
               get_event.endTime = event.end_at; //string
               get_event.venue_id = event.venue.id; //string
+              // get_event.latitude = event.location[0];
+              // get_event.longtitude = event.location[1];
               get_event.tickets = event.tickets;
               get_event.deadline = event.registeration_deadline;
               // console.log("event: ",event);
@@ -161,8 +164,11 @@ export default {
       this.tableItem={
         activityName:'',
         description:'',
+        cover: null,
         kind:'',
         venue_id:'',
+        // latitude:0.0,
+        // longtitude: 0.0,
         tickets:'',
         startTime:'',
         endTime:'',

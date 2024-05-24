@@ -31,18 +31,6 @@
         </el-form-item>
         </div>
 
-<!--        <el-form-item label="date" prop="date" label-width="150px">-->
-<!--          <el-date-picker-->
-<!--              v-model="formInfo.date"-->
-<!--              type="date"-->
-<!--              placeholder="Pick a date"-->
-<!--              value-format="yyyy-MM-dd"-->
-<!--              style="width: 250px"-->
-<!--              :picker-options="dateOptions"-->
-<!--              clearable-->
-<!--          />-->
-<!--        </el-form-item>-->
-
         <el-form-item prop="startTime">
           <el-date-picker
               v-model="formInfo.startTime"
@@ -83,15 +71,19 @@
 <!--          >-->
 <!--            <el-option label="&#45;&#45;" value="none" />-->
 <!--            <el-option label="Teaching Building No.1" value=1 />-->
-<!--            <el-option label="Lecture Hall" value=2 />-->
-<!--            <el-option label="Research Building Lecture Hall" value=3 />-->
-<!--            <el-option label="Library Conference Hall" value=4 />-->
-<!--            <el-option label="south Building" value=5 />-->
 <!--          </el-select>-->
 <!--        </el-form-item>-->
 
         <el-form-item label="venue_id" prop="venue_id">
           <el-input v-model="formInfo.venue_id" placeholder="venue_id" clearable :pattern="'^[0-9]+$'" />
+        </el-form-item>
+
+        <el-form-item label="latitude" prop="latitude">
+          <el-input v-model="formInfo.latitude" placeholder="latitude" clearable />
+        </el-form-item>
+
+        <el-form-item label="longtitude" prop="longtitude">
+          <el-input v-model="formInfo.longtitude" placeholder="longtitude" clearable />
         </el-form-item>
 
         <el-form-item label="tickets" prop="tickets">
@@ -150,6 +142,7 @@
 
 <script>
 import axios from "axios";
+import {float} from "mockjs/src/mock/random/basic";
 
 export default {
   name: "DialogComponent",
@@ -206,11 +199,14 @@ export default {
           const start_iso = new Date(this.formInfo.startTime).toISOString();
           const end_iso = new Date(this.formInfo.endTime).toISOString();
           const deadline_iso = new Date(this.formInfo.deadline).toISOString();
+          const location = [parseFloat(this.formInfo.latitude), parseFloat(this.formInfo.longtitude)];
           const eventData={
             name:this.formInfo.activityName,
             kind:this.formInfo.kind,
             description: this.formInfo.description,
+            cover: this.formInfo.cover,
             venue_id:parseInt(this.formInfo.venue_id, 10), // 将字符串转换为i32类型 10进制
+            location: location,
             start_at:start_iso.substring(0, start_iso.length - 5),
             end_at:end_iso.substring(0, end_iso.length - 5), //"2021-05-21T14:00:00",
             tickets: parseInt(this.formInfo.tickets), //100 | null,
@@ -304,9 +300,12 @@ export default {
             name:this.formInfo.activityName,
             kind:this.formInfo.kind,
             description: this.formInfo.description,
+            cover:this.formInfo.cover,
             venue_id:parseInt(this.formInfo.venue_id, 10), // 将字符串转换为i32类型 10进制
             start_at:start_iso.substring(0, start_iso.length - 5),
             end_at:end_iso.substring(0, end_iso.length - 5), //"2021-05-21T14:00:00",
+            latitude:this.formInfo.latitude,
+            longtitude:this.formInfo.longtitude,
             tickets: parseInt(this.formInfo.tickets), //100 | null,
             registration_deadline: deadline_iso.substring(0, start_iso.length - 5), //"2021-05-21T11:00:00" | null
           }
