@@ -118,8 +118,10 @@
                 aria-expanded="true"
               >
                 <div class="photo">
-                  <img src="img/anime3.png" />
+<!--                  <img :src= "this.imageUrl" alt="User Avatar"/> 不能在mounted里面设置 -->
+                  <img class="avatar" :src="imageUrl" alt="User Avatar" />
                 </div>
+
                 <b class="caret d-none d-lg-block d-xl-block"></b>
                 <p class="d-lg-none">Log out</p>
               </a>
@@ -144,6 +146,7 @@
 <script>
 import { CollapseTransition } from "vue2-transitions";
 import Modal from "@/components/Modal";
+import axios from "axios";
 
 export default {
   components: {
@@ -166,8 +169,10 @@ export default {
       showMenu: false,
       searchModalVisible: false,
       searchQuery: "",
+      imageUrl: localStorage.getItem('imageUrl'),
     };
   },
+
   methods: {
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
@@ -201,4 +206,15 @@ export default {
   },
 };
 </script>
-<style></style>
+
+<style>
+.photo {
+  text-align: center; /* 水平居中 */
+}
+
+.avatar {
+  display: inline-block;
+  max-width: 100%;    /* 防止图片超出容器边界 */
+  max-height: 100%;
+}
+</style>
