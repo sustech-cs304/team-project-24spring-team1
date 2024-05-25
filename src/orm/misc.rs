@@ -1,9 +1,10 @@
-use diesel::dsl::{AsSelect, Eq, Filter, Find, Select};
+use diesel::dsl::{AsSelect, Eq, Filter, Find, InnerJoin, InnerJoinOn, Select};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::query_builder::{DeleteStatement, InsertStatement, IntoUpdateTarget};
 use serde::Serialize;
 
+use super::event::EventSummary;
 use super::schema::*;
 
 #[derive(Debug, Serialize, Selectable, Identifiable, Queryable)]
@@ -31,6 +32,21 @@ type PlaceFind = Find<PlaceAll, i32>;
 pub type PlaceFindName = Select<PlaceFind, places::name>;
 
 type ParticipationFind = Find<participation::table, (i32, i32)>;
+type ParticipationByAccountId = Select<
+    Filter<
+        InnerJoinOn<
+            InnerJoinOn<
+                InnerJoin<participation::table, events::table>,
+                places::table,
+                Eq<places::id, events::venue_id>,
+            >,
+            accounts::table,
+            Eq<accounts::id, events::organizer_id>,
+        >,
+        Eq<participation::account_id, i32>,
+    >,
+    AsSelect<EventSummary, Pg>,
+>;
 
 impl Place {
     pub fn all() -> PlaceAll {
@@ -66,5 +82,14 @@ impl Participation {
     ) -> DeleteStatement<participation::table, <ParticipationFind as IntoUpdateTarget>::WhereClause>
     {
         diesel::delete(participation::table.find((self.event_id, self.account_id)))
+    }
+
+    pub fn by_account_id(account_id: i32) -> ParticipationByAccountId {
+        participation::table
+            .inner_join(events::table)
+            .inner_join(places::table.on(places::id.eq(events::venue_id)))
+            .inner_join(accounts::table.on(accounts::id.eq(events::organizer_id)))
+            .filter(participation::account_id.eq(account_id))
+            .select(EventSummary::as_select())
     }
 }

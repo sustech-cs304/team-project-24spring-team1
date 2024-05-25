@@ -1,4 +1,4 @@
-use actix_web::{delete, get, post, web, Responder};
+use actix_web::{delete, get, post, web, HttpResponse, Responder};
 use chrono::prelude::*;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -12,10 +12,11 @@ use crate::orm::event::{
     Event, EventChangeset, EventDisplay, EventSummary, EventType, EventWithParticipation, NewEvent,
 };
 use crate::orm::misc::Participation;
-use crate::orm::schema::events;
+use crate::orm::schema::{accounts, events, participation};
 use crate::orm::utils::types::Point;
 use crate::orm::utils::{coalesce, RunQueryDsl};
-use crate::utils::page::Page;
+use crate::orm::utils::{BracketDsl, CountReferencesDsl};
+use crate::utils::page::{Page, PaginateQuery};
 
 // ===== Handlers =====
 
@@ -246,10 +247,64 @@ async fn unregister_event(
     Ok(web::Json(serde_json::Value::Object(Default::default())))
 }
 
+#[get("/participated")]
+async fn get_participated(
+    state: web::Data<AppState>,
+    query: web::Query<PaginateQuery>,
+    auth: JwtAuth,
+) -> Result<impl Responder> {
+    let total_item = Participation::by_account_id(auth.account_id)
+        .count()
+        .get_result(&mut state.pool.get().await?)
+        .await?;
+    let page = Page::builder(total_item, query.page.unwrap_or(1)).build();
+
+    let events = Participation::by_account_id(auth.account_id)
+        .order(events::start_at.asc())
+        .limit(page.page_size)
+        .offset(page.offset)
+        .select((
+            accounts::id
+                .count_references_in(participation::account_id)
+                .bracket(),
+            EventSummary::as_select(),
+        ))
+        .get_results(&mut state.pool.get().await?)
+        .await?;
+
+    Ok(web::Json(ListEventsResponse {
+        page,
+        event_by_id: None,
+        events,
+    }))
+}
+
+#[get("/{id}/participated")]
+async fn get_is_participated(
+    state: web::Data<AppState>,
+    path: web::Path<i32>,
+    auth: JwtAuth,
+) -> Result<impl Responder> {
+    let count: i64 = participation::table
+        .filter(participation::account_id.eq(auth.account_id))
+        .filter(participation::event_id.eq(path.into_inner()))
+        .count()
+        .get_result(&mut state.pool.get().await?)
+        .await?;
+
+    match count {
+        0 => Ok(HttpResponse::NotFound()),
+        1 => Ok(HttpResponse::NoContent()),
+        _ => unreachable!("count by primary key should not have multiple results"),
+    }
+}
+
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(new_event)
         .service(list_events)
+        .service(get_participated)
         .service(get_event)
+        .service(get_is_participated)
         .service(delete_event)
         .service(register_event)
         .service(unregister_event);
