@@ -32,7 +32,6 @@
     margin-left: 20px; 
 }
 
-
 </style>
 <template>
     <div>

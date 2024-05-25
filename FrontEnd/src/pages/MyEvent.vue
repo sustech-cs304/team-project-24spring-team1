@@ -21,7 +21,10 @@
                 <!-- <a href="#" class="btn btn-primary">Check</a> -->
                 <a :href="'#/event/' + event.id" class="btn btn-primary">Check</a>
                 <div slot="footer" class="text-muted">
-                    {{ calculateTime(event.start_at) }}
+                    {{ calculateTime1(event.start_at) }}
+                </div>
+                <div slot="footer" class="text-muted">
+                    {{ calculateTime2(event.end_at) }}
                 </div>
             </card>
         </div>
@@ -30,7 +33,7 @@
             <i class="tim-icons icon-bell-55"></i>
             <span v-if="upcomingEventsCount > 0" class="notification"></span>
             <!-- <p class="d-lg-none">New Notifications</p> -->
-        </a>
+        </a>  
     </div>
 </template>
     
@@ -40,77 +43,14 @@ import axios from 'axios';
 export default {
     data() {
         return {
+            currentUserId: localStorage.getItem('id'), // 从 localStorage 读取 currentUserId
+            token: localStorage.getItem('token'), // 从 localStorage 读取 token
             eventData: [], // 将 eventData 定义为数组
-            }
-
-        // return {
-        //     eventData: [
-        //         {
-        //             id: 1,
-        //             holder: "holder 1",
-        //             title: "title 1",
-        //             content: "content 1",
-        //             time: "2024-05-31",
-        //         },
-        //         {
-        //             id: 2,
-        //             holder: "holder 2",
-        //             title: "title 2",
-        //             content: "content 2",
-        //             time: "2024-05-20",
-        //         },
-        //     ]
-        // }
+        }
     },
     mounted() {
-        this.i18n = this.$i18n;
-        if (this.enableRTL) {
-        this.i18n.locale = "ar";
-        this.$rtl.enableRTL();
-        }
-        const list_event_api = 'https://backend.sustech.me/api/event'
-        axios.get(list_event_api, {
-        headers: {
-        }
-        })
-            .then(response => {
-            const eventData = response.data;
-            this.eventData = eventData.events;
-            // this.eventData.organizer = eventData.events.organizer;
-            })
-            .catch(error => {
-            console.error('Error fetching profile data:', error);
-            });
+        this.fetchEvents();
     },
-    // mounted() {
-    //     this.token = localStorage.getItem('token');
-    //     if (!this.token) {
-    //         console.log("Token not found.");
-    //         return;
-    //     }
-
-    //     this.eventData.id = 2;
-    //     const apiUrl = `https://backend.sustech.me/api/event/${this.eventData.id}`; // 修正 eventId 
-
-    //     axios.get(apiUrl, {
-    //         headers: {
-    //         }
-    //     })
-    //     .then(response => {
-    //         const eventData = response.data;
-    //         this.eventData.push({
-    //             id: eventData.id,
-    //             name: eventData.name,
-    //             description: eventData.description,
-    //             organizer: eventData.organizer,
-    //             start_at: eventData.start_at,
-    //             end_at: eventData.end_at,
-    //         });
-    //     })
-    //     .catch(error => {
-    //         console.error('Error fetching profile data:', error);
-    //     });
-    // },
     computed: {
         upcomingEventsCount() {
             const currentTime = new Date();
@@ -123,16 +63,35 @@ export default {
         }
     },
     methods: {
-        calculateTime(eventTime) {
-            const currentTime = new Date();
-            const eventDate = new Date(eventTime);
-            const timeDiff = eventDate.getTime() - currentTime.getTime();
-            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Convert milliseconds to days
-            if (daysDiff <= 3) { // Check if the event is within 3 days
-                return "Happening soon! " + (daysDiff === 1 ? "tomorrow" : "in " + daysDiff + " days");
-            } else {
-                return "in " + daysDiff + " days";
+        async fetchEvents() {
+            try {
+                const response = await axios.get('https://backend.sustech.me/api/event/participated', {
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                },
+                params: {
+                    page: 1
+                }
+                })
+
+                this.eventData = response.data.events
+            } catch (error) {
+                console.error('Error fetching chats:', error)
             }
+        },
+        calculateTime1(start) {
+            // const currentTime = new Date();
+            // const startDate = new Date(start);
+            // const endDate = new Date(end);
+           
+            return "Start Time: " + start;
+        },
+        calculateTime2(start) {
+            // const currentTime = new Date();
+            // const startDate = new Date(start);
+            // const endDate = new Date(end);
+           
+            return "End Time: " + start;
         },
         getEventById(eventId) {
         axios.get(`https://backend.sustech.me/api/event/${eventId}`) // 发送 GET 请求到指定 eventId 的事件数据接口
