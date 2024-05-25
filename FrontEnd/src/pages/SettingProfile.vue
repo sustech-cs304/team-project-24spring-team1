@@ -3,7 +3,7 @@
         <h5 slot="header" class="title">Edit Profile</h5>
         <div class="row">
             <div class="col-md-12">
-                <input type="file" @change="handleFileUpload" style="display: none"
+                <input type="file" @change="handleFileUpload" style="display: none "
                     ref="fileInput" accept=".jpg, .jpeg, .png, .gif">
                 <img class="avatar" :src="imageUrl" alt="User Avatar" style="width: 200px;
                     height: 200px;" @click="openFileInput"/>
