@@ -40,7 +40,9 @@
                 <card v-for="(card, index) in moments" :key="index" style="width: 50rem;">
                     <!-- <p :style="{ color: 'black' }">Moment ID: {{ card.id }}</p> -->
                     <div class="card-text">
-                        <span class="name">{{ card.account.name }}</span> | <span class="role">{{ card.account.role }}</span>
+                        <a href="#/dashboard/profile" @click="handleClick(card.account.id)">
+                            <span class="name">{{ card.account.name }}</span> | <span class="role">{{ card.account.role }}</span>
+                        </a>
                     </div>
                     
                     <div class="card-text">{{ card.content }}</div>
