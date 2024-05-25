@@ -116,7 +116,6 @@
           </div>
         </div>
 
-
         <el-form-item prop="deadline">
           <el-date-picker
               v-model="formInfo.deadline"
@@ -131,11 +130,13 @@
                     clearable :pattern="'^[0-9]+$'" />
         </el-form-item>
 
-        <el-form-item style="text-align: right;">
-          <el-button type="primary" @click="submitForm('formInfo')" size="medium">confirm publish</el-button>
-          <el-button type="primary" @click="submitFormEdit('formInfo')" size="medium">submit change</el-button>
-          <el-button type="primary" @click="closeDialog(0)">cancel</el-button>
-          <el-button type="primary" @click="clearEntry">clear</el-button>
+        <el-form-item style="display: flex; justify-content: space-between;">
+          <el-button type="primary" @click="submitForm('formInfo')"
+                     size="medium"  style="margin: 0 10px;">PUBLISH</el-button>
+<!--          <el-button type="primary" @click="submitFormEdit('formInfo')" size="medium">submit change</el-button>-->
+          <el-button type="primary" @click="closeDialog(0)" style="margin: 0 10px;">CANCEL</el-button>
+          <el-button type="primary" @click="clearEntry"
+                     style="margin: 0 10px;">CLEAR</el-button>
         </el-form-item>
 
       </el-form>
@@ -197,10 +198,9 @@ export default {
 
   methods: {
     submitForm(formName) {
-      if(this.fileToUpload){
-        this.uploadFile();
-      }
       const that = this;
+      // this.uploadFile();
+      console.log("上传图片之后： ",this.formInfo.cover);
       //const params = Object.assign(this.formInfo, {});
       that.$refs[formName].validate((valid) => {
         if (valid) {
@@ -240,6 +240,7 @@ export default {
                   type: "success",
                 });
                 this.$emit("pushDialogData",eventData);
+                console.log("成功发布： ",eventData);
                 eventData.id = response.data.id;
               })
               .catch(error => {
@@ -263,6 +264,7 @@ export default {
       reader.onload = (event) => {
         this.imageUrl = event.target.result;
       };
+      this.uploadFile();
     },
 
     uploadFile() {
@@ -274,15 +276,16 @@ export default {
         }
       })
           .then(response => {
-            this.showSuccessMessage("图片上传成功");
             const uuid = response.data.split('/').pop().replace('.webp', '');
             this.formInfo.cover = uuid;
+            this.showSuccessMessage(uuid);
           })
           .catch(error => {
             this.showFailMessage("图片上传失败");
             console.error('Error uploading file:', error);
           });
     },
+
     showSuccessMessage(message) {
       this.successMessage = message;
       this.$message({
@@ -300,10 +303,7 @@ export default {
     handleRemove(file) {
       // this.fileList = this.fileList.filter(item => item.uid !== file.uid);
       this.$message.info('文件已删除');
-      this.uploadedImageUrl = ''; // 清除已删除的图片URL
-    },
-    handleExceed() {
-      this.showFailMessage("最多只能传3张照片");
+      this.imageUrl = ''; // 清除已删除的图片URL
     },
     beforeUpload(file) {
       // 在上传前进行一些检查或预处理，例如文件类型和大小
@@ -322,7 +322,6 @@ export default {
       }
       // this.$message.success('before handling succeded');
       return true;
-
       // const fileData = new FormData();
       // fileData.append("avatar", file);
       // //upload为上传的接口
@@ -340,7 +339,6 @@ export default {
       this.uploadedImageUrl = response; // 假设服务器返回的响应是图片的URL
       console.log('Uploaded file URL:', this.uploadedImageUrl);
     },
-
     handleUpload(){
       const imgUrl = "https://backend.sustech.me/upload";
       const formData = new FormData();
@@ -360,8 +358,8 @@ export default {
             this.showFailMessage("上传图片失败");
             console.error('上传图片失败：', error);
           });
-
     },
+
     submitFormEdit(formName) {
       const that = this;
       //const params = Object.assign(this.formInfo, {});
@@ -398,7 +396,7 @@ export default {
               })
               .then(response => {
                 that.$message({
-                  message: "发布成功",
+                  message: "修改活动成功",
                   type: "success",
                 });
                 this.$emit('editDialog',eventData)
@@ -406,7 +404,7 @@ export default {
               })
               .catch(error => {
                 console.error('failed to publish event：', error);
-                this.showFailMessage(`发布活动失败`);
+                this.showFailMessage(`修改活动失败`);
               })
 
           this.$parent.tableData[this.$parent.editrowNum]=eventData;

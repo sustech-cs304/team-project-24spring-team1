@@ -3,6 +3,7 @@
     <div id="map" class="map"></div>
   </card>
 </template>
+
 <script>
 export default {
   mounted() {

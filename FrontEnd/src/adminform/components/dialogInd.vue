@@ -94,6 +94,7 @@ export default {
         activityName:'',
         description:'',
         kind:'',
+        cover:null,
         venue_id:0,
         startTime:'2023-03-02 08:08',
         endTime:'',
