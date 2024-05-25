@@ -69,7 +69,6 @@ export default {
 
         this.constructRooms()
         this.allRooms = this.rooms
-        this.fetchMessages({ room: this.rooms[0] }) // 初始化时加载第一个房间的消息
       } catch (error) {
         console.error('Error fetching chats:', error)
       }
