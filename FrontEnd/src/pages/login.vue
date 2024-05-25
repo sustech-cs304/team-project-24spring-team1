@@ -41,7 +41,11 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">LOGIN</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;"
+                 @click.native.prevent="visitor_login">visitor LOGIN</el-button>
+
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;"
+                 @click.native.prevent="handleLogin">go to CAS login</el-button>
 
       <p class="tips">
         <a href="#/register" type="primary">no account? register now.</a>
@@ -52,41 +56,43 @@
 </template>
 
 <script>
-
+import axios from 'axios';
+import api from "js-cookie";
 // import {debug} from "script-ext-html-webpack-plugin/lib/common";
 
 export default {
-  name: 'Login',
   data() {
     return {
       loginForm: {
         userName: '',
-        password: ''
+        password: '',
       },
       ifAdmin: false,
       loginRules: {
-        userName: [{ type: 'email', required: true, trigger: 'blur', message: 'please enter your email' },
-          {
-            validator: (rule, value, callback) => {
-              if (value && value.endsWith('admin.com')) {
-                this.ifAdmin = true;
-              }
-              callback(); // 继续验证流程
-            }
-          },
+        userName: [ // type: 'email',
+          { required: true, trigger: 'blur', message: 'please enter your id' },
+          // {
+          //   validator: (rule, value, callback) => {
+          //     if (value && value.endsWith('admin.com')) {
+          //       this.ifAdmin = true;
+          //     }
+          //     callback(); // 继续验证流程
+          //   }
+          // },
         ],
         password: [{
           required: true,
           message: 'enter password',
           trigger: 'blur'
-        }, { pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, message: 'password has to contain both letters and digits, and length 8-20.' }]
+        },]
+          // { pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, message: 'password has to contain both letters and digits, and length 8-20.' }]
       },
       loading: false,
       passwordType: 'password',
       redirect: undefined,
+      // token:'',
     }
   },
-
   watch: {
     $route: {
       handler: function(route) {
@@ -95,7 +101,6 @@ export default {
       immediate: true
     }
   },
-
   methods: {
     showPwd() {
       if (this.passwordType === 'password') {
@@ -107,28 +112,88 @@ export default {
         this.$refs.password.focus()
       })
     },
-
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          // this.loading = true
-          // this.$store.dispatch('login', this.loginForm).then(() => {
-          //   this.$router.push({ path: this.redirect || '/' })
-          //   this.loading = false
-          // }).catch(() => {
-          //   this.loading = false
-          // })
-          let path= '/Dashboard/dashboard';
-          if (this.ifAdmin) {
-            path = '/admin/publish';
+    visitor_login(){
+      const apiUrl = `https://backend.sustech.me/api/auth/login`;
+      const requestData = {
+        sustech_id: parseInt(this.loginForm.userName),
+        password: this.loginForm.password
+      };
+      axios.post(apiUrl, requestData)
+          .then(response => {
+            const token = response.data.token;
+            const account_id = response.data.account_id;
+            localStorage.setItem('token',token);
+            localStorage.setItem('id',account_id);
+            this.showSuccessMessage("登录成功");
+            this.$refs.loginForm.validate(valid => {
+              if (valid) {
+                let path = '/Dashboard/dashboard';
+                if (this.ifAdmin) {
+                  path = '/admin/publish';
+                }
+                this.$router.push({path: path});
+              }
+            })
+          })
+          .catch(error => {
+            // console.error("data:", eventData);
+            console.error('failed to publish event：', error);
+            this.showFailMessage(`登录失败`);
+          })
+    },
+    async handleLogin(){
+        // Step 1: Make a request to /api/auth/identifier to get an identifier
+        const response = await axios.get('https://backend.sustech.me/api/auth/identifier');
+        const identifier = response.data.identifier;
+        // Step 2: Open a new tab in the browser for login
+        const loginUrl = `https://sso.cra.ac.cn/realms/cra-service-realm/protocol/cas/login?service=https://backend.sustech.me/api/auth/callback?identifier=${identifier}`;
+        window.open(loginUrl, '_blank');
+        // Step 3: Make a request to /api/auth/poll with the identifier obtained in step 1
+        this.checkLoginStatus(identifier);
+      },
+      async checkLoginStatus(identifier) {
+        try {
+          const response = await axios.get(`https://backend.sustech.me/api/auth/poll?identifier=${identifier}`);
+          const userData = response.data;
+          localStorage.setItem('id', userData.account_id);
+          localStorage.setItem('token', userData.token);
+          if (userData.token && userData.account_id) {
+            // clearInterval(pollInterval);
+            this.showSuccessMessage("登录成功");
+            this.$refs.loginForm.validate(valid => {
+              if (valid) {
+                let path = '/Dashboard/dashboard';
+                if (this.ifAdmin) {
+                  path = '/admin/publish';
+                }
+                this.$router.push({path: path});
+              }
+            });}
+          else { // Login process is not completed, continue polling
+            setTimeout(() => {
+              this.checkLoginStatus(identifier); // Polling for login status
+            }, 40000); // Polling interval: 5 seconds
           }
-          this.$router.push({ path: path }) // 想跳转的页面路径
-        } else {
-          console.log('error submit!!')
-          return false
+        } catch (error) {
+          this.showFailMessage("登录失败! ");
         }
-      })
-    }
+        },
+
+    showSuccessMessage(message) {
+      this.successMessage = message;
+      this.$message({
+        message: this.successMessage,
+        type: 'success'
+      });
+    },
+    showFailMessage(message) {
+      this.Message = message;
+      this.$message({
+        message: this.Message,
+        type: 'error'
+      });
+    },
+
   }
 }
 </script>

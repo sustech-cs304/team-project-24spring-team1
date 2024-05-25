@@ -1,6 +1,5 @@
 import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue";
 import NotFound from "@/pages/NotFoundPage.vue";
-import adminPublish from "@/pages/adminPublish.vue";
 import AdminLayout from "@/layout/admin/AdminLayout.vue";
 // import { component } from "vue/types/umd.js";
 
@@ -27,6 +26,10 @@ const Event = () =>
     import('@/pages/Event/Event.vue');
 const AdminForm = () =>
     import('@/adminform/components/dialogInd.vue');
+const SettingProfile = () =>
+  import("@/pages/SettingProfile.vue");
+const Chat = () =>
+  import("@/pages/Chat.vue");
 
 const routes = [
   {
@@ -81,6 +84,11 @@ const routes = [
         component: Profile,
       },
       {
+        path: "setting",
+        name: "setting",
+        component: SettingProfile,
+      },
+      {
         path: "notifications",
         name: "notifications",
         component: Notifications,
@@ -120,6 +128,11 @@ const routes = [
         name: "event",
         component: Event,
       },
+      {
+        path: "chat",
+        name: "chat",
+        component: Chat,
+      }
     ],
   },
   { path: "*", component: NotFound },

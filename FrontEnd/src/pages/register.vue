@@ -22,42 +22,55 @@
         size="medium"
       >
         <div style="padding-top: 10px">
-          <el-form-item label="email" prop="email">
-            <el-col :span="10">
-              <el-input
-                v-model="ruleForm.email"
-                placeholder="enter your email address and click to do verification"
-              />
-            </el-col>
-            <el-button
-              :loading="codeLoading"
-              :disabled="isDisable"
-              size="small"
-              round
-              @click="sendMsg"
-            >send verification code</el-button>
 
-            <span class="status">{{ statusMsg }}</span>
+          <el-form-item label="enter your name" prop="name">
+            <el-col :span="10">
+              <el-input v-model="ruleForm.name" />
+            </el-col>
           </el-form-item>
-          <el-form-item label="verification" prop="code">
+
+          <el-form-item label="sustech_id" prop="sustech_id">
             <el-col :span="10">
               <el-input
-                v-model="ruleForm.code"
-                maxlength="6"
-                placeholder="verification code sent to your email please check"
+                v-model="ruleForm.sustech_id"
+                placeholder="enter your sustech id"
               />
             </el-col>
           </el-form-item>
+<!--            <el-button-->
+<!--              :loading="codeLoading"-->
+<!--              :disabled="isDisable"-->
+<!--              size="small"-->
+<!--              round-->
+<!--              @click="sendMsg"-->
+<!--            >send verification code</el-button>-->
+<!--            <span class="status">{{ statusMsg }}</span>-->
+
+
+<!--          <el-form-item label="verification" prop="code">-->
+<!--            <el-col :span="10">-->
+<!--              <el-input-->
+<!--                v-model="ruleForm.code"-->
+<!--                maxlength="6"-->
+<!--                placeholder="verification code sent to your email please check"-->
+<!--              />-->
+<!--            </el-col>-->
+<!--          </el-form-item>-->
+
           <el-form-item label="pwd" prop="pwd">
             <el-col :span="10">
-              <el-input v-model="ruleForm.pwd" type="password" />
+              <el-input v-model="ruleForm.pwd" type="password"
+              placeholder="enter your password"/>
             </el-col>
           </el-form-item>
+
           <el-form-item label="confirm pwd" prop="cpwd">
             <el-col :span="10">
-              <el-input v-model="ruleForm.cpwd" type="password" />
+              <el-input v-model="ruleForm.cpwd" type="password"
+              placeholder="enter your password again"/>
             </el-col>
           </el-form-item>
+
           <el-form-item>
             <el-button
               type="primary"
@@ -65,6 +78,7 @@
               @click="register"
             >REGISTER</el-button>
           </el-form-item>
+
         </div>
       </el-form>
     </section>
@@ -76,9 +90,9 @@
 <script>
 import { getEmailCode, register } from '@/api/register'
 import { encrypt } from '@/login/utils/rsaEncrypt'
+import axios from 'axios';
 
 export default {
-  name: 'Register',
   data() {
     return {
       statusMsg: '',
@@ -86,29 +100,26 @@ export default {
       isDisable: false,
       codeLoading: false,
       ruleForm: {
-        email: '',
-        code: '',
+        sustech_id: '', // email: '',
+        name: '',
+        // code: '',
         pwd: '',
         cpwd: ''
       },
       rules: {
-        email: [{
-          required: true,
-          type: 'email',
-          message: 'please enter your email',
-          trigger: 'blur'
-        }],
-        code: [{
-          required: true,
-          type: 'string',
-          message: 'please enter verification code',
-          trigger: 'blur'
-        }],
+        name: [{required:true,trigger:'blur',message: 'enter name'}],
+        sustech_id: [
+          {required: true,
+          trigger: 'blur',
+          message: 'enter your sustech_id' }
+        ],
+        // code:[{required:false, trigger:'blur'}],
         pwd: [{
           required: true,
           message: 'set password',
           trigger: 'blur'
-        }, { pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, message: 'contain both letters and digits, length 8-20.' }],
+        }],
+          //{ pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, message: 'contain both letters and digits, length 8-20.' }],
         cpwd: [{
           required: true,
           message: 'confirm password',
@@ -174,43 +185,67 @@ export default {
       }
     },
 
-    // 用户注册
     register: function() {
       this.$refs['ruleForm'].validate((valid) => {
         if (valid) {
-          const user = {
-            code: this.ruleForm.code,
-            email: this.ruleForm.email,
-            password: encrypt(this.ruleForm.pwd)
-          }
-          register(user).then(res => {
-            console.log(res)
-            this.$message({
-              showClose: true,
-              message: 'successfully registered, linking to login page...',
-              type: 'success'
-            })
-            setTimeout(() => {
-              this.$router.push('/')
-            }, 2000)
-          }).catch(err => {
-            console.log(err.response.data.message)
-          })
+          const apiUrl = `https://backend.sustech.me/api/auth/register`;
+          const userData = {
+            sustech_id: parseInt(this.ruleForm.sustech_id),
+            name: this.ruleForm.name,
+            password: this.ruleForm.pwd //encrypt(this.ruleForm.pwd)
+          };
+
+          axios.post(apiUrl, userData)  // register(user).then(res => {
+              .then(response => {
+                const userData = response.data;
+                this.account_id = userData.account_id;
+                this.showSuccessMessage(`注册成功 ${this.account_id}`);
+
+                this.$message({
+                  showClose: true,
+                  message: 'successfully registered, linking to login page...',
+                  type: 'success'
+                });
+                setTimeout(() => {
+                  this.$router.push('/')
+                }, 1000);
+
+              })
+              .catch(error => {
+                console.error("data: ", userData);
+                console.error('failed to create an account：', error);
+                this.showFailMessage("注册失败");
+              });
         }
       })
-    }
+    },
+    showSuccessMessage(message) {
+      this.successMessage = message;
+      this.$message({
+        message: this.successMessage,
+        type: 'success'
+      });
+    },
+    showFailMessage(message) {
+      this.Message = message;
+      this.$message({
+        message: this.Message,
+        type: 'error'
+      });
+    },
   }
 
 }
 </script>
 
-<style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
+
+
+
+<style lang="scss">
 $bg: #283443;
 $light_gray: #fff;
-$cursor: #fff;
+$cursor: #b92929;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
   .register-container .el-input input {
@@ -260,7 +295,7 @@ $cursor: #fff;
 <style lang="scss" scoped>
 $bg: #2d3a4b;
 $dark_gray: #889aa4;
-$light_gray: #eee;
+$light_gray: #311b1b;
 
 body {
   min-height: 100%;
@@ -269,7 +304,7 @@ body {
   overflow: hidden;
 
   .header {
-    border-bottom: 2px solid rgb(235, 232, 232);
+    border-bottom: 2px solid rgb(26, 140, 140);
     min-width: 980px;
     color: #666;
 
@@ -311,7 +346,7 @@ body {
   .tips {
     float: right;
     font-size: 14px;
-    color: #fff;
+    color: #7c1d1d;
     margin-bottom: 20px;
 
     span {

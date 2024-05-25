@@ -2,6 +2,7 @@
     "title": "Event Title 1",
     "holder": "Event Holder Name 1",
     "time": "Event Time 1",
+    "location": "Event Location 1",
     "classification": "Event Classification 1",
     "introduction": "Event Introduction 1",
     "content": "Event 1 content",

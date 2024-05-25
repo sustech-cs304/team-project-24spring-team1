@@ -1,7 +1,10 @@
 <template>
-  <div class="dialog-demo" :style="{ backgroundImage:  'url(' + imgUrl + ')' }">
-    <p class="title"> Activity Management </p>
-    <el-row style="margin-top: 25px;margin-bottom: 10px">
+  <!-- 显示的大表格 -->
+  <div class="dialog-demo">
+<!--       :style="{ backgroundImage:  'url(' + imgUrl + ')' }">-->
+    <p class="title" style="text-align: center"> Activity Management </p>
+    <el-row style="margin-top: 25px;margin-bottom: 10px;
+    display: flex; justify-content: space-between;">
       <base-button type="primary" @click="addItem" size="medium">PUBLISH</base-button>
       <base-button type="primary" @click="deleteSelectedRows" size="medium" style="margin-left:40px;">
         delete selection</base-button>
@@ -14,30 +17,29 @@
         :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
         :page-size="5" stripe pagination
         class="storeTable"
-        style="width: 100%; margin-top: 35px;"
+        style="width: 100%; margin-top: 30px;"
         @selection-change="handleSelectionChange"
     >
       <!--"v-for="item in tableItem" :key="checked"-->
-      <el-table-column label="select" width="70" type="selection"></el-table-column>
-      <el-table-column label="activityName" prop="activityName" width="110"></el-table-column>
-      <el-table-column label="department" prop="department" width="100"></el-table-column>
-      <el-table-column label="roomType" prop="roomType" width="105"></el-table-column>
-      <el-table-column label="Date" prop="date"></el-table-column>
+
+      <el-table-column label="select" width="100" type="selection"></el-table-column>
+      <el-table-column label="id" prop="id" width="80"></el-table-column>
+      <el-table-column label="activityName" prop="activityName" width="120"></el-table-column>
+      <el-table-column label="kind" prop="kind" width="115"></el-table-column>
+      <el-table-column label="venue_id" prop="venue_id" width="110"></el-table-column>
       <el-table-column label="startTime" prop="startTime" width="110"></el-table-column>
-      <el-table-column label="endTime" prop="endTime"></el-table-column>
-      <el-table-column label="location" prop="loc1" width="140"></el-table-column>
-      <el-table-column prop="loc2" label="loc_detail" width="90"></el-table-column>
-      <el-table-column label="duration" prop="duration" width="100"></el-table-column>
+      <el-table-column label="endTime" prop="endTime" width="110"></el-table-column>
+<!--      <el-table-column label="deadline" prop="duration" width="100"></el-table-column>-->
+      <el-table-column label="description" prop="description" width="150"></el-table-column>
 
       <el-table-column label="operation" width="100">
         <template slot-scope="scope">
           <base-button type="primary" size=sm id="editBtn"
                      @click.native.prevent="editRow(scope.$index,scope.row)" round>EDIT</base-button>
           <base-button type="primary" size=sm id="deleteBtn" style="background-color: red"
-                     @click.native.prevent="deleteRow(scope.$index)" round>DEL</base-button>
+                     @click.native.prevent="deleteRow(scope.$index,true)" round>DEL</base-button>
         </template>
       </el-table-column>
-      <!--index需要加$-->
 
     </el-table>
 
@@ -70,6 +72,8 @@
 
 <script>
 import DialogComponent from "@/adminform/components/dialogComponent.vue";
+import axios from "axios";
+import event from "@/pages/Event/Event.vue";
 
 export default {
   name: "DialogDemo",
@@ -84,27 +88,23 @@ export default {
       ifE: false,
       editrowNum:'0',
       tableData: [
-        {department:'ddd', roomType:'small', loc1:'', loc2:'4A',duration:'4'},
-        {department:'ced', roomType:'big', loc1:'', loc2:'',duration:'4'},
-        {department:'ddd', roomType:'small', loc1:'', loc2:'',duration:'6'},
-        {department:'dv', roomType:'medium', loc1:'', loc2:'',duration:'7'},
-        {department:'dvfd', roomType:'small', loc1:'', loc2:'',duration:''},
-        {department:'dd', roomType:'big', loc1:'', loc2:'',duration:''},
-        {department:'defv', roomType:'small', loc1:'', loc2:'',duration:'8'},
+        // {activityName:'ddd', kind:'Free', venue_id:'1', description:'4'},
+        // {activityName:'ddd', kind:'Free', venue_id:'3', description:'4'},
       ],
       tableItem: {
         activityName:'',
-        department:'',
-        roomType:'',
-        loc1:'',
-        loc2:'',
-        date:'',
-        startTime:'08:08',
+        description:'',
+        kind:'',
+        cover:null,
+        venue_id:0,
+        startTime:'2023-03-02 08:08',
         endTime:'',
-        duration:'',
+        deadline: '',
+        id: 0,
       },
     };
   },
+
   mounted() {
     this.fetchData();
   },
@@ -115,37 +115,67 @@ export default {
       return this.tableData.slice(startIndex, endIndex);
     }
   },
+
   methods: {
     fetchData() {
       const that = this;
       that.tableLoading = true;
-      console.log(this.tableData)
       setTimeout(() => {
         that.tableLoading = false;
       }, 1000);
+      const apiUrl = "https://backend.sustech.me/api/event"
+      axios.get(apiUrl, {timeout: 3000})
+          .then(response => {
+            const events = response.data.events;
+            this.tableData = [];
+            for (const event of events) {
+              let get_event = {};
+              get_event.id = event.id;
+              get_event.activityName = event.name;
+              get_event.kind = event.kind;
+              get_event.description = event.description;
+              get_event.cover=event.cover;
+              get_event.startTime = event.start_at;
+              get_event.endTime = event.end_at; //string
+              get_event.venue_id = event.venue.id; //string
+              // get_event.latitude = event.location[0];
+              // get_event.longtitude = event.location[1];
+              get_event.tickets = event.tickets;
+              get_event.deadline = event.registeration_deadline;
+              // console.log("event: ",event);
+              this.tableData.push(get_event);
+            }
+          })
+          .catch(error => {
+            console.error('failed to init activities：', error);
+            this.showFailMessage(`活动初始化失败`);
+          })
     },
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+      console.log(`${val} records per page`);
       this.currentPage = 1;
       this.pageSize = val;
     },
     //当前页改变时触发 跳转其他页
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
+      console.log(`current page: ${val}`);
       this.currentPage = val;
     },
 
     addItem() {
       this.tableItem={
         activityName:'',
-        department:'',
-          roomType:'',
-          loc1:'',
-          loc2:'',
-          date:'',
-          startTime:'',
-          endTime:'',
-          duration:'',
+        description:'',
+        cover: null,
+        kind:'',
+        venue_id:'',
+        // latitude:0.0,
+        // longtitude: 0.0,
+        tickets:'',
+        startTime:'',
+        endTime:'',
+        deadline:'',
+        id:'',
       };
       this.dialogTitle = "publish";
       this.showDialog = true;
@@ -169,52 +199,101 @@ export default {
     updateTable(data){
       this.tableData.push(data);
     },
-
     updateEdit(data){
       //this.tableData[this.editrowNum]=data;
       console.log("edit")
       console.log(this.editrowNum)
       this.tableData.splice(this.editrowNum,1,data)
       this.$nextTick(() => {
-
       });
       console.log(this.tableData)
     },
-
     closeDialog(flag) {
       if (flag) {
         this.fetchData();
       }
       this.showDialog = false;
     },
-    deleteRow(index){
-      this.tableData.splice(index, 1);
+
+    deleteRow(index,ifMsg){
+      // this.tableData.splice(index, 1);
+      const event_id = this.tableData.at(index).id;
+      const deleteUrl = `https://backend.sustech.me/api/event/${event_id}`
+      axios.delete(deleteUrl, {timeout: 3000,headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          })
+          .then(response => {
+            if (ifMsg) {
+              this.$message({
+                message: `删除成功`,
+                type: "success",
+              });
+            }
+          })
+          .catch(error => {
+            console.error('failed to delete event：', error);
+            this.showFailMessage(`删除活动失败`);
+            return false;
+          })
+      return true;
     },
+    showFailMessage(message) {
+      this.Message = message;
+      this.$message({
+        message: this.Message,
+        type: 'error'
+      });
+    },
+
     handleSelectionChange(selection) {
       this.selectedRows = selection;
     },
     deleteSelectedRows() {
       const indices = this.selectedRows.map(row => this.tableData.indexOf(row));
-      if (indices.length > 0) {
-        this.tableData = this.tableData.filter((_, index) => !indices.includes(index));
+      // if (indices.length > 0) {
+      //   this.tableData = this.tableData.filter((_, index) => !indices.includes(index));
+      // }
+      let check = true;
+      for (const idx of indices){
+        check = check && this.deleteRow(idx,false);
+      }
+      if (check) {
+        this.showSuccessMessage(`删除选择部分活动成功`);
+      }else{
+        this.showFailMessage(`不能删除非您发布的活动`);
       }
     },
-    deleteAllRows() {
-      this.tableData = [];
+    showSuccessMessage(message) {
+      this.successMessage = message;
+      this.$message({
+        message: this.successMessage,
+        type: 'success'
+      });
     },
+    deleteAllRows() {
+      // this.tableData = [];
+      let check = true;
+      for (let i = 0; i < this.tableData.length; i++) {
+        check= check && this.deleteRow(i, false);
+      }
+      if (!check) {
+        this.showFailMessage(`不能删除非您发布的活动`);
+      }
+    },
+
   },
 };
 </script>
 
 
 <style scoped lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+
 .dialog-demo{
   position: absolute;
   padding: 50px 115px;
-  justify-content: center;
-  //top: 60%;
-  //left: 50%;
-  //transform: translate(-50%, -50%);
+  justify-content: left; // center
   .instructions {
     font-size: 20px;
     padding: 10px 0;
@@ -232,7 +311,9 @@ export default {
 .storeTable{
   width: 210px;
   background-color: rgba(255, 255, 255,0.6);
-  opacity: 0.95;
+  opacity: 0.96;
+  font-size: 15px;
+  font-family: 'EB Garamond', sans-serif; /* 使用艺术字体 */
 }
 
   .title{
