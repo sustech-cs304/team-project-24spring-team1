@@ -5,7 +5,11 @@
       <fade-transition :duration="100" mode="out-in">
         <div class="col-lg-4" :class="{ 'text-right': false }">
           <card type="nav-tabs" class="text-left" style="width: 70rem; left: 11rem">
-            <div v-if="error" class="error">{{ error }}</div>
+            <div v-if="errorMessage">
+              <base-alert type="primary" dismissible>
+                <strong>Primary!</strong> {{ errorMessage }}
+              </base-alert>
+            </div>
             <div v-else>
 <!--              <div slot="header" class="card-header-primary">-->
 <!--                EventID: {{ getEventID() }}-->
@@ -14,7 +18,7 @@
               <div class="d-flex">
                 <div class="col">
                   <card class="card" style="width: 30rem;">
-                    <img slot="image" class="card-img-top" :src="`events/${getEventID()}/1.jpg`" alt="Card image cap">
+                    <img slot="image" class="card-img-top" :src="`https://backend.sustech.me/uploads/${event.cover}.webp`" alt="Card image cap">
                     <p class="card-text">Picture 1</p>
                   </card>
                 </div>
@@ -42,14 +46,33 @@
                       <span style="margin-left: 10px;"></span>
                       <p class="card-text" style="display: inline-block;">{{ event.organizer.name }}</p>
                     </div>
+
+                    <div>
+                      <i class="tim-icons icon-bell-55" style="display: inline-block;"></i>
+                      <span style="margin-left: 10px;"></span>
+                      <p class="card-text" style="display: inline-block;">{{ event.registration_deadline }}</p>
+                    </div>
                     <br>
                     <div>
-                      <h4 class="card-text" style="display: inline-block;">Tickets Left: {{event.tickets}}</h4>
+                      <h4 class="card-text" style="display: inline-block;">Total Tickets: {{event.tickets}}</h4>
+
                     </div>
+                    <div>
+                      <h4 class="card-text" style="display: inline-block;">Registered Number: {{event.participation_count}}</h4>
+                    </div>
+
 
                     <br>
                     <div>
-                      <base-button class="animation-on-hover" type="primary" @click="registerForEvent">Register</base-button>
+                      <base-button
+                          v-if="!isRegistered"
+                          class="animation-on-hover"
+                          type="primary"
+                          @click="registerForEvent"
+                      >
+                        Register
+                      </base-button>
+                      <span v-else class="text-success">Already Registered</span>
                     </div>
 
 <!--                    <card type="nav-tabs">-->
@@ -108,8 +131,10 @@
 <script>
 import TopNavbar from "@/layout/dashboard/TopNavbar.vue";
 import axios from "axios";
+import BaseAlert from "@/components/BaseAlert.vue";
 export default {
   components: {
+    BaseAlert,
     TopNavbar,
   },
   data() {
@@ -119,12 +144,17 @@ export default {
       error: null,
       comments: [],
       newComment: '', // 用于存储新评论的内容
+      errorMessage: '', // 用于存储错误信息
+      isRegistered: false, // 用于跟踪用户是否已注册
+      participatedEvents: [],
     };
   },
   mounted() {
     this.eventId = this.$route.params.id;
     this.fetchEventData(this.eventId);
     this.getComments();
+    this.fetchParticipatedEvents();
+    this.checkIfRegistered();
   },
 
   methods: {
@@ -145,6 +175,32 @@ export default {
           });
     },
 
+    fetchParticipatedEvents() {
+      const url = `https://backend.sustech.me/api/event/participated`;
+      this.token = localStorage.getItem('token');
+      if (!this.token) {
+        console.log("Token not found.");
+        return;
+      }
+
+      axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      })
+          .then(response => {
+            this.participatedEvents = response.data.events;
+          })
+          .catch(error => {
+            console.error('Error fetching participated events:', error);
+          });
+    },
+
+    checkIfRegistered() {
+      console.log(this.participatedEvents)
+      this.isRegistered = this.participatedEvents.some(event => event.id === parseInt(this.eventId));
+    },
+
 
     registerForEvent() {
       const apiUrl = `https://backend.sustech.me/api/event/${this.eventId}/register`;
@@ -162,8 +218,28 @@ export default {
           .then(response => {
             // Handle successful registration
             alert('Successfully registered for the event.');
+            this.errorMessage = ''; // 清空错误消息
+            this.isRegistered = true; // 设置已注册状态
           })
           .catch(error => {
+            // 根据错误响应设置错误消息
+            if (error.response) {
+              switch (error.response.data.error) {
+                case 'record_not_found':
+                  this.errorMessage = 'The event is not found.';
+                  break;
+                case 'not_acceptable':
+                  this.errorMessage = 'The registration deadline has passed.';
+                  break;
+                case 'record_already_exists':
+                  this.errorMessage = 'You have already registered for the event.';
+                  break;
+                default:
+                  this.errorMessage = 'An unknown error occurred.';
+              }
+            } else {
+              this.errorMessage = 'Failed to register for the event.';
+            }
             console.error('Error Register:', error);
           });
     },
@@ -183,7 +259,7 @@ export default {
       axios.post(commentUrl, commentData, {
         headers: {
           Authorization: `Bearer ${this.token}`
-        }
+        },
       })
           .then(response => {
             // Handle successful comment submission

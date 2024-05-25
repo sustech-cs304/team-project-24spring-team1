@@ -10,9 +10,10 @@
                 :key="index"
                 :style="filterStyles(index)"
             >
-              <BaseCheckbox v-model="filter.checked" :id="'filter' + index" @change="applyFilters">
+              <BaseCheckbox v-model="filter.checked" :id="'filter' + index" @change="applyFilter">
                 {{ filter.label }}
               </BaseCheckbox>
+
             </div>
           </div>
         </template>
@@ -24,9 +25,10 @@
     <div class="row">
       <div class="col-12">
         <div class="row">
-          <div v-for="(event, index) in events" :key="index" class="col-lg-4 mb-4" :class="{ 'text-right': false }">
+          <div v-for="(event, index) in events_all" :key="index" class="col-lg-4 mb-4" :class="{ 'text-right': false }">
             <card style="width: 23rem; margin-left: 10px">
   <!--            <img slot="image" class="card-img-top" :src="getEventImagePath(index)" :alt="event.title" style="width: 60rem; height: 16rem;" />-->
+              <img class="card-img-top" :src="getEventImagePath(index)" alt="event.title" style="width: 60rem; height: 16rem;"/>
               <h4 class="card-title">{{ event.name }}</h4>
               <div>
                 <i class="tim-icons icon-time-alarm" style="display: inline-block;"></i>
@@ -91,6 +93,11 @@ export default {
         {label: "competition", checked: false},
       ],
       events: [],
+      events_all: [],
+      events_show: [],
+      events_lecture: [],
+      events_competition: [],
+      filterParams: "",
     };
   },
   computed: {
@@ -111,32 +118,87 @@ export default {
       };
     },
     getEventImagePath(index) {
-      return `events/${index + 1}/1.jpg`;
+      // return `events/${index + 1}/1.jpg`;
+      return `https://backend.sustech.me/uploads/${this.events[index].cover}.webp`;
     },
     getEventUrlPath(index) {
       return `#/event/${index}`;
     },
-    fetchEvents(kind) {
-      const url = 'https://backend.sustech.me/api/event';
 
-      axios.get(url,{
-        params:{
-          kind: kind
-        }
-      })
+    fetchEvents() {
+      const url = 'https://backend.sustech.me/api/event';
+      // axios.get(url)
+      //     .then(response => {
+      //       this.events_all = response.data.events;
+      //     })
+      //     .catch(error => {
+      //       console.error('Error fetching events:', error);
+      //       this.error = 'Error fetching events';
+      //     });
+
+      axios.get(url)
           .then(response => {
-            this.events = response.data.events;
+            this.events_all = response.data.events;
+          })
+          .catch(error => {
+            console.error('Error fetching events:', error);
+            this.error = 'Error fetching events';
+          });
+
+      axios.get(url, { params: { kind: "show" } })
+          .then(response => {
+            this.events_show = response.data.events;
+          })
+          .catch(error => {
+            console.error('Error fetching events:', error);
+            this.error = 'Error fetching events';
+          });
+
+      axios.get(url, { params: { kind: "lecture" } })
+          .then(response => {
+            this.events_lecture = response.data.events;
+          })
+          .catch(error => {
+            console.error('Error fetching events:', error);
+            this.error = 'Error fetching events';
+          });
+
+      axios.get(url, { params: { kind: "competition" } })
+          .then(response => {
+            this.events_competition = response.data.events;
           })
           .catch(error => {
             console.error('Error fetching events:', error);
             this.error = 'Error fetching events';
           });
     },
-    applyFilters() {
-      const selectedFilters = this.filters.filter(f => f.checked).map(f => f.value);
-      const filterParams = selectedFilters.length ? { kind: selectedFilters.join(",") } : {};
-      this.fetchEvents(filterParams);
-    },
+
+    applyFilter() {
+      // Initialize an empty array to collect events based on filters
+      let filteredEvents = [];
+
+      // Check each filter and add the corresponding events to filteredEvents
+      this.filters.forEach((filter, index) => {
+        if (filter.checked) {
+          if (filter.label === "show") {
+            this.events = this.events_show;
+          } else if (filter.label === "lecture") {
+            this.events = this.events_lecture;
+          } else if (filter.label === "competition") {
+            this.events = this.events_competition;
+          }
+        }
+      });
+
+      // If no filters are selected, show all events
+      if (filteredEvents.length === 0) {
+        this.events = this.events_all;
+      } else {
+        // Remove duplicates and set the filtered events
+        this.events = Array.from(new Set(filteredEvents));
+      }
+    }
+
   },
   mounted() {
     this.i18n = this.$i18n;
@@ -145,18 +207,6 @@ export default {
       this.$rtl.enableRTL();
     }
     this.fetchEvents();
-    // const list_event_api = 'https://backend.sustech.me/api/event'
-    // axios.get(list_event_api, {
-    //   headers: {
-    //   }
-    // })
-    //     .then(response => {
-    //       const eventData = response.data;
-    //       this.events = eventData.events;
-    //     })
-    //     .catch(error => {
-    //       console.error('Error fetching profile data:', error);
-    //     });
   },
 
   beforeDestroy() {
