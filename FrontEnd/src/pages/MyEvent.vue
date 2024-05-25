@@ -28,12 +28,6 @@
                 </div>
             </card>
         </div>
-        <!-- Notification Icon with Conditional Rendering -->
-        <a slot="title" class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="true">
-            <i class="tim-icons icon-bell-55"></i>
-            <span v-if="upcomingEventsCount > 0" class="notification"></span>
-            <!-- <p class="d-lg-none">New Notifications</p> -->
-        </a>  
     </div>
 </template>
     
