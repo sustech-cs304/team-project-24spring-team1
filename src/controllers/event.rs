@@ -225,7 +225,7 @@ async fn register_event(
         ));
     }
 
-    Participation::new(id, auth.account_id)
+    Participation::new(auth.account_id, id)
         .as_insert()
         .execute(&mut state.pool.get().await?)
         .await?;
@@ -240,7 +240,7 @@ async fn unregister_event(
     auth: JwtAuth,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    Participation::new(id, auth.account_id)
+    Participation::new(auth.account_id, id)
         .as_delete()
         .get_result::<Participation>(&mut state.pool.get().await?)
         .await?;

@@ -16,12 +16,12 @@ pub struct Place {
 
 #[derive(Debug, Serialize, Selectable, Identifiable, Insertable, Queryable)]
 #[diesel(table_name = participation)]
-#[diesel(primary_key(event_id, account_id))]
+#[diesel(primary_key(account_id, event_id))]
 #[diesel(belongs_to(Event))]
 #[diesel(belongs_to(Account))]
 pub struct Participation {
-    pub event_id: i32,
     pub account_id: i32,
+    pub event_id: i32,
 }
 
 type PlaceAll = Select<places::table, AsSelect<Place, Pg>>;
@@ -63,10 +63,10 @@ impl Place {
 }
 
 impl Participation {
-    pub fn new(event_id: i32, account_id: i32) -> Self {
+    pub fn new(account_id: i32, event_id: i32) -> Self {
         Self {
-            event_id,
             account_id,
+            event_id,
         }
     }
 
@@ -81,7 +81,7 @@ impl Participation {
         &self,
     ) -> DeleteStatement<participation::table, <ParticipationFind as IntoUpdateTarget>::WhereClause>
     {
-        diesel::delete(participation::table.find((self.event_id, self.account_id)))
+        diesel::delete(participation::table.find((self.account_id, self.event_id)))
     }
 
     pub fn by_account_id(account_id: i32) -> ParticipationByAccountId {
