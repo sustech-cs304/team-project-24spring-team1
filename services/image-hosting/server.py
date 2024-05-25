@@ -21,18 +21,25 @@ def upload():
     file = request.files['file']
     uuid = generate_uuid()
     ext = os.path.splitext(file.filename)[1]
-    assert ext in ['.jpg', '.jpeg', '.png', '.gif']
-    file.save(f'./uploads/{uuid}{ext}')
 
-    subprocess.run(['cwebp', f'./uploads/{uuid}{ext}', '-o', f'./uploads/{uuid}.webp'])
-    os.remove(f'./uploads/{uuid}{ext}')
+    name = uuid + ext
+    file.save(f'./uploads/{name}')
+    if ext in ['.jpg', '.jpeg', '.png', '.gif']:
+        subprocess.run(['cwebp', f'./uploads/{uuid}{ext}', '-o', f'./uploads/{uuid}.webp'])
+        os.remove(f'./uploads/{name}')
+        name = f'{uuid}.webp'
 
-    return f'/uploads/{uuid}.webp'
+    return f'/uploads/{name}'
 
 # 2. Serving the webp image from `/uploads/<uuid>.webp` endpoint.
 # If the webp image does not exist, return 404.
 @app.route('/uploads/<path:path>')
 def serve_webp(path):
+    MIME = {
+        '.webp': 'image/webp',
+    }
+    ext = os.path.splitext(path)[1]
+    mimetype = MIME.get(ext, 'application/octet-stream')
     return send_from_directory('./uploads', path,
-                               mimetype='image/webp',
+                               mimetype=mimetype,
                                max_age=3600 * 24 * 7)
