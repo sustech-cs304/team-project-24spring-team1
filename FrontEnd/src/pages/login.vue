@@ -124,20 +124,34 @@ export default {
             const account_id = response.data.account_id;
             localStorage.setItem('token',token);
             localStorage.setItem('id',account_id);
-            this.showSuccessMessage("登录成功");
-            this.$refs.loginForm.validate(valid => {
-              if (valid) {
-                let path = '/Dashboard/dashboard';
-                if (this.ifAdmin) {
-                  path = '/admin/publish';
+            axios.get(`https://backend.sustech.me/api/account/${account_id}/profile`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+            .then(profileResponse => {
+              const avatarUUID = profileResponse.data.avatar;
+              localStorage.setItem('imageUrl', "https://backend.sustech.me/uploads/" + avatarUUID + ".webp");
+
+              this.showSuccessMessage("登录成功");
+              this.$refs.loginForm.validate(valid => {
+                if (valid) {
+                  let path = '/Dashboard/dashboard';
+                  if (this.ifAdmin) {
+                    path = '/admin/publish';
+                  }
+                  this.$router.push({ path: path });
                 }
-                this.$router.push({path: path});
-              }
+              });
             })
+            .catch(profileError => {
+              console.error('Failed to fetch profile:', profileError);
+              this.showFailMessage('登录失败');
+            });
           })
           .catch(error => {
             // console.error("data:", eventData);
-            console.error('failed to publish event：', error);
+            console.error('failed to publish event:', error);
             this.showFailMessage(`登录失败`);
           })
     },

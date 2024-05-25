@@ -28,12 +28,6 @@
                 </div>
             </card>
         </div>
-        <!-- Notification Icon with Conditional Rendering -->
-        <a slot="title" class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="true">
-            <i class="tim-icons icon-bell-55"></i>
-            <span v-if="upcomingEventsCount > 0" class="notification"></span>
-            <!-- <p class="d-lg-none">New Notifications</p> -->
-        </a>  
     </div>
 </template>
     
@@ -79,11 +73,16 @@ export default {
                 console.error('Error fetching chats:', error)
             }
         },
-        calculateTime1(start) {          
-            return "Start Time: " + start;
+        calculateTime1(start) {
+            return "Start Time: " + this.formatDate(start);
         },
-        calculateTime2(start) {          
-            return "End Time: " + start;
+        calculateTime2(end) {
+            return "End Time: " + this.formatDate(end);
+        },
+        formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            return date.toLocaleDateString('en-US', options);
         },
         getEventById(eventId) {
         axios.get(`https://backend.sustech.me/api/event/${eventId}`) // 发送 GET 请求到指定 eventId 的事件数据接口

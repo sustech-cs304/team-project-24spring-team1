@@ -161,18 +161,14 @@ export default {
       // 根据搜索关键字执行搜索操作
       // 这里可以使用axios或其他方法进行搜索
       // 假设搜索结果为events_show的一部分，如果搜索到结果，跳转到dashboard页面
-      if (this.searchQuery.trim() !== "") {
+      // if (this.searchQuery.trim() !== "") {
         // this.$message.success("top-bar success");
           // 调用 Dashboard 组件的 receiveSearchResults 方法并传递搜索结果数据
-          this.$root.$emit('search-results', this.searchQuery.trim());
+
         if (this.$route.path !== '/dashboard/dashboard') {
           this.$router.push('/dashboard/dashboard');
         }
-
-      } else {
-        // 如果搜索关键字为空，给出提示或其他操作
-        alert("Please enter a search keyword.");
-      }
+        this.$root.$emit('search-results', this.searchQuery.trim());
     },
 
     capitalizeFirstLetter(string) {

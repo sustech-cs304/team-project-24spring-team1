@@ -28,8 +28,10 @@
         <div class="row">
           <div v-for="(event, index) in filter_events" :key="index" class="col-lg-4 mb-4" :class="{ 'text-right': false }">
             <card style="width: 23rem; margin-left: 10px">
-              <img class="card-img-top" :src="getEventImagePath(index)" alt="event.title" style="width: 60rem; height: 16rem;" />
-              <h4 class="card-title">{{ event.name }}</h4>
+              <img class="card-img-top" :src="getEventImagePath(index)" style="width: 60rem; height: 16rem;" />
+              <h4 class="card-title">{{ index }}</h4>
+              <h4 class="card-title">{{ getEventImagePath(index) }}</h4>
+<!--              <h4 class="card-title">{{ event.name }}</h4>-->
               <div>
                 <i class="tim-icons icon-time-alarm" style="display: inline-block;"></i>
                 <span style="margin-left: 10px;"></span>
@@ -95,7 +97,9 @@ export default {
       };
     },
     getEventImagePath(index) {
-      return `https://backend.sustech.me/uploads/${this.events[index].cover}.webp`;
+      // this.$message(this.events[index].cover);
+      // console.log('aaa', this.filter_events);
+      return `https://backend.sustech.me/uploads/${this.filter_events[index].cover}.webp`;
     },
     getEventUrlPath(id) {
       return `#/event/${id}`;
@@ -106,6 +110,39 @@ export default {
         this.filters = JSON.parse(storedFilters);
       }
       this.updateFilterEvents();
+    },
+
+
+    updateFilterEvents() {
+      let filteredEvents = [];
+
+      if (this.filters[0].checked) {
+        filteredEvents = filteredEvents.concat(this.events_show);
+      }
+      if (this.filters[1].checked) {
+        filteredEvents = filteredEvents.concat(this.events_lecture);
+      }
+      if (this.filters[2].checked) {
+        filteredEvents = filteredEvents.concat(this.events_competition);
+      }
+
+      // filteredEvents = filteredEvents.concat(filtered_keyword);
+      if (this.keyword !== "") {
+        if(!this.filters[0].checked && !this.filters[1].checked && !this.filters[2].checked){
+          filteredEvents = this.events.filter(event => {
+            return event.name.toLowerCase().includes(this.keyword.toLowerCase());
+          });
+        }else{
+          filteredEvents = filteredEvents.filter(event => {
+            return event.name.toLowerCase().includes(this.keyword.toLowerCase());
+          });
+        }
+      }
+      if (this.keyword==="" && !this.filters[0].checked && !this.filters[1].checked && !this.filters[2].checked) {
+        this.filter_events = this.events;
+      } else {
+        this.filter_events = filteredEvents;
+      }
     },
     fetchEvents() {
       const url = 'https://backend.sustech.me/api/event';
@@ -147,34 +184,9 @@ export default {
             console.error('Error fetching events:', error);
           });
     },
-    updateFilterEvents() {
-      let filteredEvents = [];
-      // this.filters = localStorage.getItem("filters");
 
-      if (this.keyword !== "") {
-        // 使用关键字过滤事件标题
-        filteredEvents = this.events.filter(event => {
-          return event.name.toLowerCase().includes(this.keyword.toLowerCase());
-        });
-        this.filter_events = filteredEvents;
-      }
 
-      if (this.filters[0].checked) {
-        filteredEvents = filteredEvents.concat(this.events_show);
-      }
-      if (this.filters[1].checked) {
-        filteredEvents = filteredEvents.concat(this.events_lecture);
-      }
-      if (this.filters[2].checked) {
-        filteredEvents = filteredEvents.concat(this.events_competition);
-      }
 
-      if (!this.filters[0].checked && !this.filters[1].checked && !this.filters[2].checked) {
-        this.filter_events = this.events;
-      } else {
-        this.filter_events = filteredEvents;
-      }
-    },
     applyFilter() {
       // this.$message.success("haha");
       localStorage.setItem("filters", JSON.stringify(this.filters));
@@ -183,6 +195,7 @@ export default {
 
     receiveSearchParam(keyword) {
       this.keyword = keyword;
+      // this.$message.success(this.keyword);
       this.updateFilterEvents();
     }
   },
@@ -192,7 +205,13 @@ export default {
     this.fetchEvents();
     this.updateFilterEvents();
     this.$root.$on('search-results', this.receiveSearchParam);
-  }
+  },
+  created() {
+    this.$root.$on('search-results', this.receiveSearchParam);
+  },
+  beforeDestroy() {
+    this.$root.$off('search-results', this.receiveSearchParam);
+  },
 };
 </script>
 
