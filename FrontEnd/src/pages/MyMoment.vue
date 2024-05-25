@@ -51,7 +51,7 @@
                     <div class="card-text">{{ extractContent(card.content) }}</div>
                     <!-- <div class="card-text">content: {{ card.content }}</div> -->
                     <div class="image-container">
-                        <img :src="extractImageLink(card.content)" style="width: 400px; height: auto;"/>    
+                        <img :src="extractImageLink(card.content)" style="width: 500px; height: auto;"/>    
                         
                     </div>
 
@@ -129,7 +129,7 @@
 
 <script>
 import axios from 'axios';
-import marked from 'marked';
+
 export default {
     props: ['username'],
     data() {
