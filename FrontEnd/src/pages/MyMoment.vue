@@ -53,7 +53,7 @@
                         </div>
                     </template>
 
-                    <div class="card-text created-time">{{ card.created_at }}</div>
+                    <div class="card-text created-time">{{ formatDate(card.created_at) }}</div>
 
                     <div class="comment-container">
                         <div style="margin-bottom: 40px;"></div> <!-- 空两行 -->
@@ -259,6 +259,19 @@ export default {
 
         getMomentImagePath(momentId, imageNumber) {
             return `users/testuser/moment/${momentId}-${imageNumber}.jpg`;
+        },
+
+        formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            return date.toLocaleDateString('en-US', options);
         },
     }
 }
