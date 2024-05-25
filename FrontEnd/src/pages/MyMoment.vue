@@ -250,6 +250,8 @@ export default {
             const newMomentId = response.data.id;
 
             console.log('New Moment ID:', newMomentId);
+
+            window.location.reload();
           })
           .catch(error => {
             console.error('Error posting moments:', error);
