@@ -2,8 +2,9 @@
   <!-- 显示的大表格 -->
   <div class="dialog-demo">
 <!--       :style="{ backgroundImage:  'url(' + imgUrl + ')' }">-->
-    <p class="title"> Activity Management </p>
-    <el-row style="margin-top: 25px;margin-bottom: 10px">
+    <p class="title" style="text-align: center"> Activity Management </p>
+    <el-row style="margin-top: 25px;margin-bottom: 10px;
+    display: flex; justify-content: space-between;">
       <base-button type="primary" @click="addItem" size="medium">PUBLISH</base-button>
       <base-button type="primary" @click="deleteSelectedRows" size="medium" style="margin-left:40px;">
         delete selection</base-button>
@@ -23,8 +24,8 @@
 
       <el-table-column label="select" width="100" type="selection"></el-table-column>
       <el-table-column label="id" prop="id" width="80"></el-table-column>
-      <el-table-column label="activityName" prop="activityName" width="110"></el-table-column>
-      <el-table-column label="kind" prop="kind" width="105"></el-table-column>
+      <el-table-column label="activityName" prop="activityName" width="120"></el-table-column>
+      <el-table-column label="kind" prop="kind" width="115"></el-table-column>
       <el-table-column label="venue_id" prop="venue_id" width="110"></el-table-column>
       <el-table-column label="startTime" prop="startTime" width="110"></el-table-column>
       <el-table-column label="endTime" prop="endTime" width="110"></el-table-column>
@@ -287,6 +288,8 @@ export default {
 
 
 <style scoped lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+
 .dialog-demo{
   position: absolute;
   padding: 50px 115px;
@@ -308,7 +311,9 @@ export default {
 .storeTable{
   width: 210px;
   background-color: rgba(255, 255, 255,0.6);
-  opacity: 0.95;
+  opacity: 0.96;
+  font-size: 15px;
+  font-family: 'EB Garamond', sans-serif; /* 使用艺术字体 */
 }
 
   .title{
