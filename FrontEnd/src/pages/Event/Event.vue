@@ -35,7 +35,8 @@
                     <div>
                       <i class="tim-icons icon-single-02" style="display: inline-block;"></i>
                       <span style="margin-left: 10px;"></span>
-                      <p class="card-text" style="display: inline-block;">{{ event.organizer.name }}</p>
+                      <a href="#/dashboard/profile" @click="handleClick(event.organizer.id)">{{ event.organizer.name }}</a>
+
                     </div>
 
                     <div>
@@ -184,6 +185,7 @@ export default {
           });
     },
 
+
     fetchEventData(eventId){
       const url = `https://backend.sustech.me/api/event/${eventId}`;
       axios.get(url, {
@@ -329,6 +331,7 @@ export default {
             console.error('Error fetching comments:', error);
           });
     },
+
   }
 };
 </script>
