@@ -53,41 +53,35 @@
 
                     <div class="card-text created-time">{{ card.created_at }}</div>
 
-
                     <div class="comment-container">
                         <div style="margin-bottom: 40px;"></div> <!-- 空两行 -->
                         <div class="comment-input-wrapper">
-                            <input type="text" class="form-control" v-model="newComment" placeholder="Comment here..." style="color: black;">
+                            <input type="text" class="form-control" v-model="newComments[card.id]" placeholder="Comment here..." style="color: black;">
                             <base-button class="animation-on-hover" style="margin-left: 10px;" @click="postComment(card.id)">Comment</base-button>
                         </div>
                     </div>
 
                     <div>
                         <base-button class="animation-on-hover" type="success" @click="getComments(card.id)">
-                            <i class="tim-icons icon-chat-33" style="margin-right: 5px;"></i> Show Comments
+                            <!-- <i class="tim-icons icon-chat-33" style="margin-right: 5px;"></i> Show Comments -->
+                            <i class="tim-icons icon-chat-33" style="margin-right: 5px;"></i>
+                            {{ showComments[card.id] ? 'Hide Comments' : 'Show Comments' }}
+                            
                         </base-button>
-                        <div v-for="(comment, cIndex) in comments" :key="cIndex">
-                            <card class="mb-3">
+                        <div v-if="showComments[card.id]">
+                            
+                            <div v-if="momentComments[card.id]" v-for="(comment, cIndex) in momentComments[card.id]" :key="cIndex">
+                                <card class="mb-3">
                                 <h4 class="card-title">{{ comment.account.name }}</h4>
                                 <p class="card-text">{{ comment.content }}</p>
                                 <p class="card-text"><small class="text-muted">{{ comment.created_at }}</small></p>
-                            </card>
+                                </card>
+                            </div>
                         </div>
+            
                     </div>
 
-                    <div class="d-flex justify-content-around">
-                        <base-button v-for="(button, bIndex) in card.buttons" :key="bIndex" round icon type="primary">
-                            <i :class="button.icon"></i>                           
-                        </base-button>
-                    </div>
-                    <div class="dropdown-divider"></div>
-                    <div v-for="(comment, cIndex) in card.comments" :key="cIndex">
-                        <card class="mb-3">
-                            <h4 class="card-title">{{ comment.username }}</h4>
-                            <p class="card-text">{{ comment.comment }}</p>
-                            <p class="card-text"><small class="text-muted">{{ comment.time }}</small></p>
-                        </card>
-                    </div>
+
                 </card>
             </div>
         </div>
@@ -116,13 +110,11 @@ export default {
     data() {
         return {
             moments: [],
+            momentComments: {},
+            showComments: {},
             comments: [],
-            idx:0,
             momentID: null,
-            userName:null,
-            content: null,
-            time: null,
-            newComment: '',
+            newComments: {},
             newMoment: '',
             buttons:[
                 { icon: "tim-icons icon-heart-2" },
@@ -134,6 +126,20 @@ export default {
         this.fetchMoments(); // 在组件挂载时,调用fetchMoments方法获取数据
     },
     methods: {
+        getComments(id) {
+            const commentUrl = `https://backend.sustech.me/api/moment/${id}/comment`;
+
+            // Toggle the showComments value
+            this.$set(this.showComments, id, !this.showComments[id]);
+
+            axios.get(commentUrl)
+                .then(response => {
+                this.$set(this.momentComments, id, response.data.comments);
+                })
+                .catch(error => {
+                console.error('Error fetching comments:', error);
+                });
+        },
         postNewMoment() {
             const commentUrl = `https://backend.sustech.me/api/moment`;
             const commentData = {
@@ -181,7 +187,7 @@ export default {
         postComment(id) {
             const commentUrl = `https://backend.sustech.me/api/moment/${id}/comment`;
             const commentData = {
-                content: this.newComment
+                content: this.newComments[id]
             };
 
             this.token = localStorage.getItem('token');
@@ -195,27 +201,56 @@ export default {
                 Authorization: `Bearer ${this.token}`
                 }
             })
-                .then(response => {
-                    // Handle successful comment submission
-                    alert('Comment submitted successfully.');
-                    this.newComment = ''; // Clear the comment input
-                    // this.getComments(id); // Refresh the comments list
-                })
-                .catch(error => {
-                    console.error('Error submitting comment:', error);
+            .then(response => {
+                // Handle successful comment submission
+                alert('Comment submitted successfully.');
+                this.$set(this.newComments, id, ''); // Clear the comment input
+                this.getComments(id); // Refresh the comments list
+            })
+            .catch(error => {
+                console.error('Error submitting comment:', error);
             });
         },
 
-        getComments(id) {
-            const commentUrl = `https://backend.sustech.me/api/moment/${id}/comment`;
-            axios.get(commentUrl)
-                .then(response => {
-                    this.comments = response.data.comments;
-                })
-                .catch(error => {
-                    console.error('Error fetching comments:', error);
-            });
-        },
+        // postComment(id) {
+        //     const commentUrl = `https://backend.sustech.me/api/moment/${id}/comment`;
+        //     const commentData = {
+        //         content: this.newComment
+        //     };
+
+        //     this.token = localStorage.getItem('token');
+        //     if (!this.token) {
+        //         console.log("Token not found.");
+        //         return;
+        //     }
+
+        //     axios.post(commentUrl, commentData, {
+        //         headers: {
+        //         Authorization: `Bearer ${this.token}`
+        //         }
+        //     })
+        //         .then(response => {
+        //             // Handle successful comment submission
+        //             alert('Comment submitted successfully.');
+        //             this.newComment = ''; // Clear the comment input
+        //             // this.getComments(id); // Refresh the comments list
+        //         })
+        //         .catch(error => {
+        //             console.error('Error submitting comment:', error);
+        //     });
+        // },
+
+        // getComments(id) {
+        //     const commentUrl = `https://backend.sustech.me/api/moment/${id}/comment`;
+        //     axios.get(commentUrl)
+        //         .then(response => {
+                    
+        //             this.comments = response.data.comments;
+        //         })
+        //         .catch(error => {
+        //             console.error('Error fetching comments:', error);
+        //     });
+        // },
 
         getMomentImagePath(momentId, imageNumber) {
             return `users/testuser/moment/${momentId}-${imageNumber}.jpg`;

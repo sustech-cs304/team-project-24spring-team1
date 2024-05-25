@@ -79,18 +79,10 @@ export default {
                 console.error('Error fetching chats:', error)
             }
         },
-        calculateTime1(start) {
-            // const currentTime = new Date();
-            // const startDate = new Date(start);
-            // const endDate = new Date(end);
-           
+        calculateTime1(start) {          
             return "Start Time: " + start;
         },
-        calculateTime2(start) {
-            // const currentTime = new Date();
-            // const startDate = new Date(start);
-            // const endDate = new Date(end);
-           
+        calculateTime2(start) {          
             return "End Time: " + start;
         },
         getEventById(eventId) {
