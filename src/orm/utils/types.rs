@@ -1,8 +1,8 @@
 use byteorder::{NetworkEndian, ReadBytesExt, WriteBytesExt};
-use diesel::pg::{Pg, PgValue};
 use diesel::deserialize::{self, FromSql, FromSqlRow};
-use diesel::serialize::{self, IsNull, Output, ToSql};
 use diesel::expression::AsExpression;
+use diesel::pg::{Pg, PgValue};
+use diesel::serialize::{self, IsNull, Output, ToSql};
 use serde::{Deserialize, Serialize};
 
 use super::sql_types::Point as SqlPoint;

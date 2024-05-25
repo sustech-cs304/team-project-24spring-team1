@@ -1,5 +1,5 @@
-use diesel::sql_types::SqlType;
 use diesel::query_builder::QueryId;
+use diesel::sql_types::SqlType;
 
 #[derive(QueryId, SqlType)]
 #[diesel(postgres_type(name = "eventtype"))]
