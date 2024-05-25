@@ -90,19 +90,32 @@
           <el-input v-model="formInfo.tickets" placeholder="tickets available" clearable :pattern="'^[0-9]+$'" />
         </el-form-item>
 
-        <el-form-item label="UPLOAD IMAGE" prop="images">
-          <el-upload
-              action=""
-              :limit="3"
-              list-type="picture-card"
-              :on-exceed="handleExceed"
-              :before-upload="beforeUpload"
-              :on-remove="handleRemove"
-              :file-list="fileList"
-          >
-            <i class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
-        </el-form-item>
+<!--        <el-form-item label="upload image" prop="cover">-->
+<!--          <el-upload-->
+<!--              ref="upload"-->
+<!--              class="upload-demo"-->
+<!--              action="https://backend.sustech.me/upload"-->
+<!--              list-type="picture-card"-->
+<!--              :before-upload = "beforeUpload"-->
+<!--              :accept="'.jpg,.jpeg,.png,.gif'"-->
+<!--              :on-success="handleSuccess"-->
+<!--              :on-remove = "handleRemove"-->
+<!--              :limit = "1"-->
+<!--              name="file"-->
+<!--          >-->
+<!--            <i class="el-icon-plus avatar-uploader-icon"></i>-->
+<!--          </el-upload>-->
+<!--        </el-form-item>-->
+
+        <div class="row">
+          <div class="col-md-12">
+            <input type="file" @change="handleFileUpload" style="display: none"
+                   ref="fileInput" accept=".jpg, .jpeg, .png, .gif">
+            <img class="avatar" :src="imageUrl" alt="User Avatar" style="width: 200px;
+                    height: 200px;" @click="openFileInput"/>
+          </div>
+        </div>
+
 
         <el-form-item prop="deadline">
           <el-date-picker
@@ -117,15 +130,6 @@
           <el-input v-model="formInfo.description" placeholder="description of your activity"
                     clearable :pattern="'^[0-9]+$'" />
         </el-form-item>
-
-<!--        <el-form-item>-->
-<!--          <el-upload-->
-<!--              action="https://jsonplaceholder.typicode.com/posts/"-->
-<!--              :http-request="onUpload"-->
-<!--          >-->
-<!--            <el-button size="small" type="primary">CLICK TO UPLOAD</el-button>-->
-<!--          </el-upload>-->
-<!--        </el-form-item>-->
 
         <el-form-item style="text-align: right;">
           <el-button type="primary" @click="submitForm('formInfo')" size="medium">confirm publish</el-button>
@@ -163,6 +167,8 @@ export default {
   data() {
     return {
       showDialog: false,
+      fileToUpload: null,
+      imageUrl: '',
       formInfo: JSON.parse(JSON.stringify(this.itemInfo)),
       formInfoRules:{
         acitivityName: [
@@ -191,6 +197,9 @@ export default {
 
   methods: {
     submitForm(formName) {
+      if(this.fileToUpload){
+        this.uploadFile();
+      }
       const that = this;
       //const params = Object.assign(this.formInfo, {});
       that.$refs[formName].validate((valid) => {
@@ -244,6 +253,36 @@ export default {
       });
     },
 
+    openFileInput() {
+      this.$refs.fileInput.click();
+    },
+    handleFileUpload(event) {
+      this.fileToUpload = event.target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(this.fileToUpload);
+      reader.onload = (event) => {
+        this.imageUrl = event.target.result;
+      };
+    },
+
+    uploadFile() {
+      const formData = new FormData();
+      formData.append('file', this.fileToUpload);
+      axios.post('https://backend.sustech.me/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+          .then(response => {
+            this.showSuccessMessage("图片上传成功");
+            const uuid = response.data.split('/').pop().replace('.webp', '');
+            this.formInfo.cover = uuid;
+          })
+          .catch(error => {
+            this.showFailMessage("图片上传失败");
+            console.error('Error uploading file:', error);
+          });
+    },
     showSuccessMessage(message) {
       this.successMessage = message;
       this.$message({
@@ -259,34 +298,70 @@ export default {
       });
     },
     handleRemove(file) {
-      this.fileList = this.fileList.filter(item => item.uid !== file.uid);
+      // this.fileList = this.fileList.filter(item => item.uid !== file.uid);
+      this.$message.info('文件已删除');
+      this.uploadedImageUrl = ''; // 清除已删除的图片URL
     },
     handleExceed() {
       this.showFailMessage("最多只能传3张照片");
     },
     beforeUpload(file) {
-      const isJPG = file.type === "image/jpeg" || file.type == "image/png";
+      // 在上传前进行一些检查或预处理，例如文件类型和大小
+      const isJPG = file.type === 'image/jpeg';
+      const isPNG = file.type === 'image/png';
+      const isGIF = file.type === 'image/gif';
       const isLt2M = file.size / 1024 / 1024 < 2;
-      if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 或 PNG 格式!");
-        return;
+
+      if (!isJPG && !isPNG && !isGIF) {
+        this.$message.error('上传图片只能是 JPG, PNG 或 GIF 格式!');
+        return false;
       }
       if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
-        return;
+        this.$message.error('上传图片大小不能超过 2MB!');
+        return false;
       }
-      const fileData = new FormData();
-      fileData.append("avatar", file);
-      //upload为上传的接口
-      upload(fileData).then(res => {
-        this.imgUrl = res.imgUrl;
-        //对返回的图片地址进行回显
-        this.$set(this.form, "avatar", this.imgUrl);
-      });
-      //阻止传到本地浏览器
-      return false;
+      // this.$message.success('before handling succeded');
+      return true;
+
+      // const fileData = new FormData();
+      // fileData.append("avatar", file);
+      // //upload为上传的接口
+      // upload(fileData).then(res => {
+      //   this.imgUrl = res.imgUrl;
+      //   //对返回的图片地址进行回显
+      //   this.$set(this.form, "avatar", this.imgUrl);
+      // });
+      // //阻止传到本地浏览器
+      // return false;
+    },
+    handleSuccess(response, file, fileList) {
+      // 处理上传成功的响应，例如获取上传后的图片URL
+      this.$message.success('上传成功');
+      this.uploadedImageUrl = response; // 假设服务器返回的响应是图片的URL
+      console.log('Uploaded file URL:', this.uploadedImageUrl);
     },
 
+    handleUpload(){
+      const imgUrl = "https://backend.sustech.me/upload";
+      const formData = new FormData();
+      formData.append("file", this.file); // file 是一个 File 对象，代表要上传的文件
+
+      axios.post(imgUrl, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      })
+          .then(response => {
+            const url = response.data;
+            this.showSuccessMessage("上传图片成功");
+            // console.log("上传成功，图片 URL:", response.data);
+          })
+          .catch(error => {
+            this.showFailMessage("上传图片失败");
+            console.error('上传图片失败：', error);
+          });
+
+    },
     submitFormEdit(formName) {
       const that = this;
       //const params = Object.assign(this.formInfo, {});
@@ -333,6 +408,7 @@ export default {
                 console.error('failed to publish event：', error);
                 this.showFailMessage(`发布活动失败`);
               })
+
           this.$parent.tableData[this.$parent.editrowNum]=eventData;
           that.closeDialog(1);
 

@@ -15,6 +15,7 @@
               <BaseCheckbox v-model="filter.checked">
                 {{ filter.label }}
               </BaseCheckbox>
+
             </div>
           </div>
 
@@ -81,6 +82,7 @@ export default {
       events_show: [],
       events_lecture: [],
       events_competition: [],
+      keyword: "",
     };
   },
   methods: {
@@ -149,6 +151,14 @@ export default {
       let filteredEvents = [];
       // this.filters = localStorage.getItem("filters");
 
+      if (this.keyword !== "") {
+        // 使用关键字过滤事件标题
+        filteredEvents = this.events.filter(event => {
+          return event.name.toLowerCase().includes(this.keyword.toLowerCase());
+        });
+        this.filter_events = filteredEvents;
+      }
+
       if (this.filters[0].checked) {
         filteredEvents = filteredEvents.concat(this.events_show);
       }
@@ -169,12 +179,19 @@ export default {
       // this.$message.success("haha");
       localStorage.setItem("filters", JSON.stringify(this.filters));
       this.updateFilterEvents();
+    },
+
+    receiveSearchParam(keyword) {
+      this.keyword = keyword;
+      this.updateFilterEvents();
     }
   },
+
   mounted() {
     // this.getFilterStatus();
     this.fetchEvents();
     this.updateFilterEvents();
+    this.$root.$on('search-results', this.receiveSearchParam);
   }
 };
 </script>

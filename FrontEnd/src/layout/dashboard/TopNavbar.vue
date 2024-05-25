@@ -62,46 +62,25 @@
               class="search-bar input-group"
               @click="searchModalVisible = true"
             >
-              <input type="text" class="custom-input" placeholder="Search...">
+              <input type="text" class="custom-input" placeholder="Search..." v-model="searchQuery">
               <!-- <div class="input-group-addon"><i class="tim-icons icon-zoom-split"></i></div> -->
+              <!-- 在搜索按钮的点击事件上添加 search 方法 -->
               <button
-                class="btn btn-link"
-                id="search-button"
-                data-toggle="modal"
-                data-target="#searchModal"
+                  class="btn btn-link"
+                  id="search-button"
+                  data-toggle="modal"
+                  data-target="#searchModal"
+                  @click="search"
               >
                 <i class="tim-icons icon-zoom-split"></i>
               </button>
-              <!-- You can choose types of search input -->
+<!--               You can choose types of search input -->
             </div>
-            <base-dropdown
-              tag="li"
-              :menu-on-right="!$rtl.isRTL"
-              title-tag="a"
-              class="nav-item"
-            >
-              <a
-                slot="title"
-                class="dropdown-toggle nav-link"
-                data-toggle="dropdown"
-                aria-expanded="true"
-              >
-                <!-- <div class="notification d-none d-lg-block d-xl-block"></div> -->
-                <i class="tim-icons icon-bell-55"></i>
-                <!-- <i class="notification"></i> -->
-                <p class="d-lg-none">New Notifications</p>
-              </a>
-              <li class="nav-link">
-                <a href="#/dashboard/notifications" class="nav-item dropdown-item"
-                  >Notifications</a
-                >
-              </li>
-              <li class="nav-link">
-                <a href="#/dashboard" class="nav-item dropdown-item"
-                  >Message</a
-                >
-              </li>
-            </base-dropdown>
+            <router-link to="/dashboard/chat">
+              <base-button round icon type="primary">
+                <i class="tim-icons icon-chat-33"></i>
+              </base-button>
+            </router-link>
 
             <base-dropdown
               tag="li"
@@ -173,6 +152,25 @@ export default {
   },
 
   methods: {
+
+    search() {
+      // 根据搜索关键字执行搜索操作
+      // 这里可以使用axios或其他方法进行搜索
+      // 假设搜索结果为events_show的一部分，如果搜索到结果，跳转到dashboard页面
+      if (this.searchQuery.trim() !== "") {
+        // this.$message.success("top-bar success");
+          // 调用 Dashboard 组件的 receiveSearchResults 方法并传递搜索结果数据
+          this.$root.$emit('search-results', this.searchQuery.trim());
+        if (this.$route.path !== '/dashboard/dashboard') {
+          this.$router.push('/dashboard/dashboard');
+        }
+
+      } else {
+        // 如果搜索关键字为空，给出提示或其他操作
+        alert("Please enter a search keyword.");
+      }
+    },
+
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
     },

@@ -43,10 +43,12 @@
                 <card v-for="(card, index) in moments" :key="index" style="width: 50rem;">
                     <!-- <p :style="{ color: 'black' }">Moment ID: {{ card.id }}</p> -->
                     <div class="card-text">
-                        <span class="name">{{ card.account.name }}</span> | <span class="role">{{ card.account.role }}</span>
+                        <a href="#/dashboard/profile" @click="handleClick(card.account.id)">
+                            <span class="name">{{ card.account.name }}</span> | <span class="role">{{ card.account.role }}</span>
+                        </a>
                     </div>
                     
-                    <div class="card-text">content: {{ extractContent(card.content) }}</div>
+                    <div class="card-text">{{ extractContent(card.content) }}</div>
                     <!-- <div class="card-text">content: {{ card.content }}</div> -->
                     <img :src="extractImageLink(card.content)"/>
                     
@@ -81,7 +83,7 @@
                             
                             <div v-if="momentComments[card.id]" v-for="(comment, cIndex) in momentComments[card.id]" :key="cIndex">
                                 <card class="mb-3">
-                                <h4 class="card-title">{{ comment.account.name }}</h4>
+                                <a href="#/dashboard/profile" @click="handleClick(comment.account.id)">{{ comment.account.name }}</a>
                                 <p class="card-text">{{ comment.content }}</p>
                                 <p class="card-text"><small class="text-muted">{{ comment.created_at }}</small></p>
                                 </card>
@@ -149,14 +151,6 @@ export default {
         // this.extractImageUrl(this.moments.content);
     },
     methods: {
-        // extractContent(content) {
-        //     const match = content.match(/```(.*?)```/);
-        //     if (match){
-        //         return match[0];
-        //     }else{
-        //         return '';
-        //     }           
-        // },
         extractContent(content) {
             const match = content.match(/```(.*?)```/);
             if (match) {
@@ -203,6 +197,15 @@ export default {
                 console.error('Error uploading file:', error);
             });
         },
+
+
+
+        handleClick(newID) {
+            console.log('set profile ID =', newID)
+            localStorage.setItem('profileCurrentID', newID);
+            window.location.href = '#/dashboard/profile';
+        },
+
         getComments(id) {
             const commentUrl = `https://backend.sustech.me/api/moment/${id}/comment`;
 
