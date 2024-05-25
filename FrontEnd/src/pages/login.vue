@@ -41,15 +41,26 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;"
-                 @click.native.prevent="visitor_login">visitor LOGIN</el-button>
+      <el-form-item>
+        <div class="button-container">
+          <el-button :loading="loading" type="primary"
+                     @click.native.prevent="visitor_login">visitor LOGIN</el-button>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;"
-                 @click.native.prevent="handleLogin">go to CAS login</el-button>
+          <el-button :loading="loading" type="primary"
+                     @click.native.prevent="handleLogin">go to CAS login</el-button>
+        </div>
+      </el-form-item>
 
-      <p class="tips">
-        <a href="#/register" type="primary">no account? register now.</a>
-      </p>
+
+<!--      <p class="tips">-->
+<!--        <a href="#/register" type="primary">no account? register now.</a>-->
+<!--      </p>-->
+
+      <div>
+        <mouseClick>
+          <a href="#/register" type="primary">no account? register now.</a>
+        </mouseClick>
+      </div>
 
     </el-form>
   </div>
@@ -58,6 +69,8 @@
 <script>
 import axios from 'axios';
 import api from "js-cookie";
+import mouseClick from "@/adminform/components/mouseClick.vue";
+
 // import {debug} from "script-ext-html-webpack-plugin/lib/common";
 
 export default {
@@ -251,7 +264,7 @@ $cursor: #fff;
   }
 
   .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(218, 128, 128, 0.1);
     background: rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     color: #454545;
@@ -260,67 +273,128 @@ $cursor: #fff;
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+$bg: #edf0f3;
+$dark_gray: #f6f7f8;
+$light_gray: #eee;
+$cursor:white;
 
 body {
   min-height: 100%;
   width: 100%;
   background-color: $bg;
   overflow: hidden;
+}
 
-  .login-form {
-    position: relative;
-    width: 520px;
-    max-width: 100%;
-    padding: 160px 35px 0;
-    margin: 0 auto;
-    overflow: hidden;
-  }
+.login-container {
+  position: relative; /* 必须设置为相对定位或其他定位才能使用伪元素 */
+  min-height: 100vh; /* 使容器至少和视口高度一样 */
+  width: 100%;
 
-  .tips {
-    float: right;
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
-
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
-  }
-
-  .svg-container {
-    padding: 6px 5px 6px 15px;
-    color: $dark_gray;
-    vertical-align: middle;
-    width: 30px;
-    display: inline-block;
-  }
-
-  .title-container {
-    position: relative;
-
-    .title {
-      font-size: 26px;
-      color: $light_gray;
-      margin: 0px auto 40px auto;
-      text-align: center;
-      font-weight: bold;
-    }
-  }
-
-  .show-pwd {
+  &:before {
+    content: "";
     position: absolute;
-    right: 10px;
-    top: 7px;
-    font-size: 16px;
-    color: $dark_gray;
-    cursor: pointer;
-    user-select: none;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('@/adminform/assets/sustech.png');
+    background-size: cover; /* 使背景图片覆盖整个容器 */
+    background-position: center; /* 背景图片居中对齐 */
+    background-repeat: no-repeat; /* 防止背景图片重复 */
+    opacity: 0.8; /* 设置透明度 */
+    z-index: -1; /* 使伪元素在其他内容的下面 */
   }
+}
+
+.el-input {
+  display: inline-block;
+  height: 90%; /* 47px; */
+  width: 85%;
+
+  input {
+    background: transparent;
+    border: 0px;
+    -webkit-appearance: none;
+    border-radius: 0px;
+    padding: 12px 5px 12px 15px;
+    color: $light_gray;
+    height: 47px;
+    caret-color: $cursor;
+
+    &:-webkit-autofill {
+      box-shadow: 0 0 0px 1000px $bg inset !important;
+      -webkit-text-fill-color: $cursor !important;
+    }
+  }
+}
+
+.el-form-item {
+  border: 1px solid rgba(218, 128, 128, 0.1);
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  color: #454545;
+}
+
+.login-form {
+  position: relative;
+  width: 520px;
+  max-width: 100%;
+  padding: 160px 35px 0;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px; /* 设置按钮之间的间隔 */
+}
+
+.button-container .el-button {
+  flex: 1;
+}
+
+.tips {
+  float: right;
+  font-size: 14px;
+  color: #fff;
+  margin-bottom: 10px;
+
+  span {
+    &:first-of-type {
+      margin-right: 16px;
+    }
+  }
+}
+
+.svg-container {
+  padding: 6px 5px 6px 15px;
+  color: $dark_gray;
+  vertical-align: middle;
+  width: 30px;
+  display: inline-block;
+}
+
+.title-container {
+  position: relative;
+
+  .title {
+    font-size: 26px;
+    color: black;
+    margin: 0px auto 40px auto;
+    text-align: center;
+    font-weight: bold;
+  }
+}
+
+.show-pwd {
+  position: absolute;
+  right: 10px;
+  top: 7px;
+  font-size: 16px;
+  color: $dark_gray;
+  cursor: pointer;
+  user-select: none;
 }
 </style>
 
@@ -329,10 +403,10 @@ body {
 <style scoped>
 /* 修改验证器样式 */
 ::v-deep .el-form-item.is-error .el-input__inner {
-  border-color: #889aa4;
+  border-color: #bfd0d9;
 }
 ::v-deep .el-form-item.is-error .el-input__validateIcon {
-  color: #889aa4;
+  color: #bac2c7;
 }
 ::v-deep .el-form-item__error {
   color: #e6a23c;
