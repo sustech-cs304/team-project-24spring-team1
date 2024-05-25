@@ -59,17 +59,16 @@
                         <div style="margin-bottom: 40px;"></div> <!-- 空两行 -->
                         <div class="comment-input-wrapper">
                             <input type="text" class="form-control" v-model="newComments[card.id]" placeholder="Comment here..." style="color: black;">
-                            <base-button class="animation-on-hover" style="margin-left: 10px;" @click="postComment(card.id)">Comment</base-button>
-                        </div>
-                    </div>
-
-                    <div>
+                            <base-button class="animation-on-hover" style="margin-left: 10px;" @click="postComment(card.id)">Shoot!</base-button>
                         <base-button class="animation-on-hover" type="success" @click="getComments(card.id)">
                             <!-- <i class="tim-icons icon-chat-33" style="margin-right: 5px;"></i> Show Comments -->
-                            <i class="tim-icons icon-chat-33" style="margin-right: 5px;"></i>
-                            {{ showComments[card.id] ? 'Hide Comments' : 'Show Comments' }}
-                            
+                            <i class="tim-icons icon-chat-33" ></i>
+                            {{ showComments[card.id] ? 'Hide' : 'Show' }}
                         </base-button>
+                        </div>
+                    </div>
+                    <div>
+            
                         <div v-if="showComments[card.id]">
                             
                             <div v-if="momentComments[card.id]" v-for="(comment, cIndex) in momentComments[card.id]" :key="cIndex">
@@ -80,7 +79,6 @@
                                 </card>
                             </div>
                         </div>
-            
                     </div>
 
 
