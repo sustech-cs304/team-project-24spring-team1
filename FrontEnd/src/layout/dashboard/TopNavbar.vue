@@ -1,12 +1,13 @@
 <style>
-    .notification {
-        position: absolute;
-        top: 17px;
-        right: 0px;
-        width: 6px;
-        height: 6px;
-    }
+.notification {
+    position: absolute;
+    top: 17px;
+    right: 0px;
+    width: 6px;
+    height: 6px;
+}
 </style>
+
 <template>
   <nav
     class="navbar navbar-expand-lg navbar-absolute"
@@ -30,7 +31,6 @@
             <span class="navbar-toggler-bar bar3"></span>
           </button>
         </div>
-<!--        <a class="navbar-brand" href="#pablo">{{ routeName }}</a>-->
         <a class="navbar-brand" href="#/dashboard/dashboard">SUSTech Event</a>
       </div>
       <button
@@ -67,8 +67,6 @@
               @click="searchModalVisible = true"
             >
               <input type="text" class="custom-input" placeholder="Search..." v-model="searchQuery">
-              <!-- <div class="input-group-addon"><i class="tim-icons icon-zoom-split"></i></div> -->
-              <!-- 在搜索按钮的点击事件上添加 search 方法 -->
               <button
                   class="btn btn-link"
                   id="search-button"
@@ -78,7 +76,6 @@
               >
                 <i class="tim-icons icon-zoom-split"></i>
               </button>
-<!--               You can choose types of search input -->
             </div>
             <router-link to="/dashboard/chat">
               <base-button round icon type="primary">
@@ -138,8 +135,6 @@ export default {
   computed: {
     routeName() {
       return "SUSTech Event";
-      // const { name } = this.$route;
-      // return this.capitalizeFirstLetter(name);
     },
     isRTL() {
       return this.$rtl.isRTL;
@@ -151,26 +146,31 @@ export default {
       showMenu: false,
       searchModalVisible: false,
       searchQuery: "",
-      imageUrl: localStorage.getItem('imageUrl'),
+      imageUrl: '',
     };
   },
-
+  mounted() {
+    this.fetchUserProfile();
+  },
   methods: {
-
-    search() {
-      // 根据搜索关键字执行搜索操作
-      // 这里可以使用axios或其他方法进行搜索
-      // 假设搜索结果为events_show的一部分，如果搜索到结果，跳转到dashboard页面
-      // if (this.searchQuery.trim() !== "") {
-        // this.$message.success("top-bar success");
-          // 调用 Dashboard 组件的 receiveSearchResults 方法并传递搜索结果数据
-
-        if (this.$route.path !== '/dashboard/dashboard') {
-          this.$router.push('/dashboard/dashboard');
-        }
-        this.$root.$emit('search-results', this.searchQuery.trim());
+    fetchUserProfile() {
+      const userId = localStorage.getItem('id');
+      axios.get(`https://backend.sustech.me/api/account/${userId}/profile`)
+        .then(response => {
+          const avatar = response.data.avatar;
+          this.imageUrl = `https://backend.sustech.me/uploads/${avatar}.webp`;
+          localStorage.setItem('imageUrl', this.imageUrl);
+        })
+        .catch(error => {
+          console.error('Error fetching user profile:', error);
+        });
     },
-
+    search() {
+      if (this.$route.path !== '/dashboard/dashboard') {
+        this.$router.push('/dashboard/dashboard');
+      }
+      this.$root.$emit('search-results', this.searchQuery.trim());
+    },
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
     },
@@ -186,13 +186,9 @@ export default {
     hideSidebar() {
       this.$sidebar.displaySidebar(false);
     },
-    // toggleMenu() {
-    //   this.showMenu = !this.showMenu;
-    // },
     toggleMenu() {
       this.showMenu = !this.showMenu;
-      // Navigate to Dashboard page
-      this.$router.push('/dashboard/dashboard'); //'Dashboard'
+      this.$router.push('/dashboard/dashboard');
     },
     sendProfileMessage() {
       console.log('from top bar to profile, set profileCurrentID =', localStorage.getItem('id'));
@@ -204,12 +200,12 @@ export default {
 
 <style>
 .photo {
-  text-align: center; /* 水平居中 */
+  text-align: center;
 }
 
 .avatar {
   display: inline-block;
-  max-width: 100%;    /* 防止图片超出容器边界 */
+  max-width: 100%;
   max-height: 100%;
 }
 </style>
