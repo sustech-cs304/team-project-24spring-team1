@@ -195,7 +195,7 @@ export default {
 
     receiveSearchParam(keyword) {
       this.keyword = keyword;
-      this.$message.success(this.keyword);
+      // this.$message.success(this.keyword);
       this.updateFilterEvents();
     }
   },
