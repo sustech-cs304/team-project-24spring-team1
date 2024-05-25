@@ -50,8 +50,13 @@
                     
                     <div class="card-text">{{ extractContent(card.content) }}</div>
                     <!-- <div class="card-text">content: {{ card.content }}</div> -->
-                    <img :src="extractImageLink(card.content)"/>
-                    
+                    <div class="image-container">
+                        <img :src="extractImageLink(card.content)" style="width: 400px; height: auto;"/>    
+                        
+                    </div>
+
+                    <!-- <img :src="extractImageLink(card.content)"/>
+                     -->
                     <!-- <img :src="'https://backend.sustech.me/uploads/273d5fb1-558b-440a-a1d9-3021e13599d4.webp'" alt="Uploaded Image" /> -->
                     <!-- <img :src="imageUrl" alt="Uploaded Image" v-if="imageUrl" /> -->
                     
