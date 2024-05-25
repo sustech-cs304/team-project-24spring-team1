@@ -1,18 +1,4 @@
 <template>
-  <!-- <div>
-    <div>
-      <h3>Rooms</h3>
-      <pre>{{ JSON.stringify(rooms, null, 2) }}</pre>
-    </div>
-    <div>
-      <h3>Messages</h3>
-      <pre>{{ JSON.stringify(messages, null, 2) }}</pre>
-    </div>
-    <div>
-      <h3>Chat</h3>
-      <pre>{{ JSON.stringify(chat, null, 2) }}</pre>
-    </div>
-  </div> -->
   <vue-advanced-chat
     :current-user-id="currentUserId"
     :rooms="JSON.stringify(rooms)"
@@ -26,7 +12,7 @@
     :message-actions="JSON.stringify(messageActions)"
     :show-new-messages-driver=false
     @fetch-messages="fetchMessages($event.detail[0])"
-    @send-message="sendMessage($event.detail[0], $event.detail[1])"
+    @send-message="sendMessage($event.detail[0], $event.detail[1], $event.detail[2])"
   />
 </template>
 
@@ -47,24 +33,10 @@ export default {
       messages: [],
       messagesLoaded: true,
       roomsLoaded: true,
-      roomActions: [
-        // { name: 'inviteUser', title: 'Invite User' },
-        // { name: 'removeUser', title: 'Remove User' },
-        // { name: 'deleteRoom', title: 'Delete Room' }
-      ],
+      roomActions: [],
       showAddRoom: false,
       showSearch: true,
-      messageActions: [
-        // {
-        //   name: 'replyMessage',
-        //   title: 'Reply'
-        // },
-        // {
-        //   name: 'editMessage',
-        //   title: 'Edit Message',
-        //   onlyMe: true
-        // },
-      ],
+      messageActions: [],
     }
   },
   mounted() {
@@ -145,10 +117,8 @@ export default {
           }
         }))
 
-        // 找到第一个不是当前用户的用户，并使用该用户的用户名作为房间名
         const otherUser = users.find(user => user._id !== this.currentUserId)
         const roomName = otherUser ? otherUser.username : `Room ${chat.id}`
-
         const roomAvatar = otherUser ? otherUser.avatar : ''
 
         return {
@@ -173,12 +143,11 @@ export default {
         }
       })
 
-      // 使用数组赋值而不是push方法
       this.rooms = rooms
     },
     async fetchMessages({ room, options = {} }) {
       this.messagesLoaded = false
-      console.log(`Fetching messages for room:`, room)
+      console.log(`Fetching messages for room:`, room.roomId)
 
       try {
         const response = await axios.get(`https://backend.sustech.me/api/chat/${room.roomId}/message`, {
@@ -186,15 +155,53 @@ export default {
             Authorization: `Bearer ${this.token}`
           },
           params: {
-            page: options.page || 1 // 使用传入的分页参数
+            page: options.page || 1
           }
         })
 
         const chatMessages = response.data.messages.map(message => {
           const sender = this.chat.find(chat => chat.id.toString() === room.roomId).members.find(member => member.id === message.account_id)
+          const files = []
+
+          console.log('fetch message content =', message.content)
+          const contentParts = message.content.split('```')
+          const content = contentParts[0].trim()
+          
+          if (contentParts.length > 1) {
+            try {
+              const fileContent = contentParts[1].trim()
+              const fileArray = JSON.parse(fileContent)
+              console.log('fileArray =', fileArray)
+
+              fileArray.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                  console.log('fetch message with image file =', file)
+                  axios.get(file.url, { responseType: 'blob' })
+                    .then(response => {
+                      const reader = new FileReader()
+                      reader.onload = (e) => {
+                        file.preview = e.target.result
+                        // Push the file with preview to the files array here to ensure it happens after preview is set
+                        files.push(file)
+                        console.log('now the file is', file)
+                      }
+                      reader.readAsDataURL(response.data)
+                    })
+                    .catch(error => {
+                      console.error('Error fetching file preview:', error)
+                    })
+                } else {
+                  files.push(file)
+                }
+              })
+            } catch (error) {
+              console.error('Error parsing file content:', error)
+            }
+          }
+
           return {
             _id: message.id.toString(),
-            content: message.content,
+            content: content,
             index: 1000 - message.id,
             senderId: message.account_id.toString(),
             username: sender ? sender.name : '',
@@ -208,21 +215,67 @@ export default {
             deleted: false,
             disableActions: false,
             disableReactions: false,
-            files: [],
+            files: files,
             reactions: {},
             replyMessage: null
           }
         })
 
-        // 使用数组赋值而不是push方法
+
         this.messages = chatMessages
         this.messagesLoaded = true
       } catch (error) {
         console.error(`Error fetching messages for room ${room.roomId}:`, error)
       }
     },
-    async sendMessage({ roomId, content, files = {}, replyMessage = {}, usersTag = {} }) {
+    async sendMessage({ roomId, content, files = [], replyMessage = {}, usersTag = {} }) {
       console.log('sendMessage: roomID = ', roomId, 'content = ', content)
+
+      const uploadedFiles = []
+      console.log('file is', files)
+
+      if (files != null) {
+        const fileUploadPromises = files.map(file => new Promise((resolve, reject) => {
+          const formData = new FormData()
+          formData.append('file', file.blob)
+
+          axios.post('https://backend.sustech.me/upload', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${this.token}`
+            }
+          })
+          .then(response => {
+            const fileUrl = 'https://backend.sustech.me' + response.data
+            console.log('upload files response', response.data)
+
+            uploadedFiles.push({
+              name: file.name,
+              size: file.size,
+              type: file.type,
+              url: fileUrl,
+              extension: file.extension,
+              progress: 100,
+              preview: '' // 不包含 preview 字段
+            })
+            resolve()
+          })
+          .catch(error => {
+            console.error('Error uploading file:', error)
+            reject(error)
+          })
+        }))
+
+        try {
+          await Promise.all(fileUploadPromises)
+          const filesContent = '```' + JSON.stringify(uploadedFiles) + '```'
+          content += '\n' + filesContent
+          console.log('upload file content =', content)
+        } catch (error) {
+          console.error('Error in file upload promises:', error)
+        }
+      }
+
       try {
         const response = await axios.post(`https://backend.sustech.me/api/chat/${roomId}/message`, {
           content: content
@@ -231,6 +284,7 @@ export default {
             Authorization: `Bearer ${this.token}`
           }
         })
+
         console.log('Response from sendMessage:', response.data)
         const room = this.rooms.find(r => r.roomId === roomId.toString())
         if (room) {
