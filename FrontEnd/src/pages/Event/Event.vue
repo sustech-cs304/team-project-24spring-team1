@@ -69,7 +69,7 @@
                           type="danger"
                           @click="cancelRegisterEvent"
                       >
-                        Cancel
+                        Cancel Registration
                       </base-button>
                     </div>
 
@@ -111,7 +111,8 @@
               <div>
                 <div v-for="(comment, cIndex) in comments" :key="cIndex">
                   <card class="mb-3">
-                    <h4 class="card-title">{{ comment.account.name }}</h4>
+<!--                    <h4 class="card-title">{{ comment.account.name }}</h4>-->
+                    <a href="#/dashboard/profile" @click="handleClick(comment.account.id)">{{ comment.account.name }}</a>
                     <p class="card-text">{{ comment.content }}</p>
                     <p class="card-text"><small class="text-muted">{{ new Date(comment.created_at).toLocaleString() }}</small></p>
                   </card>
@@ -197,6 +198,11 @@ export default {
           });
     },
 
+    handleClick(newID) {
+      console.log('set profile ID =', newID)
+      localStorage.setItem('profileCurrentID', newID);
+      window.location.href = '#/dashboard/profile';
+    },
 
 
     registerForEvent() {
@@ -217,6 +223,7 @@ export default {
             this.$message.success("Successfully registered for the event.");
             this.errorMessage = ''; // 清空错误消息
             this.isRegister = true; // 设置已注册状态
+            window.location.reload();
           })
           .catch(error => {
             // 根据错误响应设置错误消息
@@ -262,6 +269,7 @@ export default {
             this.$message.success("Successfully canceled registration for the event.");
             this.errorMessage = ''; // 清空错误消息
             this.isRegister = false; // 设置为未注册状态
+            window.location.reload();
           })
           .catch(error => {
             // 根据错误响应设置错误消息
