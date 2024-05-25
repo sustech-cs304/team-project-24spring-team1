@@ -25,12 +25,12 @@
           <div v-for="(event, index) in filter_events" :key="index" class="col-lg-4 mb-4" :class="{ 'text-right': false }">
             <card style="width: 23rem; margin-left: 10px">
               <img class="card-img-top" :src="getEventImagePath(event)" style="width: 60rem; height: 16rem;" />
-              <h4 class="card-title">{{ event.cover }}</h4>
-              <h4 class="card-title">{{ event.name }}</h4>
+<!--              <h4 class="card-title">{{ event.cover }}</h4>-->
+              <h2 class="card-title">{{ event.name }}</h2>
               <div>
                 <i class="tim-icons icon-time-alarm" style="display: inline-block;"></i>
                 <span style="margin-left: 10px;"></span>
-                <p class="card-text" style="display: inline-block;">{{ event.start_at}}</p>
+                <p class="card-text" style="display: inline-block;">{{ formatDate(event.start_at)}}</p>
               </div>
               <div>
                 <i class="tim-icons icon-square-pin" style="display: inline-block;"></i>
@@ -188,7 +188,19 @@ export default {
         this.currentPage--;
         this.fetchEvents(this.currentPage);
       }
-    }
+    },
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      };
+      return date.toLocaleDateString('en-US', options);
+    },
   },
   mounted() {
     this.fetchEvents();
