@@ -129,7 +129,7 @@ export default {
           index: new Date(lastMessage.created_at).getTime(),
           lastMessage: {
             _id: lastMessage.id.toString(),
-            content: lastMessage.content,
+            content: lastMessage.content.split('```')[0].trim(),
             senderId: lastMessage.account_id.toString(),
             username: chat.members.find(member => member.id === lastMessage.account_id)?.name || '',
             timestamp: new Date(lastMessage.created_at).toLocaleTimeString(),
@@ -221,8 +221,26 @@ export default {
           }
         })
 
-
         this.messages = chatMessages
+
+        // Update the corresponding room's lastMessage and index fields
+        const lastMessage = chatMessages[0]
+        const roomIndex = this.rooms.findIndex(r => r.roomId === room.roomId)
+        if (roomIndex !== -1) {
+          this.rooms[roomIndex].lastMessage = {
+            _id: lastMessage._id,
+            content: lastMessage.content.split('```')[0].trim(),
+            senderId: lastMessage.senderId,
+            username: lastMessage.username,
+            timestamp: lastMessage.timestamp,
+            saved: lastMessage.saved,
+            distributed: lastMessage.distributed,
+            seen: lastMessage.seen,
+            new: lastMessage.new
+          }
+          this.rooms[roomIndex].index = new Date(lastMessage.timestamp).getTime()
+        }
+
         this.messagesLoaded = true
       } catch (error) {
         console.error(`Error fetching messages for room ${room.roomId}:`, error)
