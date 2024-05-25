@@ -118,7 +118,6 @@
                 aria-expanded="true"
               >
                 <div class="photo">
-<!--                  <img :src= "this.imageUrl" alt="User Avatar"/> 不能在mounted里面设置 -->
                   <img class="avatar" :src="imageUrl" alt="User Avatar" />
                 </div>
 
@@ -198,10 +197,8 @@ export default {
       this.$router.push('/dashboard/dashboard'); //'Dashboard'
     },
     sendProfileMessage() {
-      // var id = "2";
-      // var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzE2MDEwODMyLCJleHAiOjE3MTYwOTcyMzJ9.EvfsW1EKvwYTTYfJ9aVw3F5q2tBG7Se--hKuFATsRJo";
-      // localStorage.setItem('id', id);
-      // localStorage.setItem('token', token);
+      console.log('from top bar to profile, set profileCurrentID =', localStorage.getItem('id'));
+      localStorage.setItem('profileCurrentID', localStorage.getItem('id'));
     },
   },
 };

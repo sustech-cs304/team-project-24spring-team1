@@ -70,6 +70,7 @@ export default {
       this.userNotFound = true;
       console.log("User not found!");
     } else {
+      console.log("Update userCurrent.id to", profileCurrentID);
       this.userCurrent.id = profileCurrentID;
     }
 
