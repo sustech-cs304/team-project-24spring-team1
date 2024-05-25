@@ -48,10 +48,15 @@ jobs:
           ${{ runner.os }}-cargo-
 
     - name: Build
-      run: cargo build
+      run: cargo build --release --bin backend --features cli
 
     - name: Run Clippy
       run: cargo clippy --all-targets
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        path: target/release/backend
 
 
   test:
