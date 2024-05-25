@@ -10,7 +10,8 @@
     :show-search="JSON.stringify(showSearch)"
     :room-actions="JSON.stringify(roomActions)"
     :message-actions="JSON.stringify(messageActions)"
-    :show-new-messages-driver=false
+    :show-new-messages-divider="JSON.stringify(showNewMessagesDivider)"
+    :show-reaction-emojis="JSON.stringify(showReactionEmojis)"
     @fetch-messages="fetchMessages($event.detail[0])"
     @send-message="sendMessage($event.detail[0], $event.detail[1], $event.detail[2])"
   />
@@ -36,6 +37,8 @@ export default {
       roomActions: [],
       showAddRoom: false,
       showSearch: true,
+      showNewMessagesDivider: false,
+      showReactionEmojis: false,
       messageActions: [],
     }
   },
