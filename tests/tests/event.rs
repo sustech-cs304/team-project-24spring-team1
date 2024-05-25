@@ -3,6 +3,7 @@ use actix_web::test;
 use chrono::NaiveDateTime;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::common::{create_app, TestApp};
 use crate::tests::account::AccountCard;
@@ -19,14 +20,19 @@ pub enum EventType {
     Other,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub struct Point(pub f64, pub f64);
+
 #[derive(Debug, Serialize)]
 pub struct NewEventForm<'a> {
     pub name: &'a str,
     pub kind: EventType,
+    pub description: &'a str,
+    pub cover: Option<Uuid>,
     pub start_at: NaiveDateTime,
     pub end_at: NaiveDateTime,
     pub venue_id: i32,
-    pub description: &'a str,
+    pub location: Point,
     pub tickets: Option<i32>,
     pub registeration_deadline: Option<NaiveDateTime>,
 }
@@ -52,10 +58,12 @@ pub struct EventDisplayResponse {
     pub id: i32,
     pub name: String,
     pub kind: EventType,
+    pub description: String,
+    pub cover: Uuid,
     pub start_at: NaiveDateTime,
     pub end_at: NaiveDateTime,
     pub venue: Place,
-    pub description: String,
+    pub location: Point,
     pub organizer: AccountCard,
     pub tickets: Option<i32>,
     pub registeration_deadline: Option<NaiveDateTime>,
@@ -67,10 +75,12 @@ pub struct EventSummaryResponse {
     pub id: i32,
     pub name: String,
     pub kind: EventType,
+    pub description: String,
+    pub cover: Uuid,
     pub start_at: NaiveDateTime,
     pub end_at: NaiveDateTime,
     pub venue: Place,
-    pub description: String,
+    pub location: Point,
     pub organizer: AccountCard,
     pub tickets: Option<i32>,
     pub registeration_deadline: Option<NaiveDateTime>,
@@ -118,10 +128,12 @@ lazy_static! {
     static ref DEFAULT_EVENT: NewEventForm<'static> = NewEventForm {
         name: "Test Event",
         kind: EventType::Show,
+        description: "Test Description",
+        cover: None,
         start_at: parse_datetime("2021-01-01 00:00:00"),
         end_at: parse_datetime("2021-01-02 00:00:00"),
         venue_id: 1,
-        description: "Test Description",
+        location: Point(0.0, 0.0),
         tickets: None,
         registeration_deadline: None,
     };
@@ -178,10 +190,12 @@ async fn test_event_list() {
         &NewEventForm {
             name: EVENT_NAME_1,
             kind: EventType::Show,
+            description: "Test Description 1",
+            cover: None,
             start_at: parse_datetime("2021-01-01 00:00:00"),
             end_at: parse_datetime("2021-01-02 00:00:00"),
             venue_id: 1,
-            description: "Test Description 1",
+            location: Point(0.0, 0.0),
             tickets: None,
             registeration_deadline: None,
         },
@@ -193,10 +207,12 @@ async fn test_event_list() {
         &NewEventForm {
             name: EVENT_NAME_2,
             kind: EventType::Competition,
+            description: "Test Description 2",
+            cover: None,
             start_at: parse_datetime("2021-01-01 00:00:00"),
             end_at: parse_datetime("2021-01-02 00:00:00"),
             venue_id: 2,
-            description: "Test Description 2",
+            location: Point(0.0, 0.0),
             tickets: None,
             registeration_deadline: None,
         },
