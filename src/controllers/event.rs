@@ -139,10 +139,14 @@ async fn list_events(
     };
 
     let event_by_id = if let Some(id) = query.name.as_ref().and_then(|name| name.parse().ok()) {
-        let event = Event::find_as_summary_with_participation(id)
+        match Event::find_as_summary_with_participation(id)
             .get_result(&mut state.pool.get().await?)
-            .await?;
-        Some(event)
+            .await
+        {
+            Ok(event) => Some(event),
+            Err(diesel::result::Error::NotFound) => None,
+            Err(e) => return Err(e.into()),
+        }
     } else {
         None
     };
