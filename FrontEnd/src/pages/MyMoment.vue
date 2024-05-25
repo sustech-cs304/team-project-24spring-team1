@@ -72,7 +72,7 @@
                             
                             <div v-if="momentComments[card.id]" v-for="(comment, cIndex) in momentComments[card.id]" :key="cIndex">
                                 <card class="mb-3">
-                                <h4 class="card-title">{{ comment.account.name }}</h4>
+                                <a href="#/dashboard/profile" @click="handleClick(comment.account.id)">{{ comment.account.name }}</a>
                                 <p class="card-text">{{ comment.content }}</p>
                                 <p class="card-text"><small class="text-muted">{{ comment.created_at }}</small></p>
                                 </card>
@@ -126,6 +126,11 @@ export default {
         this.fetchMoments(); // 在组件挂载时,调用fetchMoments方法获取数据
     },
     methods: {
+        handleClick(newID) {
+            console.log('set profile ID =', newID)
+            localStorage.setItem('profileCurrentID', newID);
+            window.location.href = '#/dashboard/profile';
+        },
         getComments(id) {
             const commentUrl = `https://backend.sustech.me/api/moment/${id}/comment`;
 
