@@ -76,34 +76,11 @@
               </button>
 <!--               You can choose types of search input -->
             </div>
-            <base-dropdown
-              tag="li"
-              :menu-on-right="!$rtl.isRTL"
-              title-tag="a"
-              class="nav-item"
-            >
-              <a
-                slot="title"
-                class="dropdown-toggle nav-link"
-                data-toggle="dropdown"
-                aria-expanded="true"
-              >
-                <!-- <div class="notification d-none d-lg-block d-xl-block"></div> -->
-                <i class="tim-icons icon-bell-55"></i>
-                <!-- <i class="notification"></i> -->
-                <p class="d-lg-none">New Notifications</p>
-              </a>
-              <li class="nav-link">
-                <a href="#/dashboard/notifications" class="nav-item dropdown-item"
-                  >Notifications</a
-                >
-              </li>
-              <li class="nav-link">
-                <a href="#/dashboard" class="nav-item dropdown-item"
-                  >Message</a
-                >
-              </li>
-            </base-dropdown>
+            <router-link to="/dashboard/chat">
+              <base-button round icon type="primary">
+                <i class="tim-icons icon-chat-33"></i>
+              </base-button>
+            </router-link>
 
             <base-dropdown
               tag="li"
