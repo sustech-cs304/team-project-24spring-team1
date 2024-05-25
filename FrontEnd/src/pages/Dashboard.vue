@@ -3,32 +3,31 @@
     <div class="row">
       <side-bar>
         <template>
+
           <div class="filter-container-custom">
             <div
                 class="filter-item"
                 v-for="(filter, index) in filters"
                 :key="index"
                 :style="filterStyles(index)"
+                @change = "applyFilter"
             >
-              <BaseCheckbox v-model="filter.checked" :id="'filter' + index" @change="applyFilter">
+              <BaseCheckbox v-model="filter.checked">
                 {{ filter.label }}
               </BaseCheckbox>
-
             </div>
           </div>
+
         </template>
       </side-bar>
     </div>
-    <div class="row">
-    </div>
-
+    <div class="row"></div>
     <div class="row">
       <div class="col-12">
         <div class="row">
-          <div v-for="(event, index) in events_all" :key="index" class="col-lg-4 mb-4" :class="{ 'text-right': false }">
+          <div v-for="(event, index) in filter_events" :key="index" class="col-lg-4 mb-4" :class="{ 'text-right': false }">
             <card style="width: 23rem; margin-left: 10px">
-  <!--            <img slot="image" class="card-img-top" :src="getEventImagePath(index)" :alt="event.title" style="width: 60rem; height: 16rem;" />-->
-              <img class="card-img-top" :src="getEventImagePath(index)" alt="event.title" style="width: 60rem; height: 16rem;"/>
+              <img class="card-img-top" :src="getEventImagePath(index)" alt="event.title" style="width: 60rem; height: 16rem;" />
               <h4 class="card-title">{{ event.name }}</h4>
               <div>
                 <i class="tim-icons icon-time-alarm" style="display: inline-block;"></i>
@@ -49,178 +48,140 @@
         </div>
       </div>
     </div>
-
-
   </div>
 </template>
 
 <style lang="scss">
-.filter-container-custom { /* 添加样式 */
+.filter-container-custom {
   display: flex;
   flex-direction: column;
 }
 .filter-item label {
-  color: white; // 将字体颜色设置为白色
+  color: white;
 }
 </style>
 
-
 <script>
-import LineChart from "@/components/Charts/LineChart";
-import BarChart from "@/components/Charts/BarChart";
-import * as chartConfigs from "@/components/Charts/config";
-import TaskList from "./Dashboard/TaskList";
-import UserTable from "./Dashboard/UserTable";
-import config from "@/config";
-import {BaseCheckbox} from "@/components";
-import Event from '@/pages/Event/Event.vue';
+import { BaseCheckbox } from "@/components";
 import axios from "axios";
 
 export default {
   components: {
-    LineChart,
-    BarChart,
-    TaskList,
-    UserTable,
     BaseCheckbox,
-    Event,
   },
   data() {
     return {
       filters: [
-        {label: "show", checked: false},
-        {label: "lecture", checked: false},
-        {label: "competition", checked: false},
+        { label: "show", checked: false },
+        { label: "lecture", checked: false },
+        { label: "competition", checked: false },
       ],
       events: [],
-      events_all: [],
+      filter_events: [],
       events_show: [],
       events_lecture: [],
       events_competition: [],
-      filterParams: "",
     };
   },
-  computed: {
-    enableRTL() {
-      return this.$route.query.enableRTL;
-    },
-    isRTL() {
-      return this.$rtl.isRTL;
-    },
-  },
   methods: {
-    filterStyles(index) { // 定义动态样式方法
+    filterStyles(index) {
       return {
         marginTop: '10px',
         marginHeight: '10px',
-        marginLeft: '20px', // 左边距
-        marginBlock: '0px', // 垂直方向上边距
+        marginLeft: '20px',
+        marginBlock: '0px',
       };
     },
     getEventImagePath(index) {
-      // return `events/${index + 1}/1.jpg`;
       return `https://backend.sustech.me/uploads/${this.events[index].cover}.webp`;
     },
-    getEventUrlPath(index) {
-      return `#/event/${index}`;
+    getEventUrlPath(id) {
+      return `#/event/${id}`;
     },
-
+    getFilterStatus() {
+      const storedFilters = localStorage.getItem("filters");
+      if (storedFilters) {
+        this.filters = JSON.parse(storedFilters);
+      }
+      this.updateFilterEvents();
+    },
     fetchEvents() {
       const url = 'https://backend.sustech.me/api/event';
-      // axios.get(url)
-      //     .then(response => {
-      //       this.events_all = response.data.events;
-      //     })
-      //     .catch(error => {
-      //       console.error('Error fetching events:', error);
-      //       this.error = 'Error fetching events';
-      //     });
+      localStorage.setItem("filters",JSON.stringify(this.filters));
 
       axios.get(url)
           .then(response => {
-            this.events_all = response.data.events;
+            this.events = response.data.events;
+            this.updateFilterEvents();
           })
           .catch(error => {
             console.error('Error fetching events:', error);
-            this.error = 'Error fetching events';
           });
 
       axios.get(url, { params: { kind: "show" } })
           .then(response => {
             this.events_show = response.data.events;
+            this.updateFilterEvents();
           })
           .catch(error => {
             console.error('Error fetching events:', error);
-            this.error = 'Error fetching events';
           });
 
       axios.get(url, { params: { kind: "lecture" } })
           .then(response => {
             this.events_lecture = response.data.events;
+            this.updateFilterEvents();
           })
           .catch(error => {
             console.error('Error fetching events:', error);
-            this.error = 'Error fetching events';
           });
 
       axios.get(url, { params: { kind: "competition" } })
           .then(response => {
             this.events_competition = response.data.events;
+            this.updateFilterEvents();
           })
           .catch(error => {
             console.error('Error fetching events:', error);
-            this.error = 'Error fetching events';
           });
     },
-
-    applyFilter() {
-      // Initialize an empty array to collect events based on filters
+    updateFilterEvents() {
       let filteredEvents = [];
+      // this.filters = localStorage.getItem("filters");
 
-      // Check each filter and add the corresponding events to filteredEvents
-      this.filters.forEach((filter, index) => {
-        if (filter.checked) {
-          if (filter.label === "show") {
-            this.events = this.events_show;
-          } else if (filter.label === "lecture") {
-            this.events = this.events_lecture;
-          } else if (filter.label === "competition") {
-            this.events = this.events_competition;
-          }
-        }
-      });
-
-      // If no filters are selected, show all events
-      if (filteredEvents.length === 0) {
-        this.events = this.events_all;
-      } else {
-        // Remove duplicates and set the filtered events
-        this.events = Array.from(new Set(filteredEvents));
+      if (this.filters[0].checked) {
+        filteredEvents = filteredEvents.concat(this.events_show);
       }
-    }
+      if (this.filters[1].checked) {
+        filteredEvents = filteredEvents.concat(this.events_lecture);
+      }
+      if (this.filters[2].checked) {
+        filteredEvents = filteredEvents.concat(this.events_competition);
+      }
 
+      if (!this.filters[0].checked && !this.filters[1].checked && !this.filters[2].checked) {
+        this.filter_events = this.events;
+      } else {
+        this.filter_events = filteredEvents;
+      }
+    },
+    applyFilter() {
+      // this.$message.success("haha");
+      localStorage.setItem("filters", JSON.stringify(this.filters));
+      this.updateFilterEvents();
+    }
   },
   mounted() {
-    this.i18n = this.$i18n;
-    if (this.enableRTL) {
-      this.i18n.locale = "ar";
-      this.$rtl.enableRTL();
-    }
+    // this.getFilterStatus();
     this.fetchEvents();
-  },
-
-  beforeDestroy() {
-    if (this.$rtl.isRTL) {
-      this.i18n.locale = "en";
-      this.$rtl.disableRTL();
-    }
-  },
+    this.updateFilterEvents();
+  }
 };
 </script>
+
 <style scoped>
 .btn-center {
   display: block;
   margin: 0 auto;
 }
-
 </style>

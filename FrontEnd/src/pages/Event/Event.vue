@@ -5,15 +5,6 @@
       <fade-transition :duration="100" mode="out-in">
         <div class="col-lg-4" :class="{ 'text-right': false }">
           <card type="nav-tabs" class="text-left" style="width: 70rem; left: 11rem">
-            <div v-if="errorMessage">
-              <base-alert type="primary" dismissible>
-                <strong>Primary!</strong> {{ errorMessage }}
-              </base-alert>
-            </div>
-            <div v-else>
-<!--              <div slot="header" class="card-header-primary">-->
-<!--                EventID: {{ getEventID() }}-->
-<!--              </div>-->
               <br>
               <div class="d-flex">
                 <div class="col">
@@ -65,14 +56,21 @@
                     <br>
                     <div>
                       <base-button
-                          v-if="!isRegistered"
+                          v-if="!isRegister"
                           class="animation-on-hover"
                           type="primary"
                           @click="registerForEvent"
                       >
                         Register
                       </base-button>
-                      <span v-else class="text-success">Already Registered</span>
+                      <base-button
+                          v-else
+                          class="animation-on-hover"
+                          type="danger"
+                          @click="cancelRegisterEvent"
+                      >
+                        Cancel
+                      </base-button>
                     </div>
 
 <!--                    <card type="nav-tabs">-->
@@ -119,8 +117,6 @@
                   </card>
                 </div>
               </div>
-
-            </div>
           </card>
         </div>
       </fade-transition>
@@ -145,22 +141,48 @@ export default {
       comments: [],
       newComment: '', // 用于存储新评论的内容
       errorMessage: '', // 用于存储错误信息
-      isRegistered: false, // 用于跟踪用户是否已注册
+      isRegister: false, // 用于跟踪用户是否已注册
       participatedEvents: [],
     };
   },
   mounted() {
     this.eventId = this.$route.params.id;
+    this.getRegisterStatus(this.eventId);
     this.fetchEventData(this.eventId);
     this.getComments();
-    this.fetchParticipatedEvents();
-    this.checkIfRegistered();
   },
 
   methods: {
     getEventID(){
       return this.eventId;
     },
+
+    getRegisterStatus(eventId){
+      const url = `https://backend.sustech.me/api/event/${eventId}/participated`;
+      this.token = localStorage.getItem('token');
+      if (!this.token) {
+        console.log("Token not found.");
+        return;
+      }
+      axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      })
+          .then(response => {
+            if (response.status === 204) {
+              this.isRegister = true;
+            }
+          })
+          .catch(error => {
+            if (error.response && error.response.status === 404) {
+              this.isRegister = false;
+            } else {
+              console.error('Error fetching participated events:', error);
+            }
+          });
+    },
+
     fetchEventData(eventId){
       const url = `https://backend.sustech.me/api/event/${eventId}`;
       axios.get(url, {
@@ -175,31 +197,6 @@ export default {
           });
     },
 
-    fetchParticipatedEvents() {
-      const url = `https://backend.sustech.me/api/event/participated`;
-      this.token = localStorage.getItem('token');
-      if (!this.token) {
-        console.log("Token not found.");
-        return;
-      }
-
-      axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${this.token}`
-        }
-      })
-          .then(response => {
-            this.participatedEvents = response.data.events;
-          })
-          .catch(error => {
-            console.error('Error fetching participated events:', error);
-          });
-    },
-
-    checkIfRegistered() {
-      console.log(this.participatedEvents)
-      this.isRegistered = this.participatedEvents.some(event => event.id === parseInt(this.eventId));
-    },
 
 
     registerForEvent() {
@@ -217,22 +214,25 @@ export default {
       })
           .then(response => {
             // Handle successful registration
-            alert('Successfully registered for the event.');
+            this.$message.success("Successfully registered for the event.");
             this.errorMessage = ''; // 清空错误消息
-            this.isRegistered = true; // 设置已注册状态
+            this.isRegister = true; // 设置已注册状态
           })
           .catch(error => {
             // 根据错误响应设置错误消息
             if (error.response) {
-              switch (error.response.data.error) {
+              switch (error.response.data.kind) {
                 case 'record_not_found':
                   this.errorMessage = 'The event is not found.';
+                  this.$message.error("The event is not found.")
                   break;
                 case 'not_acceptable':
                   this.errorMessage = 'The registration deadline has passed.';
+                  this.$message.error("The registration deadline has passed.")
                   break;
                 case 'record_already_exists':
                   this.errorMessage = 'You have already registered for the event.';
+                  this.$message.error("You have already registered for the event.")
                   break;
                 default:
                   this.errorMessage = 'An unknown error occurred.';
@@ -243,6 +243,45 @@ export default {
             console.error('Error Register:', error);
           });
     },
+
+    cancelRegisterEvent() {
+      const apiUrl = `https://backend.sustech.me/api/event/${this.eventId}/register`;
+      this.token = localStorage.getItem('token');
+      if (!this.token) {
+        console.log("Token not found.");
+        return;
+      }
+
+      axios.delete(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      })
+          .then(response => {
+            // 处理取消注册成功的情况
+            this.$message.success("Successfully canceled registration for the event.");
+            this.errorMessage = ''; // 清空错误消息
+            this.isRegister = false; // 设置为未注册状态
+          })
+          .catch(error => {
+            // 根据错误响应设置错误消息
+            if (error.response) {
+              switch (error.response.data.kind) {
+                case 'record_not_found':
+                  this.errorMessage = 'The user has not registered for the event.';
+                  this.$message.error("The user has not registered for the event.")
+                  break;
+                default:
+                  this.errorMessage = 'An unknown error occurred.';
+                  this.$message.error("An unknown error occurred.")
+              }
+            } else {
+              this.errorMessage = 'Failed to cancel registration for the event.';
+            }
+            console.error('Error Cancel Register:', error);
+          });
+    },
+
 
     submitComment() {
       const commentUrl = `https://backend.sustech.me/api/event/${this.eventId}/comment`;
