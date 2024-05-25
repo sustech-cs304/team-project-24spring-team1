@@ -120,7 +120,7 @@ type UpdateAll = Update<Table>;
 type WithId = Eq<events::id, i32>;
 type Find = dsl::Find<All, i32>;
 type FindJoin = InnerJoin<InnerJoin<Find, accounts::table>, places::table>;
-type ParticipationCount = Bracket<CountReferencesIn<accounts::id, participation::account_id>>;
+type ParticipationCount = Bracket<CountReferencesIn<events::id, participation::event_id>>;
 type FindWithParticipationAs<T> = Select<FindJoin, (ParticipationCount, AsSelect<T, Pg>)>;
 type Join = InnerJoin<InnerJoin<All, accounts::table>, places::table>;
 type JoinWithParticipation<T> = Select<Join, (ParticipationCount, AsSelect<T, Pg>)>;
@@ -141,8 +141,8 @@ impl Event {
 
     pub fn all_summary_with_participation() -> JoinWithParticipation<EventSummary> {
         Self::joined().select((
-            accounts::id
-                .count_references_in(participation::account_id)
+            events::id
+                .count_references_in(participation::event_id)
                 .bracket(),
             EventSummary::as_select(),
         ))
@@ -160,8 +160,8 @@ impl Event {
 
     pub fn find_as_display_with_participation(id: i32) -> FindWithParticipationAs<EventDisplay> {
         Self::find_joined(id).select((
-            accounts::id
-                .count_references_in(participation::account_id)
+            events::id
+                .count_references_in(participation::event_id)
                 .bracket(),
             EventDisplay::as_select(),
         ))
@@ -169,8 +169,8 @@ impl Event {
 
     pub fn find_as_summary_with_participation(id: i32) -> FindWithParticipationAs<EventSummary> {
         Self::find_joined(id).select((
-            accounts::id
-                .count_references_in(participation::account_id)
+            events::id
+                .count_references_in(participation::event_id)
                 .bracket(),
             EventSummary::as_select(),
         ))
