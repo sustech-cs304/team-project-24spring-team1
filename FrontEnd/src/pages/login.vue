@@ -13,7 +13,7 @@
         <el-input
           ref="userName"
           v-model="loginForm.userName"
-          placeholder="email"
+          placeholder="SID"
           name="userName"
           type="text"
           tabindex="1"
@@ -30,7 +30,7 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="password"
+          placeholder="Password"
           name="password"
           tabindex="2"
           auto-complete="on"
