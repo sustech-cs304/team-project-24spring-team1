@@ -23,7 +23,7 @@
                     <div>
                       <i class="tim-icons icon-time-alarm" style="display: inline-block;"></i>
                       <span style="margin-left: 10px;"></span>
-                      <p class="card-text" style="display: inline-block;">{{ event.start_at }} - {{ event.end_at }}</p>
+                      <p class="card-text" style="display: inline-block;">{{ new Date(event.start_at).toLocaleString() }} - {{ new Date(event.end_at).toLocaleString() }}</p>
                     </div>
 
                     <div>
@@ -41,7 +41,7 @@
                     <div>
                       <i class="tim-icons icon-bell-55" style="display: inline-block;"></i>
                       <span style="margin-left: 10px;"></span>
-                      <p class="card-text" style="display: inline-block;">{{ event.registration_deadline }}</p>
+                      <p class="card-text" style="display: inline-block;">{{ new Date(event.registration_deadline).toLocaleString() }}</p>
                     </div>
                     <br>
                     <div>
@@ -113,7 +113,7 @@
                   <card class="mb-3">
                     <h4 class="card-title">{{ comment.account.name }}</h4>
                     <p class="card-text">{{ comment.content }}</p>
-                    <p class="card-text"><small class="text-muted">{{ comment.created_at }}</small></p>
+                    <p class="card-text"><small class="text-muted">{{ new Date(comment.created_at).toLocaleString() }}</small></p>
                   </card>
                 </div>
               </div>
