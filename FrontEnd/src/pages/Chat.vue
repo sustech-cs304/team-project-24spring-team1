@@ -19,7 +19,9 @@
     :rooms-order="JSON.stringify(roomsOrder)"
     :messages="JSON.stringify(messages)"
     :messages-loaded="JSON.stringify(messagesLoaded)"
-    :rooms-loaded=true
+    :rooms-loaded="JSON.stringify(roomsLoaded)"
+    :show-add-room="JSON.stringify(showAddRoom)"
+    :show-search="JSON.stringify(showSearch)"
     :room-actions="JSON.stringify(roomActions)"
     :message-actions="JSON.stringify(messageActions)"
     :show-new-messages-driver=false
@@ -36,27 +38,23 @@ register()
 export default {
   data() {
     return {
-      currentUserId: localStorage.getItem('id'), // 从 localStorage 读取 currentUserId
-      token: localStorage.getItem('token'), // 从 localStorage 读取 token
+      currentUserId: localStorage.getItem('id'),
+      token: localStorage.getItem('token'),
       chat: [],
       rooms: [],
+      allRooms: [],
       roomsOrder: "desc",
       messages: [],
-      messagesLoaded: true, // 用于跟踪消息加载状态
+      messagesLoaded: true,
+      roomsLoaded: true,
       roomActions: [
-        { name: 'inviteUser', title: 'Invite User' },
-        { name: 'removeUser', title: 'Remove User' },
-        { name: 'deleteRoom', title: 'Delete Room' }
+        // { name: 'inviteUser', title: 'Invite User' },
+        // { name: 'removeUser', title: 'Remove User' },
+        // { name: 'deleteRoom', title: 'Delete Room' }
       ],
+      showAddRoom: false,
+      showSearch: true,
       messageActions: [
-        // {
-        //   name: 'addMessageToFavorite',
-        //   title: 'Add To Favorite'
-        // },
-        // {
-        //   name: 'shareMessage',
-        //   title: 'Share Message'
-        // },
         // {
         //   name: 'replyMessage',
         //   title: 'Reply'
@@ -66,15 +64,6 @@ export default {
         //   title: 'Edit Message',
         //   onlyMe: true
         // },
-        // {
-        //   name: 'deleteMessage',
-        //   title: 'Delete Message',
-        //   onlyMe: true
-        // },
-        // {
-        //   name: 'selectMessages',
-        //   title: 'Select'
-        // }
       ],
     }
   },
@@ -104,6 +93,7 @@ export default {
         }
 
         this.constructRooms()
+        this.allRooms = this.rooms
         this.fetchMessages({ room: this.rooms[0] }) // 初始化时加载第一个房间的消息
       } catch (error) {
         console.error('Error fetching chats:', error)
@@ -155,12 +145,15 @@ export default {
           }
         }))
 
-        // 从 users 中找到第一个不是 currentUserId 的用户的 avatar
-        const roomAvatar = users.find(user => user._id !== this.currentUserId)?.avatar || ''
+        // 找到第一个不是当前用户的用户，并使用该用户的用户名作为房间名
+        const otherUser = users.find(user => user._id !== this.currentUserId)
+        const roomName = otherUser ? otherUser.username : `Room ${chat.id}`
+
+        const roomAvatar = otherUser ? otherUser.avatar : ''
 
         return {
           roomId: chat.id.toString(),
-          roomName: `Room ${chat.id}`,
+          roomName: roomName,
           avatar: roomAvatar,
           unreadCount: 0,
           index: new Date(lastMessage.created_at).getTime(),
@@ -202,7 +195,7 @@ export default {
           return {
             _id: message.id.toString(),
             content: message.content,
-            index: 1000-message.id,
+            index: 1000 - message.id,
             senderId: message.account_id.toString(),
             username: sender ? sender.name : '',
             avatar: sender ? this.imageURL(sender.avatar) : '',
@@ -248,7 +241,7 @@ export default {
       } catch (error) {
         console.error(`Error sending message to room ${roomId}:`, error)
       }
-    }
+    },
   }
 }
 </script>
