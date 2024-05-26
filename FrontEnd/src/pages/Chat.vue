@@ -25,8 +25,8 @@ register()
 export default {
   data() {
     return {
+      currentRoom: null,
       currentUserId: localStorage.getItem('id'),
-      currentRoomId: null,
       token: localStorage.getItem('token'),
       chat: [],
       rooms: [],
@@ -77,13 +77,8 @@ export default {
         this.constructRooms()
         this.allRooms = this.rooms
 
-        // 初始化时加载第一个房间的消息，并启动定时器
-        if (this.rooms.length > 0) {
-          this.fetchMessages({ room: this.rooms[0] })
-          this.intervalId = setInterval(() => {
-            this.fetchMessages({ room: this.rooms[0] })
-          }, 10000)
-        }
+        // 启动定时器每秒检查新消息
+        this.intervalId = setInterval(this.checkNewMessages, 2000)
       } catch (error) {
         console.error('Error fetching chats:', error)
       }
@@ -118,8 +113,21 @@ export default {
         console.error(`Error fetching messages for chat ${chat.id}:`, error)
       }
     },
-    constructRooms() {
-      const rooms = this.chat.map(chat => {
+    async fetchUsername(accountId) {
+      try {
+        const response = await axios.get(`https://backend.sustech.me/api/account/${accountId}/profile`, {
+          headers: {
+            Authorization: `Bearer ${this.token}`
+          }
+        })
+        return response.data.name
+      } catch (error) {
+        console.error(`Error fetching username for account ${accountId}:`, error)
+        return ''
+      }
+    },
+    async constructRooms() {
+      const rooms = await Promise.all(this.chat.map(async chat => {
         const lastMessage = chat.messages.reduce((latest, message) => {
           return new Date(message.created_at) > new Date(latest.created_at) ? message : latest
         }, chat.messages[0])
@@ -137,6 +145,7 @@ export default {
         const otherUser = users.find(user => user._id !== this.currentUserId)
         const roomName = otherUser ? otherUser.username : `Room ${chat.id}`
         const roomAvatar = otherUser ? otherUser.avatar : ''
+        const username = await this.fetchUsername(lastMessage.account_id)
 
         return {
           roomId: chat.id.toString(),
@@ -148,7 +157,7 @@ export default {
             _id: lastMessage.id.toString(),
             content: lastMessage.content.split('```')[0].trim(),
             senderId: lastMessage.account_id.toString(),
-            username: chat.members.find(member => member.id === lastMessage.account_id)?.name || '',
+            username: username,
             timestamp: new Date(lastMessage.created_at).toLocaleTimeString(),
             saved: true,
             distributed: true,
@@ -158,13 +167,102 @@ export default {
           users: users,
           typingUsers: [Math.min(...chat.members.map(member => member.id))]
         }
-      })
+      }))
 
       this.rooms = rooms
     },
+    async checkNewMessages() {
+      try {
+        const response = await axios.get('https://backend.sustech.me/api/chat', {
+          headers: {
+            Authorization: `Bearer ${this.token}`
+          },
+          params: {
+            page: 1
+          }
+        })
+
+        const newChats = response.data.chats
+        let roomsChanged = false
+
+        // 检查房间数量是否变化
+        if (newChats.length !== this.chat.length) {
+          roomsChanged = true
+          this.chat = newChats
+
+          // 重新获取所有房间的成员和消息
+          for (const chat of this.chat) {
+            await this.fetchChatMembers(chat)
+            await this.fetchChatMessages(chat)
+          }
+
+          await this.constructRooms()
+        } else {
+          // 检查每个房间的消息数量是否变化
+          for (let i = 0; i < newChats.length; i++) {
+            const chatId = newChats[i].id
+            const oldMessages = this.chat[i].messages
+            console.log('oldMessage =', oldMessages)
+
+            const messageResponse = await axios.get(`https://backend.sustech.me/api/chat/${chatId}/message`, {
+              headers: {
+                Authorization: `Bearer ${this.token}`
+              },
+              params: {
+                page: 1
+              }
+            })
+
+            const newMessages = messageResponse.data.messages
+            console.log('newMessages =', newMessages)
+
+            if (newMessages.length !== oldMessages.length) {
+              roomsChanged = true
+              console.log('chatId =', chatId)
+              console.log('currentRoom =', this.currentRoom)
+              console.log('currentRoomId =', this.currentRoom.roomId)
+              if (chatId == this.currentRoom.roomId) {
+                await this.fetchMessages({ room: this.currentRoom })
+              }
+              this.chat[i].messages = newMessages
+
+              // 更新对应房间的 lastMessage 字段
+              const lastMessage = newMessages[0]
+              const username = await this.fetchUsername(lastMessage.account_id)
+              console.log('fetch username =', username)
+              const roomIndex = this.rooms.findIndex(r => r.roomId === newChats[i].id.toString())
+              if (roomIndex !== -1) {
+                this.rooms[roomIndex].lastMessage = {
+                  _id: lastMessage.id.toString(),
+                  content: lastMessage.content.split('```')[0].trim(),
+                  senderId: lastMessage.account_id.toString(),
+                  username: username,
+                  timestamp: new Date(lastMessage.created_at).toLocaleTimeString(),
+                  saved: true,
+                  distributed: true,
+                  seen: false,
+                  new: true
+                }
+                this.rooms[roomIndex].index = new Date(lastMessage.created_at).getTime()
+                console.log('change laseMessage to', this.rooms[roomIndex].lastMessage)
+              }
+              // console.log('lastMessage =' ,lastMessage)
+            }
+          }
+        }
+        if (roomsChanged) {
+          await this.constructRooms()
+        }
+      } catch (error) {
+        console.error('Error checking new messages:', error)
+      }
+    },
     async fetchMessages({ room, options = {} }) {
+      console.log('fetchMessages room =', room)
+      this.currentRoom = room
       this.messagesLoaded = false
       console.log(`Fetching messages for room:`, room.roomId)
+      console.log('this.currentRoom =', this.currentRoom)
 
       try {
         const response = await axios.get(`https://backend.sustech.me/api/chat/${room.roomId}/message`, {
@@ -176,8 +274,9 @@ export default {
           }
         })
 
-        const chatMessages = response.data.messages.map(message => {
+        const chatMessages = await Promise.all(response.data.messages.map(async message => {
           const sender = this.chat.find(chat => chat.id.toString() === room.roomId).members.find(member => member.id === message.account_id)
+          const username = await this.fetchUsername(message.account_id)
           const files = []
 
           console.log('fetch message content =', message.content)
@@ -196,18 +295,17 @@ export default {
                   axios.get(file.url, { responseType: 'blob' })
                     .then(response => {
                       const reader = new FileReader()
-                      reader.onload = (e) => {
-                        file.preview = e.target.result
-                        // Push the file with preview to the files array here to ensure it happens after preview is set
+                      reader.onloadend = () => {
+                        file.preview = reader.result
                         files.push(file)
-                        console.log('now the file is', file)
                       }
                       reader.readAsDataURL(response.data)
                     })
                     .catch(error => {
-                      console.error('Error fetching file preview:', error)
+                      console.error('Error fetching image file:', error)
                     })
                 } else {
+                  console.log('fetch message with non-image file =', file)
                   files.push(file)
                 }
               })
@@ -221,7 +319,7 @@ export default {
             content: content,
             index: 1000 - message.id,
             senderId: message.account_id.toString(),
-            username: sender ? sender.name : '',
+            username: username,
             avatar: sender ? this.imageURL(sender.avatar) : '',
             date: new Date(message.created_at).toLocaleDateString(),
             timestamp: new Date(message.created_at).toLocaleTimeString(),
@@ -236,33 +334,26 @@ export default {
             reactions: {},
             replyMessage: null
           }
-        })
+        }))
 
-        // 比较新获取的消息和当前的消息
-        const isMessagesChanged = this.messages.length != chatMessages.length
-        console.log('new message is', chatMessages.length)
-        console.log('old message is', this.messages.length)
+        this.messages = chatMessages
 
-        if (isMessagesChanged) {
-          this.messages = chatMessages
-          
-          // Update the corresponding room's lastMessage and index fields
-          const lastMessage = chatMessages[0]
-          const roomIndex = this.rooms.findIndex(r => r.roomId === room.roomId)
-          if (roomIndex !== -1) {
-            this.rooms[roomIndex].lastMessage = {
-              _id: lastMessage._id,
-              content: lastMessage.content.split('```')[0].trim(),
-              senderId: lastMessage.senderId,
-              username: lastMessage.username,
-              timestamp: lastMessage.timestamp,
-              saved: lastMessage.saved,
-              distributed: lastMessage.distributed,
-              seen: lastMessage.seen,
-              new: lastMessage.new
-            }
-            this.rooms[roomIndex].index = new Date(lastMessage.timestamp).getTime()
+        // Update the corresponding room's lastMessage and index fields
+        const lastMessage = chatMessages[0]
+        const roomIndex = this.rooms.findIndex(r => r.roomId === room.roomId)
+        if (roomIndex !== -1) {
+          this.rooms[roomIndex].lastMessage = {
+            _id: lastMessage._id,
+            content: lastMessage.content.split('```')[0].trim(),
+            senderId: lastMessage.senderId,
+            username: lastMessage.username,
+            timestamp: lastMessage.timestamp,
+            saved: lastMessage.saved,
+            distributed: lastMessage.distributed,
+            seen: lastMessage.seen,
+            new: lastMessage.new
           }
+          this.rooms[roomIndex].index = new Date(lastMessage.timestamp).getTime()
         }
 
         this.messagesLoaded = true
@@ -337,7 +428,7 @@ export default {
       } catch (error) {
         console.error(`Error sending message to room ${roomId}:`, error)
       }
-    },
+    }
   }
 }
 </script>
