@@ -9,7 +9,7 @@
 
 
 <script>
-import TopNavbar from "./TopNavbar.vue";
+import TopNavbar from "../dashboard/TopNavbar.vue";
 import DashboardContent from "./Content.vue";
 import {BaseTable} from "@/components";
 import 'element-ui/lib/theme-chalk/index.css';

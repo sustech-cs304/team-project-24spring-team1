@@ -1,6 +1,7 @@
 <template>
   <!-- 显示的大表格 -->
   <div class="dialog-demo">
+    <card-img></card-img>
 <!--       :style="{ backgroundImage:  'url(' + imgUrl + ')' }">-->
     <p class="title" style="text-align: center"> Activity Management </p>
     <el-row style="margin-top: 25px;margin-bottom: 10px;
@@ -74,10 +75,11 @@
 import DialogComponent from "@/adminform/components/dialogComponent.vue";
 import axios from "axios";
 import event from "@/pages/Event/Event.vue";
+import CardImg from "@/adminform/components/cardImg.vue";
 
 export default {
   name: "DialogDemo",
-  components: { DialogComponent},
+  components: {CardImg, DialogComponent},
   data() {
     return {
       tableLoading: false,
@@ -97,6 +99,7 @@ export default {
         kind:'',
         cover:null,
         venue_id:0,
+        location:[0.0,0.0],
         startTime:'2023-03-02 08:08',
         endTime:'',
         deadline: '',
@@ -107,6 +110,13 @@ export default {
 
   mounted() {
     this.fetchData();
+    this.$nextTick(() => { //挂载组件的时候
+      const role = localStorage.getItem("role");
+      if (role !== 'admin') {
+        this.showFailMessage("you have no access to this page");
+        window.location.href = "#/dashboard/dashboard";
+      }
+    });
   },
   computed: {
     filteredTableData() {
@@ -123,6 +133,7 @@ export default {
       setTimeout(() => {
         that.tableLoading = false;
       }, 1000);
+
       const apiUrl = "https://backend.sustech.me/api/event"
       axios.get(apiUrl, {timeout: 3000})
           .then(response => {
@@ -138,6 +149,7 @@ export default {
               get_event.startTime = event.start_at;
               get_event.endTime = event.end_at; //string
               get_event.venue_id = event.venue.id; //string
+              get_event.location = event.location;
               // get_event.latitude = event.location[0];
               // get_event.longtitude = event.location[1];
               get_event.tickets = event.tickets;
@@ -169,6 +181,7 @@ export default {
         cover: null,
         kind:'',
         venue_id:'',
+        location: [],
         // latitude:0.0,
         // longtitude: 0.0,
         tickets:'',
