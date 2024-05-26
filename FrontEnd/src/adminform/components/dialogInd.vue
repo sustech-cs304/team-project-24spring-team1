@@ -110,6 +110,13 @@ export default {
 
   mounted() {
     this.fetchData();
+    this.$nextTick(() => { //挂载组件的时候
+      const role = localStorage.getItem("role");
+      if (role !== 'admin') {
+        this.showFailMessage("you have no access to this page");
+        window.location.href = "#/dashboard/dashboard";
+      }
+    });
   },
   computed: {
     filteredTableData() {
