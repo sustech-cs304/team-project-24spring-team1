@@ -99,6 +99,7 @@ export default {
         kind:'',
         cover:null,
         venue_id:0,
+        location:[0.0,0.0],
         startTime:'2023-03-02 08:08',
         endTime:'',
         deadline: '',
@@ -125,6 +126,7 @@ export default {
       setTimeout(() => {
         that.tableLoading = false;
       }, 1000);
+
       const apiUrl = "https://backend.sustech.me/api/event"
       axios.get(apiUrl, {timeout: 3000})
           .then(response => {
@@ -140,6 +142,7 @@ export default {
               get_event.startTime = event.start_at;
               get_event.endTime = event.end_at; //string
               get_event.venue_id = event.venue.id; //string
+              get_event.location = event.location;
               // get_event.latitude = event.location[0];
               // get_event.longtitude = event.location[1];
               get_event.tickets = event.tickets;
@@ -171,6 +174,7 @@ export default {
         cover: null,
         kind:'',
         venue_id:'',
+        location: [],
         // latitude:0.0,
         // longtitude: 0.0,
         tickets:'',
