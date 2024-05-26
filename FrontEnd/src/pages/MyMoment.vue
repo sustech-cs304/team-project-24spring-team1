@@ -89,7 +89,7 @@
                 <card class="mb-3">
                   <a href="#/dashboard/profile" @click="handleClick(comment.account.id)">{{ comment.account.name }}</a>
                   <p class="card-text">{{ comment.content }}</p>
-                  <p class="card-text"><small class="text-muted">{{ comment.created_at }}</small></p>
+                  <p class="card-text"><small class="text-muted">{{ formatDate(comment.created_at) }}</small></p>
                 </card>
               </div>
             </div>
