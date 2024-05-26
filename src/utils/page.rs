@@ -61,3 +61,22 @@ impl PageBuilder {
         Page::new(self.total_item, self.page_size, self.current)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_basic() {
+        let page = Page::new(100, 10, 1);
+        assert_eq!(page.total_page, 10);
+        assert_eq!(page.offset, 0);
+    }
+
+    #[test]
+    fn test_builder() {
+        let page = Page::builder(81, 5).page_size(20).build();
+        assert_eq!(page.total_page, 5);
+        assert_eq!(page.offset, 80);
+    }
+}
