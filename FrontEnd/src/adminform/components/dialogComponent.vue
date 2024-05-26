@@ -166,6 +166,15 @@ export default {
   },
 
   data() {
+    const validateFloat = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('Please enter the value'));
+      }
+      if (!isFinite(value) || Number(value) !== parseFloat(value)) {
+        return callback(new Error('Please enter a valid float number'));
+      }
+      callback();
+    };
     return {
       showDialog: false,
       fileToUpload: null,
@@ -179,7 +188,15 @@ export default {
         venue_id:[{ required:true ,message:"venue",trigger:blur}],
         startTime: [{required:true,message:"choose start time",trigger:blur}],
         endTime: [{ required:true,message:"choose end time",trigger:blur},],
-        description: [{required: false, message: "enter description", trigger: "blur" },],
+        description: [{required: true, message: "enter description", trigger: "blur" },],
+        latitude: [
+          { required: true, message: 'Please enter latitude of the activity', trigger: 'blur' },
+          { validator: validateFloat, trigger: 'blur' },
+        ],
+        longtitude: [
+          { required: true, message: 'Please enter longitude of the activity', trigger: 'blur' },
+          { validator: validateFloat, trigger: 'blur' },
+        ],
         tickets:[{required:true,message:"tickets available",trigger:"blur"},
           {
             pattern: /^\d+$/,
