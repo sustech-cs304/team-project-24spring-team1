@@ -55,5 +55,6 @@ Run `npm run build` in the `FrontEnd` folder.
 In the `FrontEnd` folder:
 - Create `Dockerfile` and `.dockerignore` files
 - Run `sudo docker build -t sustech_event:dev .` to create the docker image named `sustech_event`
+  Note that if it raises an error `ERROR [internal] load metadata for docker.io/library/node:alpine`, please change the `credsStore` value in `$HOME/.docker/config.json` from `desktop` to `osxkeychain`.
 - Run `docker run -v ${PWD}:/app -v /app/node_modules -p 8089:8080 sustech_event:dev` to launch at port 8089
 - Publish the image `sustech_event` to DockerHub
