@@ -103,6 +103,27 @@ struct ListEventsResponse {
     pub events: Vec<EventWithParticipation<EventSummaryResponse>>,
 }
 
+#[derive(Debug, Serialize)]
+struct NewCommentForm<'a> {
+    pub content: &'a str,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommentDisplay {
+    pub id: i32,
+    pub account: AccountCard,
+    pub content: String,
+    pub created_at: NaiveDateTime,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CommentsResponse {
+    pub page: Page,
+    pub comments: Vec<CommentDisplay>,
+}
+
 fn parse_datetime(date: &str) -> NaiveDateTime {
     NaiveDateTime::parse_from_str(date, "%Y-%m-%d %H:%M:%S").unwrap()
 }
@@ -475,4 +496,31 @@ async fn test_event_deadline_passed() {
         .to_request();
     let resp = app.call(req).await.unwrap();
     assert_eq!(resp.status(), StatusCode::NOT_ACCEPTABLE);
+}
+
+#[actix_web::test]
+async fn test_event_comment() {
+    let app = create_app().await;
+    let account = create_default_account(&app).await;
+    let event_id = create_default_event(&app, &account).await;
+
+    let form = NewCommentForm { content: "Hello" };
+
+    let req = test::TestRequest::post()
+        .uri(&format!("/api/event/{event_id}/comment"))
+        .insert_header(account.to_header_pair())
+        .set_json(&form)
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::OK);
+
+    let req = test::TestRequest::get()
+        .uri(&format!("/api/event/{event_id}/comment"))
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::OK);
+
+    let comments: CommentsResponse = test::read_body_json(resp).await;
+    assert_eq!(comments.comments.len(), 1);
+    assert_eq!(comments.comments[0].content, form.content);
 }
