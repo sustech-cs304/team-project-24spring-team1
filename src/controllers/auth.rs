@@ -214,7 +214,7 @@ async fn callback(
     query: web::Query<CallbackQuery>,
 ) -> Result<impl Responder> {
     let CallbackQuery { identifier, ticket } = query.into_inner();
-    let result = validate_ticket(&ticket).await?;
+    let result = validate_ticket(&ticket, &state.cas_endpoint).await?;
     state
         .auth_provider
         .lock()
@@ -361,12 +361,12 @@ struct CASAttributes {
     name: Value,
 }
 
-async fn validate_ticket(ticket: &str) -> Result<AuthResult> {
+async fn validate_ticket(ticket: &str, cas_endpoint: &str) -> Result<AuthResult> {
     log::trace!("Validating ticket: {ticket}");
 
     let client = awc::Client::default();
     let mut response = client
-        .get("https://sso.cra.ac.cn/realms/cra-service-realm/protocol/cas/serviceValidate")
+        .get(cas_endpoint)
         .query(&ValidateQuery {
             service: "https://backend.sustech.me",
             ticket,

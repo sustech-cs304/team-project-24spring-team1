@@ -21,6 +21,14 @@ struct Opts {
     /// The URL of the database to connect to
     #[clap(long, env)]
     database_url: String,
+
+    /// The URL of the database to connect to
+    #[clap(
+        long,
+        env,
+        default_value = "https://sso.cra.ac.cn/realms/cra-service-realm/protocol/cas/serviceValidate"
+    )]
+    cas_endpoint: String,
 }
 
 #[actix_web::main]
@@ -40,6 +48,7 @@ async fn main() -> std::io::Result<()> {
     let configurator = AppBuilder::new()
         .with_pool(pool.clone())
         .with_auth_provider(Box::new(CRAProvider::new()))
+        .with_cas_endpoint(&opts.cas_endpoint)
         .into_configurator();
 
     log::info!("Starting server on {}:{}", opts.host, opts.port);

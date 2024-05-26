@@ -18,12 +18,14 @@ use crate::utils::auth::AuthProvider;
 pub struct AppState {
     pool: Pool<AsyncPgConnection>,
     auth_provider: Mutex<Box<dyn AuthProvider + Send>>,
+    cas_endpoint: String,
 }
 
 #[derive(Default)]
 pub struct AppBuilder {
     pool: Option<Pool<AsyncPgConnection>>,
     auth_provider: Option<Mutex<Box<dyn AuthProvider + Send>>>,
+    cas_endpoint: Option<String>,
 }
 
 #[derive(Clone)]
@@ -46,10 +48,16 @@ impl AppBuilder {
         self
     }
 
+    pub fn with_cas_endpoint(mut self, cas_endpoint: &str) -> Self {
+        self.cas_endpoint = Some(cas_endpoint.to_string());
+        self
+    }
+
     pub fn into_configurator(self) -> AppConfigurator {
         let data = web::Data::new(AppState {
             pool: self.pool.expect("pool must be set"),
             auth_provider: self.auth_provider.expect("auth_provider must be set"),
+            cas_endpoint: self.cas_endpoint.expect("cas_endpoint must be set"),
         });
 
         AppConfigurator { data }
