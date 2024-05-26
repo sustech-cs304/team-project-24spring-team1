@@ -43,7 +43,7 @@ pub async fn create_app() -> impl TestApp {
     let configurator = AppBuilder::new()
         .with_pool(pool.clone())
         .with_auth_provider(Box::new(CRAProvider::new()))
-        .with_cas_endpoint("")
+        .with_cas_endpoint("http://127.0.0.1:8089")
         .into_configurator();
 
     test::init_service(App::new().configure(configurator.as_function())).await

@@ -300,9 +300,10 @@ async fn get_account_or_create(
     state: &web::Data<AppState>,
     auth_result: &AuthResult,
 ) -> Result<AccountCredential> {
+    let conn = &mut state.pool.get().await?;
     match Account::by_sustech_id(auth_result.sustech_id)
         .select(AccountCredential::as_select())
-        .first(&mut state.pool.get().await?)
+        .first(conn)
         .await
     {
         Ok(credential) => Ok(credential),
@@ -322,7 +323,7 @@ async fn get_account_or_create(
             Ok(new_account
                 .as_insert()
                 .returning(AccountCredential::as_select())
-                .get_result(&mut state.pool.get().await?)
+                .get_result(conn)
                 .await?)
         }
         Err(err) => Err(err.into()),

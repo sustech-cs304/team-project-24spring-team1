@@ -1,6 +1,8 @@
 use actix_web::http::StatusCode;
 use actix_web::test;
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
+use uuid::Uuid;
 
 use crate::common::{create_app, TestApp};
 
@@ -22,6 +24,18 @@ pub struct LoginForm<'a> {
 pub struct AccountInfo {
     pub account_id: i32,
     pub token: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct IdentifierResponse {
+    pub identifier: Uuid,
+}
+
+#[derive(Debug, Serialize)]
+pub struct CasSimulateCallback<'a> {
+    pub identifier: Uuid,
+    pub ticket: &'a str,
 }
 
 pub const TEST_DEFAULT_ACCOUNT_FORM: RegisterForm<'_> = RegisterForm {
@@ -76,6 +90,22 @@ async fn test_login() {
 }
 
 #[actix_web::test]
+async fn test_login_incorrect_password() {
+    let app = create_app().await;
+    let _account = create_default_account(&app).await;
+
+    let req = test::TestRequest::post()
+        .uri("/api/auth/login")
+        .set_json(&LoginForm {
+            sustech_id: TEST_DEFAULT_ACCOUNT_FORM.sustech_id,
+            password: "something_wrong",
+        })
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::UNAUTHORIZED);
+}
+
+#[actix_web::test]
 async fn test_token() {
     let app = create_app().await;
     let account = create_default_account(&app).await;
@@ -117,6 +147,42 @@ async fn test_token_invalid_data() {
 
     let resp = app.call(req).await.unwrap();
     assert_eq!(resp.status(), StatusCode::UNAUTHORIZED);
+}
+
+#[actix_web::test]
+async fn test_cas_login() {
+    let app = create_app().await;
+
+    let req = test::TestRequest::get()
+        .uri("/api/auth/identifier")
+        .to_request();
+
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::OK);
+
+    let data: IdentifierResponse = test::read_body_json(resp).await;
+    let identifier = data.identifier;
+
+    let req = test::TestRequest::get()
+        .uri(&format!("/api/auth/poll?identifier={identifier}"))
+        .to_request();
+    let poll_fut = async { app.call(req).await.unwrap() };
+
+    let query = serde_urlencoded::to_string(CasSimulateCallback {
+        identifier,
+        ticket: "ST-114514",
+    })
+    .unwrap();
+    let req = test::TestRequest::get()
+        .uri(&format!("/api/auth/callback?{query}"))
+        .to_request();
+    let callback_fut = async {
+        tokio::time::sleep(Duration::from_millis(100)).await;
+        app.call(req).await.unwrap();
+    };
+
+    let (resp, _) = tokio::join!(poll_fut, callback_fut);
+    let _info: AccountInfo = test::read_body_json(resp).await;
 }
 
 // ===== Other Functions =====
