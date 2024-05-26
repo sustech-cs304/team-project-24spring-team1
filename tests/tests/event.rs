@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 use crate::common::{create_app, TestApp};
 use crate::tests::account::AccountCard;
-use crate::tests::auth::{create_account, create_default_account, AccountInfo, RegisterForm};
+use crate::tests::auth::{create_default_account, create_default_account_pair, AccountInfo};
 use crate::tests::misc::Page;
 use crate::tests::misc::Place;
 
@@ -210,16 +210,7 @@ async fn test_event_create_and_get() {
 async fn test_event_list() {
     let app = create_app().await;
 
-    let account_1 = create_default_account(&app).await;
-    let account_2 = create_account(
-        &app,
-        &RegisterForm {
-            sustech_id: 12345678,
-            name: "User2",
-            password: "password",
-        },
-    )
-    .await;
+    let (account_1, account_2) = create_default_account_pair(&app).await;
 
     let event_id_1 = create_event(&app, &account_1, &DEFAULT_EVENT_1).await;
     let event_id_2 = create_event(&app, &account_2, &DEFAULT_EVENT_2).await;
@@ -404,6 +395,26 @@ async fn test_event_delete() {
         .to_request();
     let resp = app.call(req).await.unwrap();
     assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+}
+
+#[actix_web::test]
+async fn test_event_no_delete_others() {
+    let app = create_app().await;
+    let (account, another) = create_default_account_pair(&app).await;
+    let event_id = create_default_event(&app, &account).await;
+
+    let req = test::TestRequest::delete()
+        .uri(&format!("/api/event/{event_id}"))
+        .insert_header(another.to_header_pair())
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::UNAUTHORIZED);
+
+    let req = test::TestRequest::get()
+        .uri(&format!("/api/event/{event_id}"))
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::OK);
 }
 
 #[actix_web::test]

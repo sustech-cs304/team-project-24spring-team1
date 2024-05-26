@@ -38,10 +38,16 @@ pub struct CasSimulateCallback<'a> {
     pub ticket: &'a str,
 }
 
-pub const TEST_DEFAULT_ACCOUNT_FORM: RegisterForm<'_> = RegisterForm {
+pub const TEST_DEFAULT_ACCOUNT_1: RegisterForm<'_> = RegisterForm {
     sustech_id: 11111111,
     name: "test",
     password: "password",
+};
+
+pub const TEST_DEFAULT_ACCOUNT_2: RegisterForm<'_> = RegisterForm {
+    sustech_id: 22222222,
+    name: "test2",
+    password: "password2",
 };
 
 pub async fn create_account(app: impl TestApp, form: &RegisterForm<'_>) -> AccountInfo {
@@ -60,7 +66,13 @@ pub async fn create_account(app: impl TestApp, form: &RegisterForm<'_>) -> Accou
 }
 
 pub async fn create_default_account(app: impl TestApp) -> AccountInfo {
-    create_account(app, &TEST_DEFAULT_ACCOUNT_FORM).await
+    create_account(app, &TEST_DEFAULT_ACCOUNT_1).await
+}
+
+pub async fn create_default_account_pair(app: impl TestApp) -> (AccountInfo, AccountInfo) {
+    let account_1 = create_account(&app, &TEST_DEFAULT_ACCOUNT_1).await;
+    let account_2 = create_account(&app, &TEST_DEFAULT_ACCOUNT_2).await;
+    (account_1, account_2)
 }
 
 #[actix_web::test]
@@ -78,8 +90,8 @@ async fn test_login() {
     let req = test::TestRequest::post()
         .uri("/api/auth/login")
         .set_json(&LoginForm {
-            sustech_id: TEST_DEFAULT_ACCOUNT_FORM.sustech_id,
-            password: TEST_DEFAULT_ACCOUNT_FORM.password,
+            sustech_id: TEST_DEFAULT_ACCOUNT_1.sustech_id,
+            password: TEST_DEFAULT_ACCOUNT_1.password,
         })
         .to_request();
     let resp = app.call(req).await.unwrap();
@@ -97,7 +109,7 @@ async fn test_login_incorrect_password() {
     let req = test::TestRequest::post()
         .uri("/api/auth/login")
         .set_json(&LoginForm {
-            sustech_id: TEST_DEFAULT_ACCOUNT_FORM.sustech_id,
+            sustech_id: TEST_DEFAULT_ACCOUNT_1.sustech_id,
             password: "something_wrong",
         })
         .to_request();

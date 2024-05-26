@@ -6,7 +6,7 @@ use std::collections::HashSet;
 
 use crate::common::{create_app, TestApp};
 use crate::tests::account::AccountCard;
-use crate::tests::auth::{create_account, create_default_account, AccountInfo, RegisterForm};
+use crate::tests::auth::{create_default_account, create_default_account_pair, AccountInfo};
 use crate::tests::misc::Page;
 
 #[derive(Debug, Deserialize)]
@@ -58,20 +58,6 @@ struct ChatsResponse {
     pub chats: Vec<ChatResponse>,
 }
 
-async fn create_account_pair(app: impl TestApp) -> (AccountInfo, AccountInfo) {
-    let account_1 = create_default_account(&app).await;
-    let account_2 = create_account(
-        &app,
-        &RegisterForm {
-            sustech_id: 12345678,
-            name: "User2",
-            password: "password",
-        },
-    )
-    .await;
-    (account_1, account_2)
-}
-
 async fn get_chat(
     app: impl TestApp,
     primary_account: &AccountInfo,
@@ -95,7 +81,7 @@ async fn get_chat(
 #[actix_web::test]
 async fn test_chat_commutative() {
     let app = create_app().await;
-    let (account_1, account_2) = create_account_pair(&app).await;
+    let (account_1, account_2) = create_default_account_pair(&app).await;
 
     let id_lhs = get_chat(&app, &account_1, &account_2).await;
     let id_rhs = get_chat(&app, &account_2, &account_1).await;
@@ -119,7 +105,7 @@ async fn test_chat_no_reflexive() {
 #[actix_web::test]
 async fn test_chat_message() {
     let app = create_app().await;
-    let (account_1, account_2) = create_account_pair(&app).await;
+    let (account_1, account_2) = create_default_account_pair(&app).await;
     let chat_id = get_chat(&app, &account_1, &account_2).await;
 
     let form = NewMessageForm {
@@ -150,7 +136,7 @@ async fn test_chat_message() {
 #[actix_web::test]
 async fn test_chat_member() {
     let app = create_app().await;
-    let (account_1, account_2) = create_account_pair(&app).await;
+    let (account_1, account_2) = create_default_account_pair(&app).await;
     let chat_id = get_chat(&app, &account_1, &account_2).await;
 
     let req = test::TestRequest::get()
@@ -176,7 +162,7 @@ async fn test_chat_member() {
 #[actix_web::test]
 async fn test_chat_list() {
     let app = create_app().await;
-    let (account_1, account_2) = create_account_pair(&app).await;
+    let (account_1, account_2) = create_default_account_pair(&app).await;
     let chat_id = get_chat(&app, &account_1, &account_2).await;
 
     let req = test::TestRequest::get()

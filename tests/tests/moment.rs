@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::common::{create_app, TestApp};
 use crate::tests::account::AccountCard;
-use crate::tests::auth::{create_default_account, AccountInfo};
+use crate::tests::auth::{create_default_account, create_default_account_pair, AccountInfo};
 use crate::tests::misc::Page;
 
 #[derive(Debug, Serialize)]
@@ -159,6 +159,26 @@ async fn test_moment_delete() {
         .to_request();
     let resp = app.call(req).await.unwrap();
     assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+}
+
+#[actix_web::test]
+async fn test_moment_no_delete_others() {
+    let app = create_app().await;
+    let (account, another) = create_default_account_pair(&app).await;
+    let moment_id = create_default_moment(&app, &account).await;
+
+    let req = test::TestRequest::delete()
+        .uri(&format!("/api/moment/{moment_id}"))
+        .insert_header(another.to_header_pair())
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::UNAUTHORIZED);
+
+    let req = test::TestRequest::get()
+        .uri(&format!("/api/moment/{moment_id}"))
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::OK);
 }
 
 #[actix_web::test]

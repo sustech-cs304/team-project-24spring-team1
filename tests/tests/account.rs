@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::common::{create_app, TestApp};
 use crate::tests::auth::{
-    create_account, create_default_account, RegisterForm, TEST_DEFAULT_ACCOUNT_FORM,
+    create_default_account, create_default_account_pair, TEST_DEFAULT_ACCOUNT_1,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize)]
@@ -63,8 +63,8 @@ async fn test_profile() {
 
     let profile: AccountProfile = get_profile(&app, account.account_id).await;
     assert_eq!(profile.id, account.account_id);
-    assert_eq!(profile.sustech_id, TEST_DEFAULT_ACCOUNT_FORM.sustech_id);
-    assert_eq!(profile.name, TEST_DEFAULT_ACCOUNT_FORM.name);
+    assert_eq!(profile.sustech_id, TEST_DEFAULT_ACCOUNT_1.sustech_id);
+    assert_eq!(profile.name, TEST_DEFAULT_ACCOUNT_1.name);
 }
 
 #[actix_web::test]
@@ -92,16 +92,7 @@ async fn test_profile_update() {
 #[actix_web::test]
 async fn test_profile_no_update_other() {
     let app = create_app().await;
-    let account = create_default_account(&app).await;
-    let another = create_account(
-        &app,
-        &RegisterForm {
-            sustech_id: 12345678,
-            name: "another",
-            password: "password",
-        },
-    )
-    .await;
+    let (account, another) = create_default_account_pair(&app).await;
 
     let old_profile: AccountProfile = get_profile(&app, account.account_id).await;
 
