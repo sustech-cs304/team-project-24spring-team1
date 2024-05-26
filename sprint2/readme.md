@@ -121,5 +121,20 @@ If you want to change your avatar, you can click the current avatar and upload a
 
 You can chat with others by clicking the chat button in the top bar.
 
-Note that you can only get in touch to a new user through his/her profile page. In another user's profile page, once you click the chat button shown in profile section, a chat room contains you and that user will be constructed by sending a message `Hi! My sid is {your SID}, and I wannt chat with you!` from you to that user.
+Note that you can only get in touch to a new user through his/her profile page. In another user's profile page, once you click the chat button shown in profile section, a chat room contains you and that user will be constructed by sending a message `Hi! My sid is {your SID}, and I wanna chat with you!` from you to that user.
 
+-   The chat page supports various kinds of messages, including text, image, video, emoji, etc. You can watch the video online.
+
+<img src="pics/chat1.png" style="zoom:50%;" />
+
+<img src="pics/chat2.png" style="zoom:50%;" />
+
+-   The chat page supports instant communication. That means, if someone sends a message to you, you can receive it within 2 seconds without refreshing the page.
+
+-   The chat page supports searching specified user according to the name.
+
+<img src="pics/chat3.png" style="zoom:50%;" />
+
+-   The chat page supports fold the user bar.
+
+<img src="pics/chat4.png" style="zoom:50%;" />
