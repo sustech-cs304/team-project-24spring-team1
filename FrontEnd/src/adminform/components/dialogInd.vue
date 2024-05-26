@@ -1,6 +1,7 @@
 <template>
   <!-- 显示的大表格 -->
   <div class="dialog-demo">
+    <card-img></card-img>
 <!--       :style="{ backgroundImage:  'url(' + imgUrl + ')' }">-->
     <p class="title" style="text-align: center"> Activity Management </p>
     <el-row style="margin-top: 25px;margin-bottom: 10px;
@@ -74,10 +75,11 @@
 import DialogComponent from "@/adminform/components/dialogComponent.vue";
 import axios from "axios";
 import event from "@/pages/Event/Event.vue";
+import CardImg from "@/adminform/components/cardImg.vue";
 
 export default {
   name: "DialogDemo",
-  components: { DialogComponent},
+  components: {CardImg, DialogComponent},
   data() {
     return {
       tableLoading: false,
