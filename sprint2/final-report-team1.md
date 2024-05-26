@@ -42,8 +42,18 @@
 
 ## 2. Documentation
 
+Please refer to `readme.md` and `readme_for_developer.md`.
+
 ## 3. Tests
 
 ## 4. Build
 
+Run `npm run build` in the `FrontEnd` folder.
+
 ## 5. Deployment
+
+In the `FrontEnd` folder:
+- Create `Dockerfile` and `.dockerignore` files
+- Run `sudo docker build -t sustech_event:dev .` to create the docker image named `sustech_event`
+- Run `docker run -v ${PWD}:/app -v /app/node_modules -p 8089:8080 sustech_event:dev` to launch at port 8089
+- Publish the image `sustech_event` to DockerHub
