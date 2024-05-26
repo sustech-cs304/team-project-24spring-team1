@@ -74,6 +74,10 @@
                       </base-button>
                     </div>
 
+                    <div>
+                      <button @click="share" class="btn btn-primary"> Share </button>
+                    </div>
+
 <!--                    <card type="nav-tabs">-->
 <!--                      <div slot="header" class="card-header-success">-->
 <!--                        Content-->
@@ -157,6 +161,39 @@ export default {
   methods: {
     getEventID(){
       return this.eventId;
+    },
+
+    share() {
+      const commentUrl = `https://backend.sustech.me/api/moment`;
+      const commentData = {
+        content: this.event.name,
+      };
+
+      this.token = localStorage.getItem('token');
+      if (!this.token) {
+        console.log("Token not found.");
+        return;
+      }
+
+      axios.post(commentUrl, commentData, {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      })
+          .then(response => {
+            // Handle successful post
+            alert('Event Shared successfully.');
+
+            // this.newMoment = '';
+            // const newMomentId = response.data.id;
+
+            // console.log('New Moment ID:', newMomentId);
+
+            // window.location.reload();
+          })
+          .catch(error => {
+            console.error('Error posting moments:', error);
+          });
     },
 
     getRegisterStatus(eventId){
