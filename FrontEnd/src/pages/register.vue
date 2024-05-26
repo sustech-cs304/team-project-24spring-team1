@@ -5,7 +5,7 @@
         <el-avatar icon="el-icon-user-solid" shape="circle" />
         <span class="login">
           <em class="bold">already have an account?</em>
-          <a href="/login">
+          <a href="#/login">
             <el-button type="primary" size="mini">LOGIN</el-button>
           </a>
         </span>
