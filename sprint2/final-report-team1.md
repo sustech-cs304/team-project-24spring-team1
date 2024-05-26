@@ -77,7 +77,34 @@ Node.js and npm: Used for managing project dependencies and running build script
 
 In the `FrontEnd` folder:
 - Create `Dockerfile` and `.dockerignore` files
+  The `Dockerfile` is:
+  ```
+  FROM node:alpine
+  WORKDIR /app
+  COPY package.json .
+  RUN npm install
+  CMD ["npm", "run", "serve"]
+  ```
+  The `.dockerignore` file is:
+  ```
+  node_modules
+  .git
+  .gitignore
+  dist
+  ```
+  
 - Run `sudo docker build -t sustech_event:dev .` to create the docker image named `sustech_event`
   Note that if it raises an error `ERROR [internal] load metadata for docker.io/library/node:alpine`, please change the `credsStore` value in `$HOME/.docker/config.json` from `desktop` to `osxkeychain`.
+  The result is:
+  
+  <img src="pics/dockerBuild.png" style="zoom:50%;" />
+  
 - Run `docker run -v ${PWD}:/app -v /app/node_modules -p 8089:8080 sustech_event:dev` to launch at port 8089
+
+    The result is:
+
+    <img src="pics/dockerRun.png" style="zoom:50%;" />
+
+    <img src="pics/dockerSuccess.png" style="zoom:50%;" />
+
 - Publish the image `sustech_event` to DockerHub
