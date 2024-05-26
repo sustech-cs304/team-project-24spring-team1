@@ -34,14 +34,17 @@ pub type PlaceFindName = Select<PlaceFind, places::name>;
 type ParticipationFind = Find<participation::table, (i32, i32)>;
 type ParticipationByAccountId = Select<
     Filter<
-        InnerJoinOn<
+        Filter<
             InnerJoinOn<
-                InnerJoin<participation::table, events::table>,
-                places::table,
-                Eq<places::id, events::venue_id>,
+                InnerJoinOn<
+                    InnerJoin<participation::table, events::table>,
+                    places::table,
+                    Eq<places::id, events::venue_id>,
+                >,
+                accounts::table,
+                Eq<accounts::id, events::organizer_id>,
             >,
-            accounts::table,
-            Eq<accounts::id, events::organizer_id>,
+            Eq<events::is_deleted, bool>,
         >,
         Eq<participation::account_id, i32>,
     >,
@@ -89,6 +92,7 @@ impl Participation {
             .inner_join(events::table)
             .inner_join(places::table.on(places::id.eq(events::venue_id)))
             .inner_join(accounts::table.on(accounts::id.eq(events::organizer_id)))
+            .filter(events::is_deleted.eq(false))
             .filter(participation::account_id.eq(account_id))
             .select(EventSummary::as_select())
     }
