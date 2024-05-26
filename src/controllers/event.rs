@@ -31,7 +31,7 @@ struct NewEventForm {
     pub venue_id: i32,
     pub location: Point,
     pub tickets: Option<i32>,
-    pub registeration_deadline: Option<NaiveDateTime>,
+    pub registration_deadline: Option<NaiveDateTime>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
@@ -85,7 +85,7 @@ async fn new_event(
         location: form.location,
         organizer_id: auth.account_id,
         tickets: form.tickets,
-        registeration_deadline: form.registeration_deadline,
+        registration_deadline: form.registration_deadline,
     };
 
     let id = new_event
@@ -125,7 +125,7 @@ async fn list_events(
 
         sql = match query.status {
             Some(EventStatus::Applicable) => {
-                sql.filter(coalesce(events::registeration_deadline, events::end_at).gt(now))
+                sql.filter(coalesce(events::registration_deadline, events::end_at).gt(now))
             }
             Some(EventStatus::NotStarted) => sql.filter(events::start_at.gt(now)),
             Some(EventStatus::Ongoing) => sql
@@ -219,13 +219,13 @@ async fn register_event(
 ) -> Result<impl Responder> {
     let id = path.into_inner();
     let deadline: NaiveDateTime = Event::find(id)
-        .select(coalesce(events::registeration_deadline, events::end_at))
+        .select(coalesce(events::registration_deadline, events::end_at))
         .get_result(&mut state.pool.get().await?)
         .await?;
 
     if deadline < Utc::now().naive_utc() {
         return Err(Error::NotAcceptable(
-            "Registeration deadline has passed".into(),
+            "Registration deadline has passed".into(),
         ));
     }
 

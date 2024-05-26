@@ -90,7 +90,7 @@ diesel::table! {
         venue_id -> Int4,
         location -> Point,
         tickets -> Nullable<Int4>,
-        registeration_deadline -> Nullable<Timestamp>,
+        registration_deadline -> Nullable<Timestamp>,
         is_deleted -> Bool,
         created_at -> Timestamp,
         updated_at -> Timestamp,

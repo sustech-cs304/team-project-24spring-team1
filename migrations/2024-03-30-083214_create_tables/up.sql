@@ -37,7 +37,7 @@ CREATE TABLE events (
     venue_id INT NOT NULL REFERENCES places(id),
     location POINT NOT NULL,
     tickets INT,
-    registeration_deadline TIMESTAMP,
+    registration_deadline TIMESTAMP,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
@@ -101,7 +101,7 @@ CREATE TABLE chat_messages (
 CREATE INDEX ON events (kind);
 CREATE INDEX ON events (start_at);
 CREATE INDEX ON events (end_at);
-CREATE INDEX ON events (COALESCE(registeration_deadline, end_at));
+CREATE INDEX ON events (COALESCE(registration_deadline, end_at));
 
 SELECT diesel_manage_updated_at('accounts');
 SELECT diesel_manage_updated_at('events');

@@ -35,7 +35,7 @@ pub struct NewEventForm<'a> {
     pub venue_id: i32,
     pub location: Point,
     pub tickets: Option<i32>,
-    pub registeration_deadline: Option<NaiveDateTime>,
+    pub registration_deadline: Option<NaiveDateTime>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
@@ -67,7 +67,7 @@ pub struct EventDisplayResponse {
     pub location: Point,
     pub organizer: AccountCard,
     pub tickets: Option<i32>,
-    pub registeration_deadline: Option<NaiveDateTime>,
+    pub registration_deadline: Option<NaiveDateTime>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -84,7 +84,7 @@ pub struct EventSummaryResponse {
     pub location: Point,
     pub organizer: AccountCard,
     pub tickets: Option<i32>,
-    pub registeration_deadline: Option<NaiveDateTime>,
+    pub registration_deadline: Option<NaiveDateTime>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -136,7 +136,7 @@ lazy_static! {
         venue_id: 1,
         location: Point(0.0, 0.0),
         tickets: None,
-        registeration_deadline: None,
+        registration_deadline: None,
     };
     static ref DEFAULT_EVENT_2: NewEventForm<'static> = NewEventForm {
         name: "Test Event 2",
@@ -148,7 +148,7 @@ lazy_static! {
         venue_id: 2,
         location: Point(0.0, 0.0),
         tickets: None,
-        registeration_deadline: None,
+        registration_deadline: None,
     };
 }
 
@@ -260,7 +260,7 @@ async fn test_event_filter_status() {
         &app,
         &account,
         &NewEventForm {
-            registeration_deadline: Some(before_time),
+            registration_deadline: Some(before_time),
             start_at: before_time,
             end_at: before_time,
             ..*DEFAULT_EVENT_1
@@ -271,7 +271,7 @@ async fn test_event_filter_status() {
         &app,
         &account,
         &NewEventForm {
-            registeration_deadline: Some(before_time),
+            registration_deadline: Some(before_time),
             start_at: before_time,
             end_at: after_time,
             ..*DEFAULT_EVENT_1
@@ -282,7 +282,7 @@ async fn test_event_filter_status() {
         &app,
         &account,
         &NewEventForm {
-            registeration_deadline: Some(before_time),
+            registration_deadline: Some(before_time),
             start_at: after_time,
             end_at: after_time,
             ..*DEFAULT_EVENT_1
@@ -293,7 +293,7 @@ async fn test_event_filter_status() {
         &app,
         &account,
         &NewEventForm {
-            registeration_deadline: Some(after_time),
+            registration_deadline: Some(after_time),
             start_at: after_time,
             end_at: after_time,
             ..*DEFAULT_EVENT_1
@@ -304,7 +304,7 @@ async fn test_event_filter_status() {
         &app,
         &account,
         &NewEventForm {
-            registeration_deadline: None,
+            registration_deadline: None,
             start_at: before_time,
             end_at: after_time,
             ..*DEFAULT_EVENT_1

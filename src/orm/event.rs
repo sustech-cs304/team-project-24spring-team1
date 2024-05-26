@@ -36,7 +36,7 @@ pub struct NewEvent<'a> {
     pub location: Point,
     pub organizer_id: i32,
     pub tickets: Option<i32>,
-    pub registeration_deadline: Option<NaiveDateTime>,
+    pub registration_deadline: Option<NaiveDateTime>,
 }
 
 #[derive(Debug, Selectable, Identifiable, Queryable)]
@@ -55,7 +55,7 @@ pub struct Event {
     pub location: Point,
     pub organizer_id: i32,
     pub tickets: Option<i32>,
-    pub registeration_deadline: Option<NaiveDateTime>,
+    pub registration_deadline: Option<NaiveDateTime>,
     pub is_deleted: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -77,7 +77,7 @@ pub struct EventDisplay {
     #[diesel(embed)]
     pub organizer: AccountCard,
     pub tickets: Option<i32>,
-    pub registeration_deadline: Option<NaiveDateTime>,
+    pub registration_deadline: Option<NaiveDateTime>,
 }
 
 #[derive(Debug, Serialize, Selectable, Queryable)]
@@ -96,7 +96,7 @@ pub struct EventSummary {
     #[diesel(embed)]
     pub organizer: AccountCard,
     pub tickets: Option<i32>,
-    pub registeration_deadline: Option<NaiveDateTime>,
+    pub registration_deadline: Option<NaiveDateTime>,
 }
 
 #[derive(Debug, Serialize, Queryable)]
