@@ -50,10 +50,15 @@
       <collapse-transition>
         <div class="collapse navbar-collapse show" v-show="showMenu">
           <ul class="navbar-nav" :class="$rtl.isRTL ? 'mr-auto' : 'ml-auto'">
+
             <div>
-              <base-button tag="a" round type="primary" href="#/admin/publish" role="button" aria-pressed="true">
+              <base-button v-if="isAdmin" tag="a" round type="primary" href="#/admin/publish" role="button" aria-pressed="true">
                 <i class="tim-icons el-icon-ice-cream-round"></i>PUBLISH</base-button>
+              <div v-else>
+
+              </div>
             </div>
+
             <div>
               <base-button tag="a" round type="primary" href="#/dashboard/mymoment" role="button" aria-pressed="true">
                 <i class="tim-icons icon-heart-2"></i>  My Moment</base-button>
@@ -147,10 +152,13 @@ export default {
       searchModalVisible: false,
       searchQuery: "",
       imageUrl: '',
+      isAdmin:false,
     };
   },
   mounted() {
     this.fetchUserProfile();
+    const role = localStorage.getItem('role');
+    this.isAdmin = role === 'admin';
   },
   methods: {
     fetchUserProfile() {
