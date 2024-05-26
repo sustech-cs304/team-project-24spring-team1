@@ -40,10 +40,16 @@ export default {
       showNewMessagesDivider: false,
       showReactionEmojis: false,
       messageActions: [],
+      intervalId: null
     }
   },
   mounted() {
     this.fetchChats()
+  },
+  beforeDestroy() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+    }
   },
   methods: {
     imageURL(avatar) {
@@ -69,6 +75,14 @@ export default {
 
         this.constructRooms()
         this.allRooms = this.rooms
+
+        // 初始化时加载第一个房间的消息，并启动定时器
+        if (this.rooms.length > 0) {
+          this.fetchMessages({ room: this.rooms[0] })
+          this.intervalId = setInterval(() => {
+            this.fetchMessages({ room: this.rooms[0] })
+          }, 1000)
+        }
       } catch (error) {
         console.error('Error fetching chats:', error)
       }
@@ -223,24 +237,31 @@ export default {
           }
         })
 
-        this.messages = chatMessages
+        // 比较新获取的消息和当前的消息
+        const isMessagesChanged = this.messages.length != chatMessages.length
+        console.log('new message is', chatMessages.length)
+        console.log('old message is', this.messages.length)
 
-        // Update the corresponding room's lastMessage and index fields
-        const lastMessage = chatMessages[0]
-        const roomIndex = this.rooms.findIndex(r => r.roomId === room.roomId)
-        if (roomIndex !== -1) {
-          this.rooms[roomIndex].lastMessage = {
-            _id: lastMessage._id,
-            content: lastMessage.content.split('```')[0].trim(),
-            senderId: lastMessage.senderId,
-            username: lastMessage.username,
-            timestamp: lastMessage.timestamp,
-            saved: lastMessage.saved,
-            distributed: lastMessage.distributed,
-            seen: lastMessage.seen,
-            new: lastMessage.new
+        if (isMessagesChanged) {
+          this.messages = chatMessages
+          
+          // Update the corresponding room's lastMessage and index fields
+          const lastMessage = chatMessages[0]
+          const roomIndex = this.rooms.findIndex(r => r.roomId === room.roomId)
+          if (roomIndex !== -1) {
+            this.rooms[roomIndex].lastMessage = {
+              _id: lastMessage._id,
+              content: lastMessage.content.split('```')[0].trim(),
+              senderId: lastMessage.senderId,
+              username: lastMessage.username,
+              timestamp: lastMessage.timestamp,
+              saved: lastMessage.saved,
+              distributed: lastMessage.distributed,
+              seen: lastMessage.seen,
+              new: lastMessage.new
+            }
+            this.rooms[roomIndex].index = new Date(lastMessage.timestamp).getTime()
           }
-          this.rooms[roomIndex].index = new Date(lastMessage.timestamp).getTime()
         }
 
         this.messagesLoaded = true
