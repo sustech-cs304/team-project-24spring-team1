@@ -171,10 +171,8 @@ export default {
       // const eventStartTime = this.event.start_at;
       const eventStartTime = new Date(this.event.start_at).toLocaleDateString();
 
-
       const commentData = {
-        content: `I've shared the event "${eventName}" organized by ${eventOrganizer}. 
-        The event will be held at ${eventLocation} starting at ${eventStartTime}.`,
+        content: `I've shared the event "${eventName}" organized by ${eventOrganizer}. The event will be held at ${eventLocation} starting on ${eventStartTime}. Come and join me!`
       };
 
       this.token = localStorage.getItem('token');
