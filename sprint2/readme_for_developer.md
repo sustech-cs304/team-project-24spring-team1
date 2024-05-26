@@ -143,7 +143,7 @@ The backend provides APIs for managing events, user authentication, and other fu
 
 The chat page in the frontend provides APIs to enhance the performance. The details are shown in the [Chatpage API](https://github.com/advanced-chat/vue-advanced-chat/blob/main/README.md).
 
-## 5. Contributing
+## 6. Contributing
 
 We welcome contributions. Please follow these steps:
 
