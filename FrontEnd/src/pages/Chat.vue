@@ -26,6 +26,7 @@ export default {
   data() {
     return {
       currentUserId: localStorage.getItem('id'),
+      currentRoomId: null,
       token: localStorage.getItem('token'),
       chat: [],
       rooms: [],
@@ -81,7 +82,7 @@ export default {
           this.fetchMessages({ room: this.rooms[0] })
           this.intervalId = setInterval(() => {
             this.fetchMessages({ room: this.rooms[0] })
-          }, 1000)
+          }, 10000)
         }
       } catch (error) {
         console.error('Error fetching chats:', error)
