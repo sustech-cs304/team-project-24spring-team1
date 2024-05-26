@@ -154,6 +154,20 @@ export default {
             this.showFailMessage(`登录失败`);
           })
     },
+    parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1]; // Get the payload part
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        return JSON.parse(jsonPayload);
+      } catch (error) {
+        console.error('Invalid token', error);
+        return null;
+      }
+    },
     async handleLogin(){
         // Step 1: Make a request to /api/auth/identifier to get an identifier
         const response = await axios.get('https://backend.sustech.me/api/auth/identifier');
@@ -170,6 +184,18 @@ export default {
           const userData = response.data;
           localStorage.setItem('id', userData.account_id);
           localStorage.setItem('token', userData.token);
+          const decodedToken = this.parseJwt(userData.token);
+          if (decodedToken) {
+            const userId = decodedToken.sub;
+            const userRole = decodedToken.role;
+            console.log('User ID:', userId);
+            console.log('User Role:', userRole);
+            localStorage.setItem('role',userRole);
+            this.$message.success(userRole);
+          } else {
+            console.log('Failed to decode the token');
+          }
+
           if (userData.token && userData.account_id) {
             // clearInterval(pollInterval);
             this.showSuccessMessage("登录成功");
@@ -285,11 +311,11 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('@/adminform/assets/sustech.png');
+    background-image: url('@/adminform/assets/sustech2.png');
     background-size: cover; /* 使背景图片覆盖整个容器 */
     background-position: center; /* 背景图片居中对齐 */
     background-repeat: no-repeat; /* 防止背景图片重复 */
-    opacity: 0.8; /* 设置透明度 */
+    opacity: 0.9; /* 设置透明度 */
     z-index: -1; /* 使伪元素在其他内容的下面 */
   }
 }
@@ -397,6 +423,6 @@ body {
   color: #bac2c7;
 }
 ::v-deep .el-form-item__error {
-  color: #e6a23c;
+  color: #f34c23;
 }
 </style>
