@@ -125,6 +125,18 @@ pub async fn create_event(
     id.id
 }
 
+pub async fn get_event(
+    app: impl TestApp,
+    event_id: i32,
+) -> EventWithParticipation<EventDisplayResponse> {
+    let req = test::TestRequest::get()
+        .uri(&format!("/api/event/{event_id}"))
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::OK);
+    test::read_body_json(resp).await
+}
+
 lazy_static! {
     static ref DEFAULT_EVENT_1: NewEventForm<'static> = NewEventForm {
         name: "Test Event 1",
@@ -162,13 +174,7 @@ async fn test_event_create_and_get() {
     let account = create_default_account(&app).await;
     let event_id = create_default_event(&app, &account).await;
 
-    let req = test::TestRequest::get()
-        .uri(&format!("/api/event/{}", event_id))
-        .to_request();
-    let resp = app.call(req).await.unwrap();
-    assert_eq!(resp.status(), StatusCode::OK);
-
-    let event: EventWithParticipation<EventDisplayResponse> = test::read_body_json(resp).await;
+    let event = get_event(&app, event_id).await;
     assert_eq!(event.inner.id, event_id);
     assert_eq!(event.inner.name, DEFAULT_EVENT_1.name);
     assert_eq!(event.inner.kind, DEFAULT_EVENT_1.kind);
@@ -342,7 +348,7 @@ async fn test_event_find_by_id() {
     let event_id = create_default_event(&app, &account).await;
 
     let req = test::TestRequest::get()
-        .uri(&format!("/api/event?name={}", event_id))
+        .uri(&format!("/api/event?name={event_id}"))
         .to_request();
     let resp = app.call(req).await.unwrap();
     assert_eq!(resp.status(), StatusCode::OK);
@@ -366,14 +372,14 @@ async fn test_event_delete() {
     let event_id = create_default_event(&app, &account).await;
 
     let req = test::TestRequest::delete()
-        .uri(&format!("/api/event/{}", event_id))
+        .uri(&format!("/api/event/{event_id}"))
         .insert_header(account.to_header_pair())
         .to_request();
     let resp = app.call(req).await.unwrap();
     assert_eq!(resp.status(), StatusCode::OK);
 
     let req = test::TestRequest::get()
-        .uri(&format!("/api/event/{}", event_id))
+        .uri(&format!("/api/event/{event_id}"))
         .to_request();
     let resp = app.call(req).await.unwrap();
     assert_eq!(resp.status(), StatusCode::NOT_FOUND);
@@ -383,18 +389,90 @@ async fn test_event_delete() {
 async fn test_event_participate() {
     let app = create_app().await;
     let account = create_default_account(&app).await;
-    let event_id = create_default_event(&app, &account).await;
 
-    let req = test::TestRequest::delete()
-        .uri(&format!("/api/event/{}", event_id))
+    let now = Utc::now().naive_utc();
+    let event_id = create_event(
+        &app,
+        &account,
+        &NewEventForm {
+            registration_deadline: Some(now.checked_add_days(Days::new(1)).unwrap()),
+            ..*DEFAULT_EVENT_1
+        },
+    )
+    .await;
+
+    // REGISTER
+    let req = test::TestRequest::post()
+        .uri(&format!("/api/event/{event_id}/register"))
         .insert_header(account.to_header_pair())
         .to_request();
     let resp = app.call(req).await.unwrap();
     assert_eq!(resp.status(), StatusCode::OK);
 
+    // already registered
+    // let req = test::TestRequest::post()
+    //     .uri(&format!("/api/event/{event_id}/register"))
+    //     .insert_header(account.to_header_pair())
+    //     .to_request();
+    // let resp = app.call(req).await.unwrap();
+    // assert_eq!(resp.status(), StatusCode::NOT_ACCEPTABLE);
+
+    let event = get_event(&app, event_id).await;
+    assert_eq!(event.participation_count, 1);
+
     let req = test::TestRequest::get()
-        .uri(&format!("/api/event/{}", event_id))
+        .uri("/api/event/participated")
+        .insert_header(account.to_header_pair())
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::OK);
+    let events: ListEventsResponse = test::read_body_json(resp).await;
+    assert_eq!(events.events[0].inner.id, event_id);
+
+    let req = test::TestRequest::get()
+        .uri(&format!("/api/event/{event_id}/participated"))
+        .insert_header(account.to_header_pair())
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::NO_CONTENT);
+
+    // UNREGISTER
+    let req = test::TestRequest::delete()
+        .uri(&format!("/api/event/{event_id}/register"))
+        .insert_header(account.to_header_pair())
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::OK);
+
+    let event = get_event(&app, event_id).await;
+    assert_eq!(event.participation_count, 0);
+
+    let req = test::TestRequest::get()
+        .uri(&format!("/api/event/{event_id}/participated"))
+        .insert_header(account.to_header_pair())
         .to_request();
     let resp = app.call(req).await.unwrap();
     assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+
+    // not registered
+    let req = test::TestRequest::delete()
+        .uri(&format!("/api/event/{event_id}/register"))
+        .insert_header(account.to_header_pair())
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+}
+
+#[actix_web::test]
+async fn test_event_deadline_passed() {
+    let app = create_app().await;
+    let account = create_default_account(&app).await;
+    let event_id = create_default_event(&app, &account).await;
+
+    let req = test::TestRequest::post()
+        .uri(&format!("/api/event/{event_id}/register"))
+        .insert_header(account.to_header_pair())
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::NOT_ACCEPTABLE);
 }
