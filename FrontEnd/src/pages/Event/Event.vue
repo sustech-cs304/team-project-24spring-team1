@@ -165,8 +165,16 @@ export default {
 
     share() {
       const commentUrl = `https://backend.sustech.me/api/moment`;
+      const eventName = this.event.name;
+      const eventOrganizer = this.event.organizer.name;
+      const eventLocation = this.event.venue.name;
+      // const eventStartTime = this.event.start_at;
+      const eventStartTime = new Date(this.event.start_at).toLocaleDateString();
+
+
       const commentData = {
-        content: this.event.name,
+        content: `I've shared the event "${eventName}" organized by ${eventOrganizer}. 
+        The event will be held at ${eventLocation} starting at ${eventStartTime}.`,
       };
 
       this.token = localStorage.getItem('token');
@@ -183,11 +191,6 @@ export default {
           .then(response => {
             // Handle successful post
             alert('Event Shared successfully.');
-
-            // this.newMoment = '';
-            // const newMomentId = response.data.id;
-
-            // console.log('New Moment ID:', newMomentId);
 
             // window.location.reload();
           })
