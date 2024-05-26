@@ -10,7 +10,7 @@
           <span>teaching building</span>
           <div class="bottom">
             <time class="time">{{ currentDate }}</time>
-            <el-button text class="button" @click="showMessage('teaching building')">view more</el-button>
+            <el-button text class="button" @click="showMessage('teaching building','learn')">view more</el-button>
           </div>
         </div>
       </el-card>
@@ -26,7 +26,7 @@
           <span>student domitory</span>
           <div class="bottom">
             <time class="time">{{ currentDate }}</time>
-            <el-button text class="button" @click="showMessage('student domitory')">view more</el-button>
+            <el-button text class="button" @click="showMessage('student domitory','have a rest')">view more</el-button>
           </div>
         </div>
       </el-card>
@@ -41,7 +41,7 @@
           <span>playground</span>
           <div class="bottom">
             <time class="time">{{ currentDate }}</time>
-            <el-button text class="button" @click="showMessage('playground')">view more</el-button>
+            <el-button text class="button" @click="showMessage('playground','play')">view more</el-button>
           </div>
         </div>
       </el-card>
@@ -57,8 +57,8 @@ export default {
     };
   },
   methods: {
-    showMessage(location) {
-      this.$alert(`This is ${location}`, 'Information', {
+    showMessage(location,event) {
+      this.$alert('info',`This is ${location} where you can ${event}`,{
         confirmButtonText: 'OK',
       });
     },

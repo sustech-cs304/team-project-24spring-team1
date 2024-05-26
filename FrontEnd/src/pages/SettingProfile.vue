@@ -9,6 +9,7 @@
                     height: 200px;" @click="openFileInput"/>
             </div>
         </div>
+
         <div class="row">
             <div class="col-md-5 pr-md-1">
                 <base-input
