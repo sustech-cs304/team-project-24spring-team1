@@ -139,6 +139,10 @@ After installation, you can use `npm run serve` to launch the project.
 
 The backend provides APIs for managing events, user authentication, and other functionalities required by the SUSTech Event application. For detailed information on the available APIs, refer to the [API documentation](https://gist.github.com/YanWQ-monad/df20490a9097472f30c62c39c7b669af).
 
+## 5. Frontend API
+
+The chat page in the frontend provides APIs to enhance the performance. The details is shown in the [Chatpage API](https://github.com/advanced-chat/vue-advanced-chat/blob/main/README.md).
+
 ## 5. Contributing
 
 We welcome contributions. Please follow these steps:
