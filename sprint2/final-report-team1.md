@@ -105,6 +105,7 @@ In the `FrontEnd` folder:
   ```
   
 - Run `sudo docker build -t sustech_event:dev .` to create the docker image named `sustech_event`
+  
   Note that if it raises an error `ERROR [internal] load metadata for docker.io/library/node:alpine`, please change the `credsStore` value in `$HOME/.docker/config.json` from `desktop` to `osxkeychain`.
   The result is:
   
@@ -119,3 +120,18 @@ In the `FrontEnd` folder:
     <img src="pics/dockerSuccess.png" style="zoom:50%;" />
 
 - Publish the image `sustech_event` to DockerHub
+
+## 6. Collaborations
+
+-   Git board
+
+    <img src="pics/GitBoard.png" style="zoom:50%;" />
+
+-   Git contributors
+
+    <img src="pics/GitContributors.png" style="zoom:50%;" />
+
+-   Git network
+
+​	<img src="pics/GitNetwork.png" style="zoom:50%;" />
+

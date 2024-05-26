@@ -18,10 +18,16 @@
 </template>
 
 <script>
+/**
+     * AI-generated-content
+     * tool: ChatGPT
+     * version: 3.5
+     * usage: I used the prompt "generate a chat page", and
+     * directly copy the code from its response
+     */
 import axios from 'axios'
 import { register } from 'vue-advanced-chat'
 register()
-
 export default {
   data() {
     return {

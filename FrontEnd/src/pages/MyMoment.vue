@@ -128,6 +128,13 @@
 
 
 <script>
+/**
+     * AI-generated-content
+     * tool: ChatGPT
+     * version: 3.5
+     * usage: I used many prompts , and
+     * directly copy the code from its response
+     */
 import axios from 'axios';
 
 export default {

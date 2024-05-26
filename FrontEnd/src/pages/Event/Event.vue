@@ -131,6 +131,13 @@
 </template>
 
 <script>
+/**
+     * AI-generated-content
+     * tool: ChatGPT
+     * version: 3.5
+     * usage: I used many prompts , and
+     * directly copy the code from its response
+     */
 import TopNavbar from "@/layout/dashboard/TopNavbar.vue";
 import axios from "axios";
 import BaseAlert from "@/components/BaseAlert.vue";
