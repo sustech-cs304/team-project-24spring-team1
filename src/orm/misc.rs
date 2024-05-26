@@ -25,11 +25,6 @@ pub struct Participation {
 }
 
 type PlaceAll = Select<places::table, AsSelect<Place, Pg>>;
-type PlaceWithName<'a> = Eq<places::name, &'a str>;
-type PlaceByName<'a> = Filter<PlaceAll, PlaceWithName<'a>>;
-type PlaceIdByName<'a> = Select<PlaceByName<'a>, places::id>;
-type PlaceFind = Find<PlaceAll, i32>;
-pub type PlaceFindName = Select<PlaceFind, places::name>;
 
 type ParticipationFind = Find<participation::table, (i32, i32)>;
 type ParticipationByAccountId = Select<
@@ -54,14 +49,6 @@ type ParticipationByAccountId = Select<
 impl Place {
     pub fn all() -> PlaceAll {
         places::table.select(Place::as_select())
-    }
-
-    pub fn by_name(name: &str) -> PlaceIdByName<'_> {
-        Self::all().filter(places::name.eq(name)).select(places::id)
-    }
-
-    pub fn find(id: i32) -> PlaceFindName {
-        Self::all().find(id).select(places::name)
     }
 }
 

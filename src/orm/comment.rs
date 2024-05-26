@@ -1,5 +1,5 @@
 use chrono::prelude::*;
-use diesel::dsl::{AsSelect, Eq, Filter, Find, InnerJoin, Select};
+use diesel::dsl::{AsSelect, Eq, Filter, InnerJoin, Select};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::query_builder::InsertStatement;
@@ -7,7 +7,6 @@ use serde::Serialize;
 
 use super::account::AccountCard;
 use super::schema::*;
-use super::utils::Update;
 
 #[derive(Debug, Insertable)]
 #[diesel(table_name = comments)]
@@ -45,14 +44,10 @@ type Table = comments::table;
 type RawAll = Select<Table, AsSelect<Comment, Pg>>;
 type All = Filter<RawAll, Eq<comments::is_deleted, bool>>;
 type JoinAccount = InnerJoin<All, accounts::table>;
-type UpdateAll = Update<Table>;
-type WithId = Eq<comments::id, i32>;
 type WithEventId = Eq<comments::event_id, i32>;
-type FindId = Find<All, i32>;
 
 type ByEventId = Filter<All, WithEventId>;
 type ByEventIdDisplay = Filter<JoinAccount, WithEventId>;
-type UpdateId = Filter<UpdateAll, WithId>;
 
 impl Comment {
     pub fn all() -> All {
@@ -69,14 +64,6 @@ impl Comment {
         Self::all()
             .inner_join(accounts::table)
             .filter(comments::event_id.eq(event_id))
-    }
-
-    pub fn find(id: i32) -> FindId {
-        Self::all().find(id)
-    }
-
-    pub fn update(id: i32) -> UpdateId {
-        diesel::update(comments::table).filter(comments::id.eq(id))
     }
 }
 

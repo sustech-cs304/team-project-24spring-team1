@@ -9,14 +9,6 @@ use super::account::AccountCard;
 use super::schema::*;
 use super::utils::Update;
 
-// CREATE TABLE moments (
-//     id SERIAL PRIMARY KEY NOT NULL,
-//     account_id INT NOT NULL REFERENCES accounts(id),
-//     content TEXT NOT NULL,
-//     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-//     created_at TIMESTAMP NOT NULL DEFAULT NOW()
-// );
-
 #[derive(Debug, Insertable)]
 #[diesel(table_name = moments)]
 pub struct NewMoment<'a> {

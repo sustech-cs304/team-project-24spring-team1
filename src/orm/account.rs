@@ -85,21 +85,15 @@ type Table = accounts::table;
 type All = Select<Table, AsSelect<Account, Pg>>;
 type UpdateAll = Update<Table>;
 type WithId = Eq<accounts::id, i32>;
-type WithName<'a> = Eq<accounts::name, &'a str>;
 type WithStudentId = Eq<accounts::sustech_id, i32>;
 type FindId = Find<All, i32>;
 
-type ByName<'a> = Filter<All, WithName<'a>>;
 type ByStudentId = Filter<All, WithStudentId>;
 type UpdateId = Filter<UpdateAll, WithId>;
 
 impl Account {
     pub fn all() -> All {
         accounts::table.select(Account::as_select())
-    }
-
-    pub fn by_name(name: &str) -> ByName<'_> {
-        Self::all().filter(accounts::name.eq(name))
     }
 
     pub fn by_sustech_id(sustech_id: i32) -> ByStudentId {

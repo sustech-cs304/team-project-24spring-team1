@@ -2,7 +2,6 @@ use chrono::prelude::*;
 use diesel::dsl::{AliasedFields, AsSelect, CountStar, Desc, Eq, Filter, InnerJoin, Order, Select};
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use diesel::query_builder::InsertStatement;
 use diesel::query_source::Alias;
 use serde::Serialize;
 
@@ -126,9 +125,5 @@ impl NewChatMember {
             chat_id,
             account_id,
         }
-    }
-
-    pub fn as_insert(&self) -> InsertStatement<Table, <&Self as Insertable<Table>>::Values> {
-        diesel::insert_into(chat_members::table).values(self)
     }
 }

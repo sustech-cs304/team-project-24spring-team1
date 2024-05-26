@@ -179,10 +179,6 @@ impl Event {
     pub fn update(id: i32) -> UpdateId {
         diesel::update(events::table).filter(events::id.eq(id))
     }
-
-    pub fn venue(&self) -> super::misc::PlaceFindName {
-        Place::find(self.venue_id)
-    }
 }
 
 impl<'a> NewEvent<'a> {
