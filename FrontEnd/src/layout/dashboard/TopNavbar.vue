@@ -128,6 +128,13 @@
 </template>
 
 <script>
+/**
+     * AI-generated-content
+     * tool: ChatGPT
+     * version: 3.5
+     * usage: I used many prompts , and
+     * directly copy the code from its response
+     */
 import { CollapseTransition } from "vue2-transitions";
 import Modal from "@/components/Modal";
 import axios from "axios";
