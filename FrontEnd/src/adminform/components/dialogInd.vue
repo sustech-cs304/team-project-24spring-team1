@@ -118,6 +118,7 @@ export default {
       }
     });
   },
+
   computed: {
     filteredTableData() {
       const startIndex = (this.currentPage - 1) * this.pageSize;
@@ -216,16 +217,18 @@ export default {
       //this.tableData[this.editrowNum]=data;
       console.log("edit")
       console.log(this.editrowNum)
+      this.fetchData();
       this.tableData.splice(this.editrowNum,1,data)
       this.$nextTick(() => {
       });
-      console.log(this.tableData)
+      // console.log(this.tableData)
     },
     closeDialog(flag) {
       if (flag) {
         this.fetchData();
       }
       this.showDialog = false;
+      this.fetchData();
     },
 
     deleteRow(index,ifMsg){
@@ -242,6 +245,7 @@ export default {
                 message: `删除成功`,
                 type: "success",
               });
+              this.fetchData();
             }
           })
           .catch(error => {
@@ -249,8 +253,10 @@ export default {
             this.showFailMessage(`删除活动失败`);
             return false;
           })
+      this.fetchData();
       return true;
     },
+
     showFailMessage(message) {
       this.Message = message;
       this.$message({
@@ -273,6 +279,7 @@ export default {
       }
       if (check) {
         this.showSuccessMessage(`删除选择部分活动成功`);
+        this.fetchData();
       }else{
         this.showFailMessage(`不能删除非您发布的活动`);
       }
@@ -293,6 +300,7 @@ export default {
       if (!check) {
         this.showFailMessage(`不能删除非您发布的活动`);
       }
+      this.fetchData();
     },
 
   },
