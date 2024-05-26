@@ -1,4 +1,4 @@
-use diesel::dsl::{AsSelect, Eq, Filter, Find, InnerJoin, InnerJoinOn, Select};
+use diesel::dsl::{AsSelect, CountStar, Eq, Filter, Find, InnerJoin, InnerJoinOn, Select};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::query_builder::{DeleteStatement, InsertStatement, IntoUpdateTarget};
@@ -27,6 +27,8 @@ pub struct Participation {
 type PlaceAll = Select<places::table, AsSelect<Place, Pg>>;
 
 type ParticipationFind = Find<participation::table, (i32, i32)>;
+type ParticipationCountByEvent =
+    Select<Filter<participation::table, Eq<participation::event_id, i32>>, CountStar>;
 type ParticipationByAccountId = Select<
     Filter<
         Filter<
@@ -82,5 +84,11 @@ impl Participation {
             .filter(events::is_deleted.eq(false))
             .filter(participation::account_id.eq(account_id))
             .select(EventSummary::as_select())
+    }
+
+    pub fn count_event_participation(event_id: i32) -> ParticipationCountByEvent {
+        participation::table
+            .filter(participation::event_id.eq(event_id))
+            .count()
     }
 }

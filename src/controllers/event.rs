@@ -1,6 +1,8 @@
 use actix_web::{delete, get, post, web, HttpResponse, Responder};
 use chrono::prelude::*;
 use diesel::prelude::*;
+use diesel_async::AsyncConnection;
+use scoped_futures::ScopedFutureExt;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use validator::Validate;
@@ -218,8 +220,11 @@ async fn register_event(
     auth: JwtAuth,
 ) -> Result<impl Responder> {
     let id = path.into_inner();
-    let deadline: NaiveDateTime = Event::find(id)
-        .select(coalesce(events::registration_deadline, events::end_at))
+    let (deadline, tickets): (NaiveDateTime, Option<i32>) = Event::find(id)
+        .select((
+            coalesce(events::registration_deadline, events::end_at),
+            events::tickets,
+        ))
         .get_result(&mut state.pool.get().await?)
         .await?;
 
@@ -229,10 +234,28 @@ async fn register_event(
         ));
     }
 
-    Participation::new(auth.account_id, id)
-        .as_insert()
-        .execute(&mut state.pool.get().await?)
-        .await?;
+    let mut conn = state.pool.get().await?;
+    conn.transaction::<_, Error, _>(|conn| {
+        async move {
+            if let Some(tickets) = tickets {
+                let count: i64 = Participation::count_event_participation(id)
+                    .get_result(conn)
+                    .await?;
+                if count >= tickets as i64 {
+                    return Err(Error::NotAcceptable("No tickets left".into()));
+                }
+            }
+
+            Participation::new(auth.account_id, id)
+                .as_insert()
+                .execute(conn)
+                .await?;
+
+            Ok(())
+        }
+        .scope_boxed()
+    })
+    .await?;
 
     Ok(web::Json(serde_json::Value::Object(Default::default())))
 }

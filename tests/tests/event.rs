@@ -499,6 +499,31 @@ async fn test_event_deadline_passed() {
 }
 
 #[actix_web::test]
+async fn test_event_no_tickets() {
+    let app = create_app().await;
+    let account = create_default_account(&app).await;
+
+    let now = Utc::now().naive_utc();
+    let event_id = create_event(
+        &app,
+        &account,
+        &NewEventForm {
+            registration_deadline: Some(now.checked_add_days(Days::new(1)).unwrap()),
+            tickets: Some(0),
+            ..*DEFAULT_EVENT_1
+        },
+    )
+    .await;
+
+    let req = test::TestRequest::post()
+        .uri(&format!("/api/event/{event_id}/register"))
+        .insert_header(account.to_header_pair())
+        .to_request();
+    let resp = app.call(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::NOT_ACCEPTABLE);
+}
+
+#[actix_web::test]
 async fn test_event_comment() {
     let app = create_app().await;
     let account = create_default_account(&app).await;
