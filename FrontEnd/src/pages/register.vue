@@ -33,6 +33,7 @@
           <el-form-item label="sustech_id" prop="sustech_id">
             <el-col :span="10">
               <el-input
+                  style="color: white"
                 v-model="ruleForm.sustech_id"
                 placeholder="enter your sustech id"
               />
@@ -46,7 +47,6 @@
 <!--              @click="sendMsg"-->
 <!--            >send verification code</el-button>-->
 <!--            <span class="status">{{ statusMsg }}</span>-->
-
 
 <!--          <el-form-item label="verification" prop="code">-->
 <!--            <el-col :span="10">-->
@@ -101,7 +101,7 @@ export default {
       isDisable: false,
       codeLoading: false,
       ruleForm: {
-        sustech_id: '', // email: '',
+        sustech_id: '',
         name: '',
         // code: '',
         pwd: '',
@@ -240,191 +240,192 @@ export default {
 </script>
 
 
+<style></style>
 
-<style lang="scss" scoped>
-$bg: #dc8a8a;
-$cursor:white;
-$bgImage: url('@/adminform/assets/sustech2.png'); // 替换为你的背景图片路径
+<!--<style lang="scss" scoped>-->
+<!--$bg: #dc8a8a;-->
+<!--$cursor:white;-->
+<!--$bgImage: url('@/adminform/assets/sustech2.png'); // 替换为你的背景图片路径-->
 
-body {
-  min-height: 100vh;
-  width: 100%;
-  background-color: $bg;
-  background-image: $bgImage;
-  background-size: cover; // 使背景图片覆盖整个屏幕
-  background-position: center; // 背景图片居中
-  background-repeat: no-repeat; // 防止背景图片重复
-  opacity: 0.8; // 设置透明度
-  overflow: hidden;
+<!--body {-->
+<!--  min-height: 100vh;-->
+<!--  width: 100%;-->
+<!--  background-color: $bg;-->
+<!--  background-image: $bgImage;-->
+<!--  background-size: cover; // 使背景图片覆盖整个屏幕-->
+<!--  background-position: center; // 背景图片居中-->
+<!--  background-repeat: no-repeat; // 防止背景图片重复-->
+<!--  opacity: 0.8; // 设置透明度-->
+<!--  overflow: hidden;-->
 
-  .header {
-    border-bottom: 2px solid rgb(6, 7, 7);
-    min-width: 980px;
-    color: black;
+<!--  .header {-->
+<!--    border-bottom: 2px solid rgb(6, 7, 7);-->
+<!--    min-width: 980px;-->
+<!--    color: black;-->
 
-    header {
-      margin: 0 auto;
-      padding: 10px 0;
-      width: 980px;
+<!--    header {-->
+<!--      margin: 0 auto;-->
+<!--      padding: 10px 0;-->
+<!--      width: 980px;-->
 
-      .login {
-        float: right;
-      }
+<!--      .login {-->
+<!--        float: right;-->
+<!--      }-->
 
-      .bold {
-        font-style: normal;
-        color: black;
-      }
-    }
-  }
+<!--      .bold {-->
+<!--        font-style: normal;-->
+<!--        color: black;-->
+<!--      }-->
+<!--    }-->
+<!--  }-->
 
-  > section {
-    display: flex;
-    justify-content: center; // 水平居中
-    align-items: center; // 垂直居中
-    height: 100vh; // 确保容器有足够的高度来居中内容
-    padding-top: 30px;
-    box-sizing: border-box;
-    width: 980px;
-  }
+<!--  > section {-->
+<!--    display: flex;-->
+<!--    justify-content: center; // 水平居中-->
+<!--    align-items: center; // 垂直居中-->
+<!--    height: 100vh; // 确保容器有足够的高度来居中内容-->
+<!--    padding-top: 30px;-->
+<!--    box-sizing: border-box;-->
+<!--    width: 980px;-->
+<!--  }-->
 
-  .status {
-    font-size: 12px;
-    margin-left: 10%;
-    color: #e6a23c;
-  }
+<!--  .status {-->
+<!--    font-size: 12px;-->
+<!--    margin-left: 10%;-->
+<!--    color: #e6a23c;-->
+<!--  }-->
 
-  .error {
-    color: #e13030;
-  }
+<!--  .error {-->
+<!--    color: #e13030;-->
+<!--  }-->
 
-  .tips {
-    float: right;
-    font-size: 14px;
-    color: #ce1e1e;
-    margin-bottom: 20px;
+<!--  .tips {-->
+<!--    float: right;-->
+<!--    font-size: 14px;-->
+<!--    color: #ce1e1e;-->
+<!--    margin-bottom: 20px;-->
 
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
-  }
-}
-
-.register-container {
-  position: relative;
-  background: rgba(255, 255, 255, 0.9); // 设置表单容器的背景颜色和透明度
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
-  .el-input {
-    display: inline-block;
-    height: 100%;
-    width: 95%;
-
-    input {
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: 5px;
-      border: 1px solid rgba(150, 127, 127, 0.1);
-      -webkit-appearance: none;
-      padding: 12px 5px 12px 15px;
-      color: lightgray;
-      height: 50px;
-      caret-color: lightgray;
-
-      &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $bg inset !important;
-        -webkit-text-fill-color: $cursor !important;
-      }
-    }
-  }
-
-  .el-form-item {
-    label {
-      font-style: normal;
-      font-size: 12px;
-      color: black;
-    }
-  }
-}
-</style>
-
-<style lang="scss" scoped>
-$bg: #fafafa;
-
-body {
-  min-height: 100%;
-  width: 100%;
-  background-color: $bg;
-  overflow: hidden;
-
-  .header {
-    border-bottom: 2px solid rgb(6, 7, 7);
-    min-width: 980px;
-    color: black;
-
-    header {
-      margin: 0 auto;
-      padding: 10px 0;
-      width: 980px;
-
-      .login {
-        float: right;
-      }
-
-      .bold {
-        font-style: normal;
-        color: black;
-      }
-    }
-  }
-
-  > section {
-    margin: 0 auto 30px;
-    padding-top: 30px;
-    width: 980px;
-    min-height: 300px;
-    padding-right: 100px;
-    box-sizing: border-box;
-
-    .status {
-      font-size: 12px;
-      margin-left: 10%;
-      color: #e6a23c;
-    }
-
-    .error {
-      color: #e13030;
-    }
-  }
-
-  .tips {
-    float: right;
-    font-size: 14px;
-    color: #ce1e1e;
-    margin-bottom: 20px;
-
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
-  }
-}
-</style>
-
-
-<!--<style scoped>-->
-<!--/* 修改验证器样式 */-->
-<!--::v-deep .el-form-item.is-error .el-input__inner {-->
-<!--  border-color: #889aa4;-->
+<!--    span {-->
+<!--      &:first-of-type {-->
+<!--        margin-right: 16px;-->
+<!--      }-->
+<!--    }-->
+<!--  }-->
 <!--}-->
-<!--::v-deep .el-form-item.is-error .el-input__validateIcon {-->
-<!--  color: #c2ddec;-->
-<!--}-->
-<!--::v-deep .el-form-item__error {-->
-<!--  color: #eaa43a;-->
+
+<!--.register-container {-->
+<!--  position: relative;-->
+<!--  background: rgba(255, 255, 255, 0.9); // 设置表单容器的背景颜色和透明度-->
+<!--  padding: 20px;-->
+<!--  border-radius: 8px;-->
+<!--  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);-->
+
+<!--  .el-input {-->
+<!--    display: inline-block;-->
+<!--    height: 100%;-->
+<!--    width: 95%;-->
+
+<!--    input {-->
+<!--      background: rgba(0, 0, 0, 0.1);-->
+<!--      border-radius: 5px;-->
+<!--      border: 1px solid rgba(150, 127, 127, 0.1);-->
+<!--      -webkit-appearance: none;-->
+<!--      padding: 12px 5px 12px 15px;-->
+<!--      color: lightgray;-->
+<!--      height: 50px;-->
+<!--      caret-color: lightgray;-->
+
+<!--      &:-webkit-autofill {-->
+<!--        box-shadow: 0 0 0px 1000px $bg inset !important;-->
+<!--        -webkit-text-fill-color: $cursor !important;-->
+<!--      }-->
+<!--    }-->
+<!--  }-->
+
+<!--  .el-form-item {-->
+<!--    label {-->
+<!--      font-style: normal;-->
+<!--      font-size: 12px;-->
+<!--      color: black;-->
+<!--    }-->
+<!--  }-->
 <!--}-->
 <!--</style>-->
+
+<!--<style lang="scss" scoped>-->
+<!--$bg: #fafafa;-->
+
+<!--body {-->
+<!--  min-height: 100%;-->
+<!--  width: 100%;-->
+<!--  background-color: $bg;-->
+<!--  overflow: hidden;-->
+
+<!--  .header {-->
+<!--    border-bottom: 2px solid rgb(6, 7, 7);-->
+<!--    min-width: 980px;-->
+<!--    color: black;-->
+
+<!--    header {-->
+<!--      margin: 0 auto;-->
+<!--      padding: 10px 0;-->
+<!--      width: 980px;-->
+
+<!--      .login {-->
+<!--        float: right;-->
+<!--      }-->
+
+<!--      .bold {-->
+<!--        font-style: normal;-->
+<!--        color: black;-->
+<!--      }-->
+<!--    }-->
+<!--  }-->
+
+<!--  > section {-->
+<!--    margin: 0 auto 30px;-->
+<!--    padding-top: 30px;-->
+<!--    width: 980px;-->
+<!--    min-height: 300px;-->
+<!--    padding-right: 100px;-->
+<!--    box-sizing: border-box;-->
+
+<!--    .status {-->
+<!--      font-size: 12px;-->
+<!--      margin-left: 10%;-->
+<!--      color: #e6a23c;-->
+<!--    }-->
+
+<!--    .error {-->
+<!--      color: #e13030;-->
+<!--    }-->
+<!--  }-->
+
+<!--  .tips {-->
+<!--    float: right;-->
+<!--    font-size: 14px;-->
+<!--    color: #ce1e1e;-->
+<!--    margin-bottom: 20px;-->
+
+<!--    span {-->
+<!--      &:first-of-type {-->
+<!--        margin-right: 16px;-->
+<!--      }-->
+<!--    }-->
+<!--  }-->
+<!--}-->
+<!--</style>-->
+
+
+<style scoped>
+/* 修改验证器样式 */
+::v-deep .el-form-item.is-error .el-input__inner {
+  border-color: #889aa4;
+}
+::v-deep .el-form-item.is-error .el-input__validateIcon {
+  color: #c2ddec;
+}
+::v-deep .el-form-item__error {
+  color: #eaa43a;
+}
+</style>

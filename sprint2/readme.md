@@ -108,3 +108,18 @@ The profile page contains some basic information of you, which is public to ever
 After registration, you will be given a default avatar shown below and a default email address in `SID + @mail.sustech.edu.cn`. You can change your profile in the setting page.
 
 <img src="pics/profile.png" style="zoom:50%;" />
+
+### Setting
+
+You can modify your personal information here. Note that some of the information is not able to change.
+
+If you want to change your avatar, you can click the current avatar and upload a new image. You are not able to edit the picture, and the image will be pressed into a circle as your new avatar.
+
+<img src="pics/setting.png" style="zoom:50%;" />
+
+## Chat
+
+You can chat with others by clicking the chat button in the top bar.
+
+Note that you can only get in touch to a new user through his/her profile page. In another user's profile page, once you click the chat button shown in profile section, a chat room contains you and that user will be constructed by sending a message `Hi! My sid is {your SID}, and I wannt chat with you!` from you to that user.
+
