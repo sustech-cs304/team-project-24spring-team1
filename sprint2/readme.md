@@ -1,47 +1,46 @@
 # SUSTech Event
 
-On the SUSTech campus, there is a wide variety of channels for releasing information about events, covering various methods such as emails, public numbers, QQ groups, etc. However, this diversity also brings some inconvenience to students and faculty. For example, students who want to participate in an event need to search for the availability of relevant information on various channels, which causes a certain degree of inconvenience. In addition, event organizers also need to release information about the event on different channels. At the same time, there may be many different registration forms, such as using questionnaire stars, WeChat groups, or filling out Tencent documents. 
+On the SUSTech campus, information about events is disseminated through various channels, including emails, public announcements, QQ groups, and more. However, this diversity can lead to inconvenience for students and faculty. For example, students who want to participate in an event need to search for relevant information across multiple channels, which can be cumbersome. Additionally, event organizers must disseminate information about events on various platforms, often using different registration forms, such as questionnaires, WeChat groups, or Tencent documents.
 
-We plan to develop a comprehensive campus event service website to address these issues and make life easier for SUSTech students and faculty. The site will allow SUSTech students and faculty to browse information about various performances (e.g., musical concerts), lectures, competitions, and other events on campus and provide functions such as booking, purchasing tickets, and writing reviews. 
+To address these issues and simplify life for SUSTech students and faculty, we plan to develop a comprehensive campus event service website. This site will allow users to browse information about various events, such as musical concerts, lectures, competitions, and more. It will also provide functionalities like booking, purchasing tickets, and writing reviews.
 
-That is SUSTech Event, an open-source, lightweight event management system for students in SUSTech, based on Vue.
+Introducing SUSTech Event, an open-source, lightweight event management system for SUSTech students, based on Vue.
 
 ## Features
 
--   Responsive user interface
--   Visitor / CAS authentication for registration and login
--   Event list
--   Moment list
-
--   Comment
--   Chat room
--   Hilarious and cute stickers
--   Support images and videos
--   Security
+- Responsive user interface
+- Visitor / CAS authentication for registration and login
+- Event list
+- Moment list
+- Comments
+- Chat room
+- Hilarious and cute stickers
+- Support for images and videos
+- Security
 
 ## Installation
 
 ### Requirements
 
-Before building SUSTech Event from the source, you must install several prerequisites. First, you must install NPM using `sudo apt install npm` in Linux or `brew install npm` in MacOS. After that, you can enter the dictionary of `package.json` and run `npm install` to install all compulsory packages. Finally, run `npm run serve` to launch the project.
+Before building SUSTech Event from the source, you must install several prerequisites. First, install NPM using `sudo apt install npm` on Linux or `brew install npm` on macOS. After that, navigate to the directory containing `package.json` and run `npm install` to install all necessary packages. Finally, run `npm run serve` to launch the project.
 
-It's highly recommended that you could use Google Chrome to visit the website.
+It is highly recommended to use Google Chrome to visit the website.
 
 ### Build
 
-In the dictionary of `package.json`, you can run `npm run build` to generate the `dist` folder.
+In the directory containing `package.json`, you can run `npm run build` to generate the `dist` folder.
 
 ## Login & Register
 
 ### Login
 
-Note that you can log in as a visitor or through CAS. If you want to log in as a visitor, as you don't have a visitor account, you can click `no account? register now` to register a visitor account.
+Note that you can log in as a visitor or through CAS. If you want to log in as a visitor and do not have an account, click `no account? register now` to register a visitor account.
 
 <img src="pics/login.png" style="zoom:50%;" />
 
 ### Register
 
-To log in as a visitor, you should register by providing your SID, name, and password. Your email address will be set to `SID + @mail.sustech.edu.cn` as default, which can be changed on the profile page.
+To log in as a visitor, you should register by providing your SID, name, and password. Your email address will be set to `SID + @mail.sustech.edu.cn` by default, which can be changed on the profile page.
 
 <img src="pics/register.png" style="zoom:50%;" />
 
@@ -49,19 +48,19 @@ To log in as a visitor, you should register by providing your SID, name, and pas
 
 ### Browse events
 
-After logging in successfully, you will be redirected to an event browse page, which is the home page.
+After logging in successfully, you will be redirected to the event browsing page, which is the home page.
 
 ![](pics/dashboard.png)
 
-As is shown above, you can select preferred events to participate in. The home page contains three parts, top bar, leftside bar, and the main area. The `My Moment` button and the two icon buttons in the rightmost of the top bar will be introduced in further sections.
+As shown above, you can select preferred events to participate in. The home page contains three parts: the top bar, the left sidebar, and the main area. The `My Moment` button and the two icon buttons on the far right of the top bar will be introduced in further sections.
 
-Basically, the main area shows events you can choose to enter by clicking `Event Detail`. The events are of four types, show, lecture, competition, and others. You can use the filter button in the left bar to select events that have the specified type. If you choose none of the types, it will show all of the events.
+Basically, the main area shows events you can choose to enter by clicking `Event Detail`. The events are of four types: show, lecture, competition, and others. You can use the filter button in the left bar to select events of a specified type. If you choose none of the types, it will show all the events.
 
 Take events whose types are `lecture` or `competition` as an example.
 
 <img src="pics/fliterEvent.png" style="zoom:50%;" />
 
-What's more, the search area in the top bar can help you find events by the name.
+Additionally, the search area in the top bar can help you find events by name.
 
 Take events whose names contain `science` as an example.
 
@@ -71,49 +70,49 @@ Take events whose names contain `science` as an example.
 
 If you find an event that you are interested in, you can see the details after clicking `Event Detail`.
 
-**Todo: picture**
+<img src="pics/eventDetail.png" style="zoom:50%;" />
 
-Here you can check the time, place, holder, and tickets remaining. You can click `Register` to note that you will attend it.
+Here you can check the time, place, organizer, and tickets remaining. You can click `Register` to note that you will attend it.
 
-What's more, you can make a comment and look through others' comments. You can click the name to see the student's profile, and get in touch to him/her if needed, which will be introduced later.
+Additionally, you can make a comment and view others' comments. You can click the name to see the student's profile and get in touch with them if needed, which will be introduced later.
 
 ### My events
 
-You can check your events that you have entered or will enter. You can click `Check` to verify details.
+You can check the events you have entered or will enter. You can click `Check` to verify details.
 
 <img src="pics/myEvent.png" style="zoom:50%;" />
 
 ## Moment
 
-This page shows "moments" published by all the users. Actually, it is very similar to Tencent Qzone. You can enjoy others' moments and comment to them.
+This page shows "moments" published by all users. It is similar to Tencent Qzone. You can enjoy others' moments and comment on them.
 
 <img src="pics/myMoment.png" style="zoom:50%;" />
 
-Click the `shoot!` to make a comment, and click `Show` to show all the comments corresponding to the moment.
+Click `shoot!` to make a comment, and click `Show` to display all comments related to the moment.
 
 <img src="pics/myMomentComment.png" style="zoom:50%;" />
 
-You can also publish your moment which can contain at most one picture.
+You can also publish your own moment, which can contain at most one picture.
 
-The time format is polished, which makes the interface more hommization.
+The time format is polished, enhancing the user experience.
 
 ## Profile
 
-Click the avatar button in the top bar, you can check or modify your profile.
+Click the avatar button in the top bar to check or modify your profile.
 
 ### Profile
 
-The profile page contains some basic information of you, which is public to every user. Users can see your avatar, name, SID, role, and a short description. What's more, the chat button can construct a chat room of you and the user corresponds to the profile page, and the email button allows you to write an email to the user. Note that you are not able to chat with yourself.
+The profile page contains basic information about you, which is public to every user. Users can see your avatar, name, SID, role, and a short description. Additionally, the chat button can initiate a chat room with the user corresponding to the profile page, and the email button allows you to send an email to the user. Note that you cannot chat with yourself.
 
-After registration, you will be given a default avatar shown below and a default email address in `SID + @mail.sustech.edu.cn`. You can change your profile in the setting page.
+After registration, you will be given a default avatar (shown below) and a default email address in the format `SID + @mail.sustech.edu.cn`. You can change your profile in the settings page.
 
 <img src="pics/profile.png" style="zoom:50%;" />
 
 ### Setting
 
-You can modify your personal information here. Note that some of the information is not able to change.
+You can modify your personal information here. Note that some of the information cannot be changed.
 
-If you want to change your avatar, you can click the current avatar and upload a new image. You are not able to edit the picture, and the image will be pressed into a circle as your new avatar.
+To change your avatar, click the current avatar and upload a new image. You are not able to edit the picture, and the image will be pressed into a circle as your new avatar.
 
 <img src="pics/setting.png" style="zoom:50%;" />
 
@@ -121,20 +120,20 @@ If you want to change your avatar, you can click the current avatar and upload a
 
 You can chat with others by clicking the chat button in the top bar.
 
-Note that you can only get in touch to a new user through his/her profile page. In another user's profile page, once you click the chat button shown in profile section, a chat room contains you and that user will be constructed by sending a message `Hi! My sid is {your SID}, and I wanna chat with you!` from you to that user.
+Note that you can only initiate contact with a new user through their profile page. On another user's profile page, once you click the chat button (shown in the profile section), a chat room containing you and that user will be created by sending a message saying `Hi! My SID is {your SID}, and I want to chat with you!` from you to that user.
 
--   The chat page supports various kinds of messages, including text, image, video, emoji, etc. You can watch the video online.
+- The chat page supports various kinds of messages, including text, images, videos, and emojis. You can watch videos online.
 
 <img src="pics/chat1.png" style="zoom:50%;" />
 
 <img src="pics/chat2.png" style="zoom:50%;" />
 
--   The chat page supports instant communication. That means, if someone sends a message to you, you can receive it within 2 seconds without refreshing the page.
+- The chat page supports instant communication. That means if someone sends a message to you, you can receive it within 2 seconds without refreshing the page.
 
--   The chat page supports searching specified user according to the name.
+- The chat page supports searching for a specified user by name.
 
 <img src="pics/chat3.png" style="zoom:50%;" />
 
--   The chat page supports fold the user bar.
+- The chat page supports folding the user bar.
 
 <img src="pics/chat4.png" style="zoom:50%;" />
