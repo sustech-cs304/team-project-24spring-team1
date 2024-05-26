@@ -48,9 +48,30 @@ Please refer to `readme.md` and `readme_for_developer.md`.
 
 ## 4. Build
 
+#### Tools
+
+Node.js and npm: Used for managing project dependencies and running build scripts.
+
+#### Tasks Executed in a Build
+
+1. Dependency Installation: Use `npm install` to install all necessary dependencies for the project.
+2. Compilation and Packaging: Use `npm run build` to compile the source code and produce the final deployable artifacts.
+
+#### Build Process
+
 - In the `vue.config.js` file, add `publicPath: './',` to `module.exports`
 - Run `npm run build` in the `FrontEnd` folder.
 - Find `dist` folder, open `index.html` in browser.
+
+#### Final Artifacts
+
+**dist folder**:
+
+<img src="pics/build_dist.png" style="zoom:50%;" />
+
+**index.html**:
+
+<img src="pics/build_index.png" style="zoom:50%;" />
 
 ## 5. Deployment
 
