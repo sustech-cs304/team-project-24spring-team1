@@ -29,7 +29,7 @@
     >
       <el-card :body-style="{ padding: '0px' }">
         <img alt="image unable to render"
-             src="@/adminform/assets/img.png"
+             src="../assets/sustech2.png"
              class="image"
         />
         <div style="padding: 14px">
