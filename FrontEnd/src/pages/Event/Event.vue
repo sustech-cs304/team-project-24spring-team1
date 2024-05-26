@@ -15,7 +15,7 @@
                 </div>
                 <div class="col">
                   <div>
-                    <h2 class="card-title">{{ event.name }}</h2>
+                    <h3 class="card-title">{{ event.name }}</h3>
                     <div>
                       <base-button class="animation-on-hover" simple type="primary">{{ event.kind }}</base-button>
                     </div>
