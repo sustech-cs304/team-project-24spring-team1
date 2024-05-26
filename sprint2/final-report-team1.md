@@ -48,7 +48,9 @@ Please refer to `readme.md` and `readme_for_developer.md`.
 
 ## 4. Build
 
-Run `npm run build` in the `FrontEnd` folder.
+- In the `vue.config.js` file, add `publicPath: './',` to `module.exports`
+- Run `npm run build` in the `FrontEnd` folder.
+- Find `dist` folder, open `index.html` in browser.
 
 ## 5. Deployment
 
