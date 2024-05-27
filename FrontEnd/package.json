@@ -12,11 +12,7 @@
     "dev": "vue-cli-service serve --open",
     "lint-fix": "vue-cli-service lint --fix",
     "prettify": "prettier --write .",
-<<<<<<< HEAD
     "test": "jest"
-=======
-    "test:unit": "jest"
->>>>>>> cded6bcfcb8880efa4795b00f90d517a9939edb0
   },
   "dependencies": {
     "chalk": "^5.3.0",
