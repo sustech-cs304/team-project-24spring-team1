@@ -42,7 +42,7 @@
                     <div>
                       <i class="tim-icons icon-bell-55" style="display: inline-block;"></i>
                       <span style="margin-left: 10px;"></span>
-                      <p class="card-text" style="display: inline-block;">{{ new Date(event.registration_deadline).toLocaleString() }}</p>
+                      <p class="card-text" style="display: inline-block;">Register Deadline: {{ new Date(event.registration_deadline).toLocaleString() }}</p>
                     </div>
                     <br>
                     <div>
@@ -282,7 +282,7 @@ export default {
                   break;
                 case 'not_acceptable':
                   this.errorMessage = 'The registration deadline has passed.';
-                  this.$message.error("The registration deadline has passed.")
+                  this.$message.error(error.response.data.message);
                   break;
                 case 'record_already_exists':
                   this.errorMessage = 'You have already registered for the event.';
