@@ -210,8 +210,9 @@ export default {
       });
     },
 
-    updateTable(data){
-      this.tableData.push(data);
+    updateTable(){
+      // this.tableData.push(data);
+      this.fetchData();
     },
     updateEdit(data){
       //this.tableData[this.editrowNum]=data;
@@ -223,12 +224,13 @@ export default {
       });
       // console.log(this.tableData)
     },
+
     closeDialog(flag) {
       if (flag) {
         this.fetchData();
       }
       this.showDialog = false;
-      this.fetchData();
+      // this.fetchData();
     },
 
     deleteRow(index,ifMsg){
@@ -245,7 +247,7 @@ export default {
                 message: `删除成功`,
                 type: "success",
               });
-              this.fetchData();
+              // this.fetchData();
             }
           })
           .catch(error => {
