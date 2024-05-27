@@ -2,7 +2,7 @@
 
 ## 1. Metrics
 
-#### FrontEnd
+#### Frontend
 
 - Lines of Code 
 
@@ -40,11 +40,13 @@
   - Command: `npm list --depth=0`
   - Result: 36 dependencies
 
+#### Backend
+
 - Lines of Code and Number of Source Files
 
   ```
   $ cloc . --exclude-dir=target
-
+  
   -----------------------------------------------------------------------------------
   Language                         files          blank        comment           code
   -----------------------------------------------------------------------------------
@@ -71,11 +73,11 @@
 
 ## 2. Documentation
 
-Please refer to `readme.md` and `readme_for_developer.md`.
+Please refer to  [readme](readme.md) and [readme_for_developer](readme_for_developer.md)
 
 ## 3. Tests
 
-#### FrontEnd
+#### Frontend
 
 We've encountered some challenges while using Jest for testing, which has prevented us from employing automated scripts. As a result, we've switched to manual testing for the time being. While this increases the time and effort required for testing, it provides us with a more intuitive testing process, allowing for a deeper understanding of the code's behavior and potential issues. Although manual testing may not be as efficient as automation, we remain committed to ensuring code quality and are actively working to address the current challenges so that we can resume automated testing as soon as possible. There are some figures that show our error.<img src="pics/test_error.png" style="zoom:40%;" />
 
@@ -190,10 +192,10 @@ In the `FrontEnd` folder:
   COPY . .
   RUN rustup target add x86_64-unknown-linux-musl \
    && cargo build --release --target x86_64-unknown-linux-musl --bin backend --features cli
-
+  
   FROM scratch
   COPY --from=0 /etc/passwd /etc/passwd
-
+  
   COPY --from=0 /build/target/x86_64-unknown-linux-musl/release/backend /backend
   CMD ["/backend"]
   ```
@@ -208,7 +210,7 @@ In the `FrontEnd` folder:
 
   ``` yml
     version: "3"
-
+  
   services:
     db:
       image: postgres:16
@@ -218,7 +220,7 @@ In the `FrontEnd` folder:
         POSTGRES_DB: "robetta"
       volumes:
         - "db:/var/lib/postgresql/data"
-
+  
     traefik:
       image: traefik:v2.11
       ports:
@@ -228,7 +230,7 @@ In the `FrontEnd` folder:
         - "./dynamic.yml:/etc/traefik/dynamic.yml:ro,noexec"
         - "./traefik.yml:/etc/traefik/traefik.yml:ro,noexec"
         - "./certs:/etc/traefik/certs:ro"
-
+  
     image:
       image: image-hosting
       build: ../services/image-hosting
@@ -239,7 +241,7 @@ In the `FrontEnd` folder:
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.image.loadbalancer.server.port=8000"
-
+  
     backend:
       image: backend
       build:
@@ -256,14 +258,14 @@ In the `FrontEnd` folder:
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.backend.loadbalancer.server.port=8080"
-
+  
     frontend:
       image: frontend
       read_only: true
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.backend.loadbalancer.server.port=8080"
-
+  
   volumes:
     db:
   ```
